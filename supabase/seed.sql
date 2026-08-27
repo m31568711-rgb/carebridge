@@ -203,3 +203,66 @@ insert into public.app_settings(key,value,description_key,is_public) values
 ('platform.supported_languages','["en","fr","ar"]','settings.supportedLanguages',true),
 ('platform.demo_data','{"fictional":true,"label":"CareBridge demonstration data"}','settings.demoData',false)
 on conflict (key) do update set value=excluded.value,is_public=excluded.is_public;
+
+-- Deterministic coordinates support Part 3 list/map discovery without relying on a map vendor.
+update public.hospital_branches hb set
+  latitude = points.latitude,
+  longitude = points.longitude
+from (values
+  ('51000000-0000-0000-0000-000000000001'::uuid, 30.044420::numeric, 31.235712::numeric),
+  ('51000000-0000-0000-0000-000000000002'::uuid, 30.013056::numeric, 31.208853::numeric),
+  ('51000000-0000-0000-0000-000000000003'::uuid, 31.200092::numeric, 29.918739::numeric),
+  ('51000000-0000-0000-0000-000000000004'::uuid, 33.573110::numeric, -7.589843::numeric),
+  ('51000000-0000-0000-0000-000000000006'::uuid, 14.716677::numeric, -17.467686::numeric),
+  ('51000000-0000-0000-0000-000000000008'::uuid, -1.944072::numeric, 30.061885::numeric),
+  ('51000000-0000-0000-0000-000000000010'::uuid, 5.603717::numeric, -0.186964::numeric),
+  ('51000000-0000-0000-0000-000000000012'::uuid, -1.292066::numeric, 36.821946::numeric)
+) as points(id, latitude, longitude)
+where hb.id = points.id;
+
+update public.pharmacies p set
+  latitude = points.latitude,
+  longitude = points.longitude
+from (values
+  ('70000000-0000-0000-0000-000000000001'::uuid, 30.050000::numeric, 31.240000::numeric),
+  ('70000000-0000-0000-0000-000000000003'::uuid, 33.580000::numeric, -7.600000::numeric),
+  ('70000000-0000-0000-0000-000000000004'::uuid, 14.720000::numeric, -17.450000::numeric),
+  ('70000000-0000-0000-0000-000000000005'::uuid, -1.950000::numeric, 30.070000::numeric),
+  ('70000000-0000-0000-0000-000000000008'::uuid, 5.350000::numeric, -4.020000::numeric),
+  ('70000000-0000-0000-0000-000000000009'::uuid, 6.524379::numeric, 3.379206::numeric)
+) as points(id, latitude, longitude)
+where p.id = points.id;
+
+insert into public.radiology_centers (
+  id, legal_name, display_name_i18n, slug, description_i18n, country_id, city_id,
+  address_i18n, public_phone, public_email, latitude, longitude, status, verification_state
+) values
+  ('80000000-0000-0000-0000-000000000001', 'CareBridge Demo Nile Imaging', '{"en":"Nile Precision Imaging","fr":"Imagerie de Précision du Nil","ar":"مركز النيل للتصوير الدقيق"}', 'nile-precision-imaging', '{"en":"Fictional diagnostic imaging center for CareBridge demonstrations.","fr":"Centre fictif d’imagerie diagnostique pour les démonstrations CareBridge.","ar":"مركز تصوير تشخيصي خيالي لعروض كيربريدج."}', '10000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', '{"en":"CareBridge demo address","fr":"Adresse de démonstration CareBridge","ar":"عنوان تجريبي لكيربريدج"}', '+000 800 0001', 'imaging@example.invalid', 30.047000, 31.233000, 'ACTIVE', 'VERIFIED'),
+  ('80000000-0000-0000-0000-000000000002', 'CareBridge Demo Atlas Imaging', '{"en":"Atlas Advanced Radiology","fr":"Radiologie Avancée Atlas","ar":"أطلس للأشعة المتقدمة"}', 'atlas-advanced-radiology', '{"en":"Fictional diagnostic imaging center for CareBridge demonstrations.","fr":"Centre fictif d’imagerie diagnostique pour les démonstrations CareBridge.","ar":"مركز تصوير تشخيصي خيالي لعروض كيربريدج."}', '10000000-0000-0000-0000-000000000007', '20000000-0000-0000-0000-000000000015', '{"en":"CareBridge demo address","fr":"Adresse de démonstration CareBridge","ar":"عنوان تجريبي لكيربريدج"}', '+000 800 0002', 'imaging@example.invalid', 33.575000, -7.595000, 'ACTIVE', 'VERIFIED'),
+  ('80000000-0000-0000-0000-000000000003', 'CareBridge Demo Acacia Imaging', '{"en":"Acacia Diagnostic Imaging","fr":"Imagerie Diagnostique Acacia","ar":"أكاسيا للتصوير التشخيصي"}', 'acacia-diagnostic-imaging', '{"en":"Fictional diagnostic imaging center for CareBridge demonstrations.","fr":"Centre fictif d’imagerie diagnostique pour les démonstrations CareBridge.","ar":"مركز تصوير تشخيصي خيالي لعروض كيربريدج."}', '10000000-0000-0000-0000-000000000009', '20000000-0000-0000-0000-000000000021', '{"en":"CareBridge demo address","fr":"Adresse de démonstration CareBridge","ar":"عنوان تجريبي لكيربريدج"}', '+000 800 0003', 'imaging@example.invalid', -1.286000, 36.817000, 'DRAFT', 'DRAFT')
+on conflict (id) do update set display_name_i18n=excluded.display_name_i18n, description_i18n=excluded.description_i18n,
+  latitude=excluded.latitude, longitude=excluded.longitude, status=excluded.status, verification_state=excluded.verification_state;
+
+insert into public.medical_laboratories (
+  id, legal_name, display_name_i18n, slug, description_i18n, country_id, city_id,
+  address_i18n, public_phone, public_email, latitude, longitude, status, verification_state
+) values
+  ('90000000-0000-0000-0000-000000000001', 'CareBridge Demo Meridian Labs', '{"en":"Meridian Clinical Laboratories","fr":"Laboratoires Cliniques Meridian","ar":"مختبرات ميريديان السريرية"}', 'meridian-clinical-laboratories', '{"en":"Fictional medical laboratory for CareBridge demonstrations.","fr":"Laboratoire médical fictif pour les démonstrations CareBridge.","ar":"مختبر طبي خيالي لعروض كيربريدج."}', '10000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', '{"en":"CareBridge demo address","fr":"Adresse de démonstration CareBridge","ar":"عنوان تجريبي لكيربريدج"}', '+000 900 0001', 'laboratory@example.invalid', 30.040000, 31.230000, 'ACTIVE', 'VERIFIED'),
+  ('90000000-0000-0000-0000-000000000002', 'CareBridge Demo Teranga Labs', '{"en":"Teranga Reference Laboratory","fr":"Laboratoire de Référence Teranga","ar":"مختبر تيرانغا المرجعي"}', 'teranga-reference-laboratory', '{"en":"Fictional medical laboratory for CareBridge demonstrations.","fr":"Laboratoire médical fictif pour les démonstrations CareBridge.","ar":"مختبر طبي خيالي لعروض كيربريدج."}', '10000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000006', '{"en":"CareBridge demo address","fr":"Adresse de démonstration CareBridge","ar":"عنوان تجريبي لكيربريدج"}', '+000 900 0002', 'laboratory@example.invalid', 14.710000, -17.460000, 'ACTIVE', 'VERIFIED'),
+  ('90000000-0000-0000-0000-000000000003', 'CareBridge Demo Summit Labs', '{"en":"Summit Molecular Laboratory","fr":"Laboratoire Moléculaire Summit","ar":"مختبر ساميت الجزيئي"}', 'summit-molecular-laboratory', '{"en":"Fictional medical laboratory for CareBridge demonstrations.","fr":"Laboratoire médical fictif pour les démonstrations CareBridge.","ar":"مختبر طبي خيالي لعروض كيربريدج."}', '10000000-0000-0000-0000-000000000010', '20000000-0000-0000-0000-000000000023', '{"en":"CareBridge demo address","fr":"Adresse de démonstration CareBridge","ar":"عنوان تجريبي لكيربريدج"}', '+000 900 0003', 'laboratory@example.invalid', -1.948000, 30.065000, 'ACTIVE', 'PENDING_REVIEW')
+on conflict (id) do update set display_name_i18n=excluded.display_name_i18n, description_i18n=excluded.description_i18n,
+  latitude=excluded.latitude, longitude=excluded.longitude, status=excluded.status, verification_state=excluded.verification_state;
+
+insert into public.radiology_center_specialties (radiology_center_id, specialty_id) values
+  ('80000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000002'),
+  ('80000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003'),
+  ('80000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000009'),
+  ('80000000-0000-0000-0000-000000000003', '30000000-0000-0000-0000-000000000015')
+on conflict do nothing;
+
+insert into public.medical_laboratory_specialties (medical_laboratory_id, specialty_id) values
+  ('90000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003'),
+  ('90000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000006'),
+  ('90000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000012'),
+  ('90000000-0000-0000-0000-000000000003', '30000000-0000-0000-0000-000000000009')
+on conflict do nothing;

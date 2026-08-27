@@ -35,7 +35,9 @@ export function DashboardShell({ portal, locale, dictionary, context, children }
         <nav aria-label={dictionary.common.dashboard} className="mt-7 flex-1 space-y-1">
           {config.navigation.map((item) => {
             const active = 'active' in item && item.active;
-            return <span aria-current={active ? 'page' : undefined} aria-disabled={!active} className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/15' : 'cursor-default text-slate-500'}`} key={item.label}><item.icon aria-hidden="true" className="size-5" />{item.label}{!active ? <span className="ms-auto size-1.5 rounded-full bg-slate-200" /> : null}</span>;
+            const href = 'href' in item ? `/${locale}/${portal}${item.href}` : null;
+            const content = <><item.icon aria-hidden="true" className="size-5" />{item.label}{!href ? <span className="ms-auto size-1.5 rounded-full bg-slate-200" /> : null}</>;
+            return href ? <Link aria-current={active ? 'page' : undefined} className={`flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/15' : 'text-slate-600 transition hover:bg-slate-100'}`} href={href} key={item.label}>{content}</Link> : <span aria-disabled="true" className="flex min-h-11 cursor-default items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-500" key={item.label}>{content}</span>;
           })}
         </nav>
         <div className="border-t border-slate-100 pt-5"><Link className="flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm font-medium text-slate-600 transition hover:bg-slate-100" href={`/${locale}`}><Menu aria-hidden="true" className="size-4" />{dictionary.auth.shared.returnHome}</Link></div>
@@ -54,7 +56,7 @@ export function DashboardShell({ portal, locale, dictionary, context, children }
             </div>
           </div>
           <div className="flex gap-2 overflow-x-auto border-t border-slate-200 px-5 py-3 lg:hidden">
-            {config.navigation.map((item) => <span className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold ${'active' in item && item.active ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`} key={item.label}><item.icon aria-hidden="true" className="size-4" />{item.label}</span>)}
+            {config.navigation.map((item) => { const href = 'href' in item ? `/${locale}/${portal}${item.href}` : null; const className = `inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold ${'active' in item && item.active ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`; const content = <><item.icon aria-hidden="true" className="size-4" />{item.label}</>; return href ? <Link className={className} href={href} key={item.label}>{content}</Link> : <span className={className} key={item.label}>{content}</span>; })}
           </div>
         </header>
         <main className="px-5 py-8 sm:px-8 lg:px-10 lg:py-10" id="main-content">{children}</main>

@@ -20,7 +20,7 @@ import type { Dictionary } from '@/src/i18n/messages/en';
 
 export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
   const navigation = dictionary.dashboard.navigation;
-  const base = [{ icon: LayoutDashboard, label: navigation.overview, active: true }];
+  const base = [{ icon: LayoutDashboard, label: navigation.overview, active: true, href: '' }];
 
   const portalNavigation = {
     admin: [
@@ -31,13 +31,13 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: FileClock, label: navigation.audit },
     ],
     patient: [
-      { icon: ClipboardList, label: navigation.cases },
-      { icon: Building2, label: navigation.providers },
+      { icon: ClipboardList, label: navigation.cases, href: '' },
+      { icon: Building2, label: navigation.providers, href: '/providers' },
       { icon: CalendarDays, label: navigation.appointments },
       { icon: FileText, label: navigation.documents },
     ],
     hospital: [
-      { icon: UserRound, label: navigation.patients },
+      { icon: ClipboardList, label: navigation.cases, href: '' },
       { icon: Stethoscope, label: navigation.doctors },
       { icon: UsersRound, label: navigation.team },
       { icon: ClipboardList, label: navigation.catalog },

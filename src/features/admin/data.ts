@@ -71,24 +71,28 @@ export async function loadAdminRecord(supabase: SupabaseClient, definition: Admi
 }
 
 export async function loadAdminDashboard(supabase: SupabaseClient) {
-  const [hospitals, doctors, pharmacies, specialties, countries, hospitalStates, doctorStates, pharmacyStates] = await Promise.all([
+  const [hospitals, doctors, pharmacies, radiologyCenters, medicalLaboratories, specialties, countries, hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates] = await Promise.all([
     supabase.from('hospitals').select('*', { count: 'exact', head: true }),
     supabase.from('doctors').select('*', { count: 'exact', head: true }),
     supabase.from('pharmacies').select('*', { count: 'exact', head: true }),
+    supabase.from('radiology_centers').select('*', { count: 'exact', head: true }),
+    supabase.from('medical_laboratories').select('*', { count: 'exact', head: true }),
     supabase.from('specialties').select('*', { count: 'exact', head: true }),
     supabase.from('countries').select('*', { count: 'exact', head: true }).eq('is_active', true),
     supabase.from('hospitals').select('verification_state'),
     supabase.from('doctors').select('verification_state'),
     supabase.from('pharmacies').select('verification_state'),
+    supabase.from('radiology_centers').select('verification_state'),
+    supabase.from('medical_laboratories').select('verification_state'),
   ]);
-  const stateRows = [hospitalStates, doctorStates, pharmacyStates].flatMap((result) => (result.data ?? []) as { verification_state: string }[]);
+  const stateRows = [hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates].flatMap((result) => (result.data ?? []) as { verification_state: string }[]);
   const distribution = stateRows.reduce<Record<string, number>>((counts, row) => {
     counts[row.verification_state] = (counts[row.verification_state] ?? 0) + 1;
     return counts;
   }, {});
-  const errors = [hospitals, doctors, pharmacies, specialties, countries, hospitalStates, doctorStates, pharmacyStates].some((result) => result.error);
+  const errors = [hospitals, doctors, pharmacies, radiologyCenters, medicalLaboratories, specialties, countries, hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates].some((result) => result.error);
   return {
-    counts: { hospitals: hospitals.count ?? 0, doctors: doctors.count ?? 0, pharmacies: pharmacies.count ?? 0, specialties: specialties.count ?? 0, countries: countries.count ?? 0 },
+    counts: { hospitals: hospitals.count ?? 0, doctors: doctors.count ?? 0, pharmacies: pharmacies.count ?? 0, radiologyCenters: radiologyCenters.count ?? 0, medicalLaboratories: medicalLaboratories.count ?? 0, specialties: specialties.count ?? 0, countries: countries.count ?? 0 },
     distribution,
     verified: distribution.VERIFIED ?? 0,
     awaiting: (distribution.PENDING_REVIEW ?? 0) + (distribution.DRAFT ?? 0),

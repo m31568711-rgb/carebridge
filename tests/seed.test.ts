@@ -22,3 +22,18 @@ describe('fictional Part 2 seed', () => {
     expect(seed).toContain("'Visiting consultant',false");
   });
 });
+
+describe('fictional Part 3 provider seed', () => {
+  it('adds deterministic radiology and laboratory providers with coordinates', () => {
+    expect(seed).toContain('insert into public.radiology_centers');
+    expect(seed).toContain('insert into public.medical_laboratories');
+    expect(seed).toContain('33.575000, -7.595000');
+    expect(seed).toContain('14.710000, -17.460000');
+  });
+
+  it('normalizes diagnostic specialties and keeps non-verified demos out of discovery', () => {
+    expect(seed).toContain('insert into public.radiology_center_specialties');
+    expect(seed).toContain('insert into public.medical_laboratory_specialties');
+    expect(seed).toContain("'ACTIVE', 'PENDING_REVIEW'");
+  });
+});

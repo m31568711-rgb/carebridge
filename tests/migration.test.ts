@@ -8,6 +8,8 @@ const adminMigrationPath = fileURLToPath(new URL('../supabase/migrations/2026082
 const adminMigration = readFileSync(adminMigrationPath, 'utf8');
 const apiGrantsMigrationPath = fileURLToPath(new URL('../supabase/migrations/202608270003_api_role_grants.sql', import.meta.url));
 const apiGrantsMigration = readFileSync(apiGrantsMigrationPath, 'utf8');
+const part3MigrationPath = fileURLToPath(new URL('../supabase/migrations/202608270004_patient_cases_discovery.sql', import.meta.url));
+const part3Migration = readFileSync(part3MigrationPath, 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -29,6 +31,37 @@ describe('initial database migration', () => {
 
   it('limits notification recipients to the read timestamp column', () => {
     expect(migration).toContain('grant update (read_at) on public.notifications to authenticated;');
+  });
+});
+
+describe('patient cases and provider discovery migration', () => {
+  it('keeps treatment selection out of patient cases and in doctor recommendations', () => {
+    const caseTable = part3Migration.slice(part3Migration.indexOf('create table public.medical_cases'), part3Migration.indexOf('create table public.case_doctor_assignments'));
+    expect(caseTable).not.toContain('treatment_id');
+    expect(part3Migration).toContain('create table public.treatment_recommendations');
+    expect(part3Migration).toContain('treatment_id uuid not null references public.treatments');
+  });
+
+  it.each(['medical_cases', 'case_doctor_assignments', 'case_documents', 'treatment_recommendations', 'radiology_centers', 'medical_laboratories'])('enables RLS on %s', (table) => {
+    expect(part3Migration).toContain(`alter table public.${table} enable row level security;`);
+  });
+
+  it('uses a private constrained medical-document bucket with case-scoped policies', () => {
+    expect(part3Migration).toContain("values ('patient-medical', 'patient-medical', false, 26214400");
+    expect(part3Migration).toContain('public.can_access_case_object(name, true)');
+    expect(part3Migration).not.toMatch(/grant select on table public\.medical_cases[^;]*to anon/);
+  });
+
+  it('discovers only active verified providers using server-side filters', () => {
+    expect(part3Migration).toContain('create function public.search_providers');
+    expect(part3Migration).toContain("r.status = 'ACTIVE' and r.verification_state = 'VERIFIED'");
+    expect(part3Migration).toContain("l.status = 'ACTIVE' and l.verification_state = 'VERIFIED'");
+    expect(part3Migration).toContain('p_offset integer default 0');
+  });
+
+  it('extends provider evidence relationships to both diagnostic provider types', () => {
+    expect(part3Migration).toContain('add column radiology_center_id uuid references public.radiology_centers');
+    expect(part3Migration).toContain('add column medical_laboratory_id uuid references public.medical_laboratories');
   });
 });
 

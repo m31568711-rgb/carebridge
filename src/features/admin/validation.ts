@@ -73,6 +73,8 @@ export function validateAdminForm(module: AdminModuleKey, formData: FormData): A
     payload.hospital_id = providerType === 'HOSPITAL' ? providerId : null;
     payload.doctor_id = providerType === 'DOCTOR' ? providerId : null;
     payload.pharmacy_id = providerType === 'PHARMACY' ? providerId : null;
+    payload.radiology_center_id = providerType === 'RADIOLOGY_CENTER' ? providerId : null;
+    payload.medical_laboratory_id = providerType === 'MEDICAL_LABORATORY' ? providerId : null;
   }
 
   return { success: Object.keys(errors).length === 0, payload, errors };
@@ -86,7 +88,7 @@ export function getInitialFieldValue(row: Record<string, unknown> | null, field:
     return group && typeof group === 'object' && !Array.isArray(group) ? String((group as Record<string, unknown>)[locale] ?? '') : '';
   }
   if (field.name === 'provider_id') {
-    return String(row.hospital_id ?? row.doctor_id ?? row.pharmacy_id ?? '');
+    return String(row.hospital_id ?? row.doctor_id ?? row.pharmacy_id ?? row.radiology_center_id ?? row.medical_laboratory_id ?? '');
   }
   const value = row[field.name];
   if (field.type === 'boolean') return Boolean(value);

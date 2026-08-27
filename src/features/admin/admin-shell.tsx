@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, type ComponentType, type ReactNode } from 'react';
-import { BadgeCheck, BookOpenCheck, Building2, ChevronRight, FileCheck2, Globe2, Hospital, Languages, LayoutDashboard, MapPinned, Menu, Pill, ShieldCheck, Stethoscope, UserRound, X } from 'lucide-react';
+import { BadgeCheck, BookOpenCheck, Building2, ChevronRight, FileCheck2, FlaskConical, Globe2, Hospital, Languages, LayoutDashboard, MapPinned, Menu, Pill, ScanLine, ShieldCheck, Stethoscope, UserRound, X } from 'lucide-react';
 import { Brand } from '@/src/components/brand';
 import { LanguageSelector } from '@/src/components/language-selector';
 import { SignOutButton } from '@/src/features/auth/sign-out-button';
@@ -20,7 +20,7 @@ type NavigationItem = readonly [string, NavigationKey, ComponentType<{ className
 const groups: readonly { title: NavigationKey; items: readonly NavigationItem[] }[] = [
   { title: 'geography', items: [['countries','countries',Globe2],['cities','cities',MapPinned]] },
   { title: 'clinical', items: [['specialties','specialties',BookOpenCheck],['treatments','treatments',BadgeCheck]] },
-  { title: 'providers', items: [['hospitals','hospitals',Hospital],['hospital_branches','branches',Building2],['hospital_specialties','hospitalSpecialties',BookOpenCheck],['hospital_treatments','hospitalTreatments',BadgeCheck],['doctors','doctors',Stethoscope],['doctor_specialties','doctorSpecialties',BookOpenCheck],['doctor_languages','doctorLanguages',Languages],['doctor_hospitals','doctorHospitals',Hospital],['pharmacies','pharmacies',Pill]] },
+  { title: 'providers', items: [['hospitals','hospitals',Hospital],['hospital_branches','branches',Building2],['hospital_specialties','hospitalSpecialties',BookOpenCheck],['hospital_treatments','hospitalTreatments',BadgeCheck],['doctors','doctors',Stethoscope],['doctor_specialties','doctorSpecialties',BookOpenCheck],['doctor_languages','doctorLanguages',Languages],['doctor_hospitals','doctorHospitals',Hospital],['pharmacies','pharmacies',Pill],['radiology_centers','radiologyCenters',ScanLine],['medical_laboratories','medicalLaboratories',FlaskConical]] },
   { title: 'governance', items: [['provider_documents','documents',FileCheck2],['provider_accreditations','accreditations',ShieldCheck]] },
 ];
 

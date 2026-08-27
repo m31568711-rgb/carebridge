@@ -37,4 +37,17 @@ describe('admin form validation', () => {
     expect(result.payload.doctor_id).toBeNull();
     expect(result.payload.pharmacy_id).toBeNull();
   });
+
+  it('maps diagnostic providers to their normalized evidence foreign keys', () => {
+    const providerId = '80000000-0000-0000-0000-000000000001';
+    const form = new FormData();
+    form.set('provider_type', 'RADIOLOGY_CENTER');
+    form.set('provider_id', providerId);
+    form.set('document_type', 'MEDICAL_LICENSE');
+    form.set('object_path', `radiology_center/${providerId}/license.pdf`);
+    const result = validateAdminForm('provider_documents', form);
+    expect(result.success).toBe(true);
+    expect(result.payload.radiology_center_id).toBe(providerId);
+    expect(result.payload.medical_laboratory_id).toBeNull();
+  });
 });

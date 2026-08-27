@@ -1,6 +1,6 @@
 # CareBridge
 
-CareBridge is a production-oriented multilingual international medical tourism and patient journey platform. Parts 1 and 2 establish the public experience, authentication, role-aware portals, provider directory, complete Admin/master-data workspace, provider governance, notification infrastructure, PWA shell, and least-privilege Supabase policies. It deliberately does **not** implement medical cases, treatment offers, bookings, payments, prescriptions, or laboratory workflows.
+CareBridge is a production-oriented multilingual international medical tourism and patient journey platform. Parts 1–3 establish the public experience, authentication, role-aware portals, Admin/master-data workspace, provider governance, private patient medical cases, assigned-doctor treatment recommendations, verified provider discovery, notification infrastructure, PWA shell, and least-privilege Supabase policies. Bookings, payments, prescriptions, offers, and operational laboratory workflows remain outside the current scope.
 
 ## Technology stack
 
@@ -28,7 +28,7 @@ app/
 src/
   components/           # Shared brand, layout, and UI primitives
   config/               # Central role and portal configuration
-  features/             # Auth, dashboard, notifications, and PWA features
+  features/             # Auth, cases, discovery, Admin, dashboard, notifications, and PWA
   i18n/                 # Locale configuration and dictionaries
   lib/                  # Supabase, environment, auth, and utility helpers
   types/                # Domain interfaces
@@ -56,7 +56,7 @@ No service-role credential is read by application code. Never prefix a secret wi
 
 ### Apply the schema
 
-Apply all versioned migrations in order, including `202608270001_initial_foundation.sql` and `202608270002_admin_master_data.sql`, using the CLI:
+Apply all versioned migrations in order through `202608270004_patient_cases_discovery.sql` using the CLI:
 
 ```bash
 npx supabase init
@@ -66,7 +66,7 @@ npx supabase db push
 
 For a clean local Supabase environment, `npx supabase db reset` applies migrations and then `supabase/seed.sql`. In a hosted project, run the seed explicitly only if the generic country, city, specialty, and treatment examples are wanted.
 
-The migration creates Storage buckets and adds `notifications` to the `supabase_realtime` publication. It is designed for a fresh project; review policy names before applying it to a project that already has similarly named Storage policies.
+The migration chain creates Storage buckets (including private `patient-medical` evidence), adds `notifications` to the `supabase_realtime` publication, and installs case/provider RLS and audit triggers. It is designed for a fresh project; review policy names before applying it to a project that already has similarly named Storage policies.
 
 ### Configure Auth
 
@@ -103,7 +103,7 @@ The Admin UI uses the publishable key and relies on RLS. To grant a scoped admin
 | `NEXT_PUBLIC_APP_URL` | Browser-safe | Canonical origin, Auth redirects, and social metadata |
 | `NEXT_PUBLIC_SUPABASE_URL` | Browser-safe | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Browser-safe | Supabase publishable/anon credential protected by RLS |
-| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Browser-safe, restricted | Future Maps integration |
+| `NEXT_PUBLIC_MAP_TILE_URL` | Browser-safe, optional | Replaceable `{z}/{x}/{y}` map tiles; defaults to OpenStreetMap |
 | `NEXT_PUBLIC_PAYMENT_PUBLIC_KEY` | Browser-safe | Future payment UI |
 | `PAYMENT_PROVIDER_SECRET_KEY` | Server-only | Future payment server calls |
 | `PAYMENT_WEBHOOK_SECRET` | Server-only | Future webhook verification |
@@ -135,7 +135,9 @@ Every exposed application table has RLS enabled. Key principles:
 - Profiles are private to the owner and platform administrators.
 - Provider directory rows are anonymous-readable only when both active and verified.
 - Hospital staff access is tied to an active `hospital_memberships` row for one hospital.
-- Doctor access is limited to their own professional record; the doctor role grants no blanket patient access.
+- Doctor access is limited to their own professional record and explicitly assigned medical cases; the doctor role grants no blanket patient access.
+- Patient cases and evidence are private to their patient owner until an active doctor assignment exists.
+- Treatment is selected only in a verified assigned doctor's recommendation, never in the patient's case submission.
 - Provider documents and private Storage objects are provider-scoped and never anonymous.
 - Notification rows are visible only to their recipient; recipients can update only `read_at`.
 - Audit rows are immutable to clients. The generic audit RPC is restricted to `service_role` for trusted server-side use.
@@ -173,4 +175,4 @@ The scripts call their local Node entry points directly, which keeps them reliab
 
 ## Phase boundaries
 
-This foundation intentionally leaves patient cases, medical record sharing, offers, booking, payments, prescriptions, invoices, travel workflows, and laboratories for later migrations and feature modules. Do not place medical data in the current `profiles`, `notifications`, or provider-directory tables.
+Part 3 includes private specialty-led medical cases, explicit doctor sharing, treatment recommendations, secure case documents, diagnostic provider master data, and provider list/map discovery. It intentionally leaves offers, booking, payments, prescriptions, invoices, travel workflows, and operational radiology/laboratory orders for later migrations. Do not place medical content in `profiles`, `notifications`, provider-directory rows, or audit metadata.

@@ -7,7 +7,7 @@ const en = {
     overview: 'Overview', geography: 'Geography', countries: 'Countries', cities: 'Cities', clinical: 'Clinical catalog',
     specialties: 'Specialties', treatments: 'Treatments', providers: 'Providers', hospitals: 'Hospitals', branches: 'Hospital branches',
     hospitalSpecialties: 'Hospital specialties', hospitalTreatments: 'Hospital treatments', doctors: 'Doctors', doctorSpecialties: 'Doctor specialties',
-    doctorLanguages: 'Doctor languages', doctorHospitals: 'Doctor hospitals', pharmacies: 'Pharmacies', governance: 'Governance',
+    doctorLanguages: 'Doctor languages', doctorHospitals: 'Doctor hospitals', pharmacies: 'Pharmacies', radiologyCenters: 'Radiology centers', medicalLaboratories: 'Medical laboratories', governance: 'Governance',
     documents: 'Provider documents', accreditations: 'Accreditations', audit: 'Audit logs',
   },
   common: {
@@ -28,7 +28,7 @@ const en = {
   dashboard: {
     eyebrow: 'Master data overview', title: 'A clear view of the provider network',
     description: 'Live counts and distributions are calculated from records visible through your database permissions.',
-    hospitals: 'Total hospitals', doctors: 'Total doctors', pharmacies: 'Total pharmacies', specialties: 'Specialties',
+    hospitals: 'Total hospitals', doctors: 'Total doctors', pharmacies: 'Total pharmacies', radiologyCenters: 'Radiology centers', medicalLaboratories: 'Medical laboratories', specialties: 'Specialties',
     verified: 'Verified providers', awaiting: 'Awaiting verification', countries: 'Active countries', providersByType: 'Providers by type',
     verificationDistribution: 'Verification distribution', databaseUnavailable: 'Dashboard data is temporarily unavailable.',
   },
@@ -46,6 +46,8 @@ const en = {
     doctor_languages: ['Doctor languages', 'Maintain normalized clinician language proficiency.'],
     doctor_hospitals: ['Doctor hospitals', 'Assign clinicians to one or more hospitals.'],
     pharmacies: ['Pharmacies', 'Manage pharmacy profiles, location data, working hours, and verification.'],
+    radiology_centers: ['Radiology centers', 'Manage diagnostic imaging centers, locations, and verification.'],
+    medical_laboratories: ['Medical laboratories', 'Manage laboratory profiles, locations, and verification.'],
     provider_documents: ['Provider documents', 'Manage sensitive provider evidence stored in private Storage.'],
     provider_accreditations: ['Accreditations', 'Record provider credentials without fabricating public claims.'],
   },
@@ -69,10 +71,10 @@ const en = {
   },
 } as const;
 
-type DeepString<T> = T extends string ? string : { [K in keyof T]: DeepString<T[K]> };
+type DeepString<T> = T extends string ? string : T extends readonly unknown[] ? readonly string[] : { [K in keyof T]: DeepString<T[K]> };
 export type AdminDictionary = DeepString<typeof en>;
 
-const fr: AdminDictionary = {
+const fr = {
   ...en,
   title: 'Administration de la plateforme', subtitle: 'Données de référence, gouvernance des prestataires, vérification et audit.',
   navigation: { overview:'Vue d’ensemble',geography:'Géographie',countries:'Pays',cities:'Villes',clinical:'Catalogue clinique',specialties:'Spécialités',treatments:'Traitements',providers:'Prestataires',hospitals:'Hôpitaux',branches:'Sites hospitaliers',hospitalSpecialties:'Spécialités des hôpitaux',hospitalTreatments:'Traitements des hôpitaux',doctors:'Médecins',doctorSpecialties:'Spécialités des médecins',doctorLanguages:'Langues des médecins',doctorHospitals:'Médecins et hôpitaux',pharmacies:'Pharmacies',governance:'Gouvernance',documents:'Documents prestataires',accreditations:'Accréditations',audit:'Journaux d’audit' },
@@ -86,7 +88,7 @@ const fr: AdminDictionary = {
   },
 };
 
-const ar: AdminDictionary = {
+const ar = {
   ...en,
   title: 'إدارة المنصة', subtitle: 'البيانات المرجعية وحوكمة مقدمي الخدمة والتحقق وسجل التدقيق.',
   navigation: { overview:'نظرة عامة',geography:'الجغرافيا',countries:'الدول',cities:'المدن',clinical:'الدليل الطبي',specialties:'التخصصات',treatments:'العلاجات',providers:'مقدمو الخدمة',hospitals:'المستشفيات',branches:'فروع المستشفيات',hospitalSpecialties:'تخصصات المستشفيات',hospitalTreatments:'علاجات المستشفيات',doctors:'الأطباء',doctorSpecialties:'تخصصات الأطباء',doctorLanguages:'لغات الأطباء',doctorHospitals:'الأطباء والمستشفيات',pharmacies:'الصيدليات',governance:'الحوكمة',documents:'وثائق مقدمي الخدمة',accreditations:'الاعتمادات',audit:'سجل التدقيق' },
@@ -100,5 +102,27 @@ const ar: AdminDictionary = {
   },
 };
 
-const messages: Record<Locale, AdminDictionary> = { en, fr, ar };
+const messages: Record<Locale, AdminDictionary> = {
+  en,
+  fr: {
+    ...fr,
+    navigation: { ...en.navigation, ...fr.navigation, radiologyCenters: 'Centres de radiologie', medicalLaboratories: 'Laboratoires médicaux' },
+    modules: {
+      ...en.modules,
+      ...fr.modules,
+      radiology_centers: ['Centres de radiologie', 'Gérez les centres d’imagerie, leurs lieux et leur vérification.'],
+      medical_laboratories: ['Laboratoires médicaux', 'Gérez les profils des laboratoires, leurs lieux et leur vérification.'],
+    },
+  },
+  ar: {
+    ...ar,
+    navigation: { ...en.navigation, ...ar.navigation, radiologyCenters: 'مراكز الأشعة', medicalLaboratories: 'المختبرات الطبية' },
+    modules: {
+      ...en.modules,
+      ...ar.modules,
+      radiology_centers: ['مراكز الأشعة', 'إدارة مراكز التصوير التشخيصي ومواقعها والتحقق منها.'],
+      medical_laboratories: ['المختبرات الطبية', 'إدارة ملفات المختبرات ومواقعها والتحقق منها.'],
+    },
+  },
+};
 export function getAdminDictionary(locale: Locale) { return messages[locale]; }

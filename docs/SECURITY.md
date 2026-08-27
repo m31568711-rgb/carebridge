@@ -1,6 +1,6 @@
 # Security and RLS model
 
-This document describes the Phase 1 authorization boundary. It is not a substitute for a production penetration test, compliance review, data-processing agreement, incident-response plan, or jurisdiction-specific medical privacy assessment.
+This document describes the current Parts 1–3 authorization boundary. It is not a substitute for a production penetration test, compliance review, data-processing agreement, incident-response plan, or jurisdiction-specific medical privacy assessment.
 
 ## Trust boundaries
 
@@ -21,6 +21,10 @@ This document describes the Phase 1 authorization boundary. It is not a substitu
 | Hospital memberships | None | Own row; hospital admins can manage coordinators | Full management |
 | Doctors and affiliations | Active + verified directory | Doctor owns professional record; hospital staff see affiliations for their hospital | Full management |
 | Pharmacies | Active + verified directory | Owner manages own pharmacy | Full management |
+| Radiology centers and laboratories | Active + verified directory | Owner scope only | Scoped/full management |
+| Medical cases | None | Patient owner; actively assigned verified doctor | Scoped management |
+| Case documents | None | Patient owner; actively assigned verified doctor | Scoped management |
+| Treatment recommendations | None | Patient sees submitted recommendations; assigned doctor manages own recommendation | Scoped management |
 | Provider documents | None | Owning provider scope only | Full review and management |
 | Approved accreditations | Approved public credentials | Owning provider scope | Full review and management |
 | Notifications | None | Recipient only; `read_at` is the only client-updatable field | Can create operational notifications |
@@ -31,7 +35,7 @@ This document describes the Phase 1 authorization boundary. It is not a substitu
 
 ### Patient isolation
 
-There are no medical case or record tables in this phase. When those tables are added, every row must have an explicit patient owner and a separately modeled care-team assignment. A `DOCTOR` role alone must never authorize access to all patients.
+Every medical case has an explicit patient owner. A doctor receives access only through an active `case_doctor_assignments` row and an active, verified doctor profile linked to the authenticated user. A `DOCTOR` role alone never authorizes access to patients. Treatment choices exist only on doctor recommendations and must belong to the case specialty.
 
 ### Hospital scope
 
@@ -49,9 +53,10 @@ RLS decides which rows may be updated. Explicit PostgreSQL column grants further
 
 - Avatar path: `{auth_user_id}/{filename}`
 - Provider path: `{provider_kind}/{provider_uuid}/{filename}`
-- Provider kind is one of `hospital`, `doctor`, or `pharmacy`
+- Provider kind is one of `hospital`, `doctor`, `pharmacy`, `radiology_center`, or `medical_laboratory`
+- Patient medical path: `{patient_uuid}/{case_uuid}/{safe_unique_filename}` in private `patient-medical`
 
-The Storage policy parses this convention and checks provider ownership or hospital membership. `provider-private` is never public. Signed URLs should be short-lived when private downloads are added.
+Storage policies parse these conventions and check provider ownership, hospital membership, patient ownership, or an active doctor assignment. `provider-private` and `patient-medical` are never public. Medical downloads use short-lived signed URLs.
 
 ## Security checklist before production
 
