@@ -6,6 +6,8 @@ const migrationPath = fileURLToPath(new URL('../supabase/migrations/202608270001
 const migration = readFileSync(migrationPath, 'utf8');
 const adminMigrationPath = fileURLToPath(new URL('../supabase/migrations/202608270002_admin_master_data.sql', import.meta.url));
 const adminMigration = readFileSync(adminMigrationPath, 'utf8');
+const apiGrantsMigrationPath = fileURLToPath(new URL('../supabase/migrations/202608270003_api_role_grants.sql', import.meta.url));
+const apiGrantsMigration = readFileSync(apiGrantsMigrationPath, 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -51,5 +53,17 @@ describe('admin and master-data migration', () => {
     expect(adminMigration).toContain('create function public.audit_admin_change()');
     expect(adminMigration).toContain('create trigger hospitals_audit');
     expect(adminMigration).not.toContain('grant execute on function public.audit_admin_change() to authenticated');
+  });
+});
+
+describe('API role grants migration', () => {
+  it('allows public directory reads without exposing private provider documents', () => {
+    expect(apiGrantsMigration).toContain('public.hospitals');
+    expect(apiGrantsMigration).not.toMatch(/provider_documents,[\s\S]*?to anon;/);
+  });
+
+  it('preserves column-restricted profile and notification updates', () => {
+    expect(apiGrantsMigration).toContain('revoke update on table public.profiles from authenticated;');
+    expect(apiGrantsMigration).toContain('grant update (read_at) on table public.notifications to authenticated;');
   });
 });
