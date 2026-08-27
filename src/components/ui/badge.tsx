@@ -2,11 +2,11 @@ import type { HTMLAttributes } from 'react';
 import { cn } from '@/src/lib/utils/cn';
 
 const variants = {
-  blue: 'bg-blue-50 text-blue-700 ring-blue-100',
-  green: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
-  amber: 'bg-amber-50 text-amber-800 ring-amber-100',
-  slate: 'bg-slate-100 text-slate-700 ring-slate-200',
-  rose: 'bg-rose-50 text-rose-700 ring-rose-100',
+  blue: 'bg-[#eaf3f9] text-[#164b7a] ring-[#d4e5ef]',
+  green: 'bg-[#eaf6f1] text-[#217a5b] ring-[#d0e9df]',
+  amber: 'bg-[#fbf3df] text-[#8b611a] ring-[#f1e2bc]',
+  slate: 'bg-[#eef3f6] text-[#53697b] ring-[#dce6ec]',
+  rose: 'bg-[#fbecef] text-[#a43547] ring-[#f3d5dc]',
 } as const;
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -14,5 +14,5 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 export function Badge({ className, variant = 'blue', ...props }: BadgeProps) {
-  return <span className={cn('inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset', variants[variant], className)} {...props} />;
+  return <span className={cn('inline-flex items-center rounded-full px-2.5 py-1 text-[0.72rem] font-semibold tracking-[0.01em] ring-1 ring-inset', variants[variant], className)} {...props} />;
 }

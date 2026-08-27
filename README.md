@@ -1,6 +1,6 @@
 # CareBridge
 
-CareBridge is a production-oriented foundation for a multilingual international medical tourism and patient journey platform. This first phase establishes the public experience, authentication, role-aware portals, provider directory schema, notification infrastructure, PWA shell, and least-privilege Supabase policies. It deliberately does **not** implement medical cases, treatment offers, bookings, payments, prescriptions, or laboratory workflows.
+CareBridge is a production-oriented multilingual international medical tourism and patient journey platform. Parts 1 and 2 establish the public experience, authentication, role-aware portals, provider directory, complete Admin/master-data workspace, provider governance, notification infrastructure, PWA shell, and least-privilege Supabase policies. It deliberately does **not** implement medical cases, treatment offers, bookings, payments, prescriptions, or laboratory workflows.
 
 ## Technology stack
 
@@ -56,7 +56,7 @@ No service-role credential is read by application code. Never prefix a secret wi
 
 ### Apply the schema
 
-The primary migration is `supabase/migrations/202608270001_initial_foundation.sql`. Apply it to a new Supabase project using the CLI:
+Apply all versioned migrations in order, including `202608270001_initial_foundation.sql` and `202608270002_admin_master_data.sql`, using the CLI:
 
 ```bash
 npx supabase init
@@ -88,7 +88,13 @@ values ('USER_UUID_HERE', 'SUPER_ADMIN')
 on conflict (user_id, role) do nothing;
 ```
 
-Provider roles require both a global role in `user_roles` and, for hospital staff, a scoped row in `hospital_memberships`. Add those only through a trusted administrative process or the SQL editor until the administration workflows are implemented.
+Provider roles require both a global role in `user_roles` and, for hospital staff, a scoped row in `hospital_memberships`. Admin access is controlled by `ADMIN`/`SUPER_ADMIN`; scoped `admin_privileges` rows authorize master-data, provider, verification, document, and accreditation mutations. `SUPER_ADMIN` retains all administrative privileges.
+
+### Moving to another Supabase project
+
+No business-code change is required. Create the destination project, replace only the environment values, run the complete migration chain, optionally apply the fictional seed, configure Auth URLs/SMTP and any external secrets, then verify the two Storage buckets and their policies. Never copy a service-role key into a `NEXT_PUBLIC_` variable. Database rows and Storage objects are separate exports; migrate both when preserving production data.
+
+The Admin UI uses the publishable key and relies on RLS. To grant a scoped administrator access, insert the appropriate permission rows (for example `master_data.countries`, `providers.hospitals`, or `providers.verify`) into `admin_privileges` through a trusted SQL process. `master_data.all` covers only the master-data namespace and does not grant provider verification or document access.
 
 ## Environment variables
 

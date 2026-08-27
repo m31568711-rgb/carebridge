@@ -27,6 +27,7 @@ import { Badge } from '@/src/components/ui/badge';
 import { Card, CardContent } from '@/src/components/ui/card';
 import { SiteFooter } from '@/src/components/site-footer';
 import { SiteHeader } from '@/src/components/site-header';
+import { ProviderVisualPlaceholder } from '@/src/components/provider-visual-placeholder';
 import { InstallApp } from '@/src/features/pwa/install-app';
 import { isLocale } from '@/src/i18n/config';
 import { getDictionary } from '@/src/i18n/dictionaries';
@@ -78,15 +79,15 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <div className="min-h-screen bg-white text-slate-950">
       <SiteHeader dictionary={dictionary} locale={locale} />
       <main id="main-content">
-        <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#fff_100%)]">
-          <div aria-hidden="true" className="absolute start-1/2 top-20 size-[38rem] rounded-full bg-blue-100/60 blur-3xl" />
+        <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f4f8fb_0%,#fff_100%)]">
+          <div aria-hidden="true" className="absolute start-1/2 top-20 size-[38rem] rounded-full bg-[#dcebf3]/70 blur-3xl" />
           <div className="relative mx-auto grid max-w-7xl gap-12 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-12 lg:pb-28 lg:pt-24">
             <div className="relative z-10 max-w-3xl">
               <Badge className="px-4 py-2 uppercase tracking-[0.13em]" variant="blue">{landing.hero.eyebrow}</Badge>
-              <h1 className="mt-7 text-balance text-5xl font-semibold leading-[1.06] tracking-[-0.05em] sm:text-6xl lg:text-7xl">{landing.hero.title}</h1>
-              <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-600 sm:text-xl">{landing.hero.description}</p>
+              <h1 className="type-display mt-7 max-w-[14ch] text-balance text-[var(--foreground)]">{landing.hero.title}</h1>
+              <p className="mt-6 max-w-2xl text-base leading-7 text-[var(--muted)] sm:text-lg sm:leading-8">{landing.hero.description}</p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <a className="inline-flex min-h-13 items-center justify-center gap-2 rounded-2xl bg-blue-600 px-6 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition hover:bg-blue-700" href="#find-care">
+                <a className="inline-flex min-h-13 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-button)] transition hover:bg-[var(--primary-strong)]" href="#find-care">
                   {landing.hero.primaryAction}<ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
                 </a>
                 <a className="inline-flex min-h-13 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-blue-200" href="#how-it-works">{landing.hero.secondaryAction}</a>
@@ -98,8 +99,9 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
 
             <div className="relative" id="find-care">
               <div aria-hidden="true" className="absolute -inset-10 rounded-full bg-blue-200/35 blur-3xl" />
-              <Card className="relative overflow-hidden rounded-[2rem] border-white/80 shadow-[0_35px_100px_-45px_rgba(30,64,175,.45)]">
-                <CardContent className="p-5 sm:p-8">
+              <Card className="relative overflow-hidden rounded-[1.75rem] border-white/80 shadow-[0_35px_100px_-45px_rgba(22,75,122,.38)]">
+                <ProviderVisualPlaceholder label={landing.providers.doctorLabel} />
+                <CardContent className="p-5 sm:p-7">
                   <div className="mb-7 flex items-center justify-between gap-4">
                     <div><p className="text-sm font-semibold text-blue-700">{landing.search.eyebrow}</p><p className="mt-1 text-sm text-slate-500">{landing.search.helper}</p></div>
                     <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-blue-50 text-blue-700"><Sparkles aria-hidden="true" className="size-5" /></span>
@@ -107,7 +109,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
                   <div className="space-y-4">
                     <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">{landing.search.treatmentLabel}</span><span className="flex min-h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-400"><Stethoscope aria-hidden="true" className="size-5 text-blue-600" />{landing.search.treatmentPlaceholder}</span></label>
                     <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">{landing.search.destinationLabel}</span><span className="flex min-h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-400"><MapPin aria-hidden="true" className="size-5 text-blue-600" />{landing.search.destinationPlaceholder}</span></label>
-                    <button className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-blue-700" type="button"><Search aria-hidden="true" className="size-4" />{landing.search.action}</button>
+                    <button className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--primary-strong)]" type="button"><Search aria-hidden="true" className="size-4" />{landing.search.action}</button>
                   </div>
                   <div className="mt-7 rounded-2xl bg-blue-50 p-5"><p className="font-semibold text-slate-900">{landing.search.assuranceTitle}</p><p className="mt-2 text-sm leading-6 text-slate-600">{landing.search.assuranceDescription}</p></div>
                 </CardContent>
