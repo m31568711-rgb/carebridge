@@ -52,3 +52,9 @@ export function resolvePortalForRoles(roles: readonly AppRole[]): PortalKey {
 export function hasAllowedRole(roles: readonly AppRole[], allowed: readonly AppRole[]) {
   return roles.some((role) => allowed.includes(role));
 }
+
+export function usesDiagnosticProviderLanding(roles: readonly AppRole[]) {
+  return roles.includes('PROVIDER') && !roles.some((role) =>
+    ['SUPER_ADMIN', 'ADMIN', 'HOSPITAL_ADMIN', 'HOSPITAL_COORDINATOR', 'DOCTOR', 'PHARMACY'].includes(role),
+  );
+}

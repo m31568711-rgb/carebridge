@@ -18,5 +18,7 @@ export function notificationHref(record: NotificationRecord, locale: Locale, por
   if (record.related_entity_type === 'offer' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/offers/${record.related_entity_id}`;
   if (record.related_entity_type === 'booking' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/bookings/${record.related_entity_id}`;
   if (record.related_entity_type === 'appointment' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/appointments/${record.related_entity_id}`;
+  if (record.related_entity_type === 'lab_order' && portal === 'provider') return `/${locale}/provider/diagnostics/lab/${record.related_entity_id}`;
+  if (record.related_entity_type === 'radiology_order' && portal === 'provider') return `/${locale}/provider/diagnostics/radiology/${record.related_entity_id}`;
   return `/${locale}/notifications`;
 }
