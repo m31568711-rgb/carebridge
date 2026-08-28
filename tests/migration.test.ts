@@ -10,6 +10,14 @@ const apiGrantsMigrationPath = fileURLToPath(new URL('../supabase/migrations/202
 const apiGrantsMigration = readFileSync(apiGrantsMigrationPath, 'utf8');
 const part3MigrationPath = fileURLToPath(new URL('../supabase/migrations/202608270004_patient_cases_discovery.sql', import.meta.url));
 const part3Migration = readFileSync(part3MigrationPath, 'utf8');
+const part4MigrationPath = fileURLToPath(new URL('../supabase/migrations/202608280001_offers_bookings_application.sql', import.meta.url));
+const part4Migration = readFileSync(part4MigrationPath, 'utf8');
+const part4HardeningPath = fileURLToPath(new URL('../supabase/migrations/202608280002_part4_rls_hardening.sql', import.meta.url));
+const part4Hardening = readFileSync(part4HardeningPath, 'utf8');
+const part4DoctorScopePath = fileURLToPath(new URL('../supabase/migrations/202608280003_part4_offer_doctor_scope.sql', import.meta.url));
+const part4DoctorScope = readFileSync(part4DoctorScopePath, 'utf8');
+const part4DoctorGrantPath = fileURLToPath(new URL('../supabase/migrations/202608280004_part4_offer_doctor_grant.sql', import.meta.url));
+const part4DoctorGrant = readFileSync(part4DoctorGrantPath, 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -86,6 +94,43 @@ describe('admin and master-data migration', () => {
     expect(adminMigration).toContain('create function public.audit_admin_change()');
     expect(adminMigration).toContain('create trigger hospitals_audit');
     expect(adminMigration).not.toContain('grant execute on function public.audit_admin_change() to authenticated');
+  });
+});
+
+describe('offers and booking journey migration', () => {
+  it.each(['case_provider_assignments', 'offers', 'bookings', 'booking_events'])('enables RLS on %s', (table) => {
+    expect(part4Migration).toContain(`alter table public.${table} enable row level security;`);
+  });
+
+  it('scopes providers through explicit case assignments and organization ownership', () => {
+    expect(part4Migration).toContain('create function public.is_case_provider');
+    expect(part4Migration).toContain("a.status = 'ACTIVE'");
+    expect(part4Migration).toContain('public.is_hospital_member(a.hospital_id)');
+  });
+
+  it('enforces one accepted offer and creates a normalized booking on acceptance', () => {
+    expect(part4Migration).toContain("offers_one_accepted_per_case_uidx on public.offers(case_id) where status = 'ACCEPTED'");
+    expect(part4Migration).toContain('create function public.create_booking_for_accepted_offer()');
+    expect(part4Migration).toContain('insert into public.bookings');
+  });
+
+  it('locks sent offer content and records booking lifecycle events', () => {
+    expect(part4Migration).toContain("raise exception 'sent offer contents are locked'");
+    expect(part4Migration).toContain('create trigger bookings_history');
+    expect(part4Migration).toContain('create trigger offers_audit');
+    expect(part4Migration).toContain('create trigger bookings_audit');
+  });
+
+  it('keeps private journey records unavailable to anonymous users', () => {
+    expect(part4Migration).not.toMatch(/grant (?:select|insert|update|delete)[^;]*public\.(?:offers|bookings|booking_events)[^;]*to anon/);
+  });
+
+  it('keeps drafts private and checks doctor assignments without broad table visibility', () => {
+    expect(part4Hardening).toContain("target_offer.status not in ('DRAFT', 'WITHDRAWN')");
+    expect(part4DoctorScope).toContain('create function public.is_doctor_assigned_to_case');
+    expect(part4DoctorScope).toContain('security definer');
+    expect(part4DoctorGrant).toContain('grant execute on function public.is_doctor_assigned_to_case(uuid, uuid) to authenticated;');
+    expect(part4DoctorGrant).not.toContain('grant select on');
   });
 });
 

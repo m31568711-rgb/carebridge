@@ -6,11 +6,12 @@ export const appRoles = [
   'HOSPITAL_COORDINATOR',
   'DOCTOR',
   'PHARMACY',
+  'PROVIDER',
 ] as const;
 
 export type AppRole = (typeof appRoles)[number];
 
-export type PortalKey = 'admin' | 'patient' | 'hospital' | 'doctor' | 'pharmacy';
+export type PortalKey = 'admin' | 'patient' | 'hospital' | 'doctor' | 'pharmacy' | 'provider';
 
 export const portalRoles: Record<PortalKey, readonly AppRole[]> = {
   admin: ['SUPER_ADMIN', 'ADMIN'],
@@ -18,16 +19,18 @@ export const portalRoles: Record<PortalKey, readonly AppRole[]> = {
   hospital: ['HOSPITAL_ADMIN', 'HOSPITAL_COORDINATOR'],
   doctor: ['DOCTOR'],
   pharmacy: ['PHARMACY'],
+  provider: ['PROVIDER', 'HOSPITAL_ADMIN', 'HOSPITAL_COORDINATOR', 'PHARMACY'],
 };
 
 export const rolePortal: Record<AppRole, PortalKey> = {
   SUPER_ADMIN: 'admin',
   ADMIN: 'admin',
   PATIENT: 'patient',
-  HOSPITAL_ADMIN: 'hospital',
-  HOSPITAL_COORDINATOR: 'hospital',
+  HOSPITAL_ADMIN: 'provider',
+  HOSPITAL_COORDINATOR: 'provider',
   DOCTOR: 'doctor',
-  PHARMACY: 'pharmacy',
+  PHARMACY: 'provider',
+  PROVIDER: 'provider',
 };
 
 const portalPriority: AppRole[] = [
@@ -37,6 +40,7 @@ const portalPriority: AppRole[] = [
   'HOSPITAL_COORDINATOR',
   'DOCTOR',
   'PHARMACY',
+  'PROVIDER',
   'PATIENT',
 ];
 

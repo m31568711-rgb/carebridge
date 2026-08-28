@@ -1,58 +1,48 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Download, Smartphone } from 'lucide-react';
+import { Download } from 'lucide-react';
 import type { Dictionary } from '@/src/i18n/messages/en';
 import { Button } from '@/src/components/ui/button';
-import { Dialog } from '@/src/components/ui/dialog';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
-interface InstallAppProps {
-  copy: Dictionary['install'];
-  closeLabel: string;
-}
+interface InstallAppProps { copy: Dictionary['install']; compact?: boolean; }
 
-export function InstallApp({ copy, closeLabel }: InstallAppProps) {
+export function InstallApp({ copy, compact = false }: InstallAppProps) {
   const [event, setEvent] = useState<BeforeInstallPromptEvent | null>(null);
-  const [open, setOpen] = useState(false);
+  const [installed, setInstalled] = useState(true);
 
   useEffect(() => {
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+    const stateTimer = window.setTimeout(() => setInstalled(standalone), 0);
     const listener = (installEvent: Event) => {
       installEvent.preventDefault();
+      setInstalled(false);
       setEvent(installEvent as BeforeInstallPromptEvent);
     };
+    const onInstalled = () => { setInstalled(true); setEvent(null); };
 
     window.addEventListener('beforeinstallprompt', listener);
-    return () => window.removeEventListener('beforeinstallprompt', listener);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => { window.clearTimeout(stateTimer); window.removeEventListener('beforeinstallprompt', listener); window.removeEventListener('appinstalled', onInstalled); };
   }, []);
 
   async function install() {
-    if (!event) {
-      setOpen(true);
-      return;
-    }
-
+    if (!event) return;
     await event.prompt();
-    await event.userChoice;
-    setEvent(null);
+    const choice = await event.userChoice;
+    if (choice.outcome === 'accepted') setEvent(null);
   }
 
+  if (installed || !event) return null;
   return (
-    <>
-      <Button onClick={install} type="button" variant="subtle">
+      <Button aria-label={copy.action} onClick={install} size={compact?'icon':'md'} title={copy.action} type="button" variant="subtle">
         <Download aria-hidden="true" className="size-4" />
-        {copy.action}
+        {compact ? null : copy.action}
       </Button>
-      <Dialog closeLabel={closeLabel} onClose={() => setOpen(false)} open={open} title={copy.unavailableTitle}>
-        <div className="text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-blue-50 text-blue-700"><Smartphone aria-hidden="true" className="size-7" /></span>
-          <p className="mt-5 text-sm leading-6 text-slate-600">{copy.unavailableDescription}</p>
-        </div>
-      </Dialog>
-    </>
   );
 }

@@ -51,7 +51,7 @@ export function AdminShell({ adminCopy, children, context, dictionary, locale }:
         <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-white/92 backdrop-blur-xl">
           <div className="flex min-h-18 items-center justify-between gap-3 px-4 sm:px-7 lg:px-9">
             <div className="flex min-w-0 items-center gap-3"><button aria-label={adminCopy.common.openMenu} className="grid size-10 place-items-center rounded-xl border border-[var(--border)] bg-white lg:hidden" onClick={() => setMobileOpen(true)} type="button"><Menu className="size-5" /></button><div className="min-w-0"><div className="flex items-center gap-1.5 text-[0.7rem] font-medium text-[#7a8e9e]"><span>{adminCopy.title}</span><ChevronRight className="size-3 rtl:rotate-180" /><span className="truncate text-[var(--primary)]">{breadcrumb}</span></div><p className="mt-0.5 truncate text-sm font-semibold text-[var(--foreground)]">{breadcrumb}</p></div></div>
-            <div className="flex items-center gap-2"><LanguageSelector compact labels={dictionary.language} locale={locale} /><NotificationIndicator copy={dictionary.notifications} locale={locale} /><div className="hidden sm:block"><SignOutButton label={dictionary.common.signOut} locale={locale} /></div></div>
+            <div className="flex items-center gap-2"><LanguageSelector compact labels={dictionary.language} locale={locale} /><NotificationIndicator copy={dictionary.notifications} locale={locale} portal="admin" /><div className="hidden sm:block"><SignOutButton label={dictionary.common.signOut} locale={locale} /></div></div>
           </div>
         </header>
         <main className="px-4 py-7 sm:px-7 lg:px-9 lg:py-9" id="main-content">{children}</main>

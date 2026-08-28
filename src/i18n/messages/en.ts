@@ -230,6 +230,10 @@ export const en = {
       verification: 'Verification',
       users: 'Users and roles',
       audit: 'Audit logs',
+      offers: 'Offers',
+      bookings: 'Bookings',
+      assignedCases: 'Assigned cases',
+      notifications: 'Notifications',
     },
     stats: {
       profileTitle: 'Profile readiness',
@@ -273,6 +277,8 @@ export const en = {
       doctorDescription: 'Professional profile, hospital affiliations, availability, and future patient collaboration.',
       pharmacyTitle: 'Pharmacy portal',
       pharmacyDescription: 'Pharmacy profile, future prescription handling, fulfilment, and patient coordination.',
+      providerTitle: 'Provider workspace',
+      providerDescription: 'Scoped cases, medical offers, bookings, and care coordination for your organization.',
     },
   },
   notifications: {

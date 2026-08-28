@@ -125,6 +125,7 @@ Roles are defined once in `src/config/roles.ts`:
 - `HOSPITAL_ADMIN`, `HOSPITAL_COORDINATOR`
 - `DOCTOR`
 - `PHARMACY`
+- `PROVIDER` (generic provider-staff application experience; facility access still requires an explicit ownership or membership relationship)
 
 `/portal` resolves the correct area on the server. Every dashboard calls a server-side role guard before rendering. Frontend visibility is only a usability layer; database access is controlled independently by RLS. A future `LAB` role should be introduced through a new enum migration and a new provider module, without modifying existing migrations.
 
@@ -173,6 +174,12 @@ npm run build:next
 
 The scripts call their local Node entry points directly, which keeps them reliable even when the workspace path contains shell metacharacters.
 
+## Part 4 application journey
+
+Part 4 adds a unified role dispatcher and provider workspace, explicitly scoped provider-to-case assignments, draft/sent/decision offer lifecycles, patient offer comparison, automatic booking creation on acceptance, booking status history, event notifications, and role-aware patient/doctor/provider navigation. Offer and booking relationships remain normalized to cases, treatments, providers, doctors, and patients. Draft and withdrawn offers are hidden from patients, one accepted offer is allowed per case, and acceptance expires competing open offers.
+
+The install action now appears only after the browser emits `beforeinstallprompt` and disappears after installation or when running standalone. Secure API responses and medical records are not added to the offline cache.
+
 ## Phase boundaries
 
-Part 3 includes private specialty-led medical cases, explicit doctor sharing, treatment recommendations, secure case documents, diagnostic provider master data, and provider list/map discovery. It intentionally leaves offers, booking, payments, prescriptions, invoices, travel workflows, and operational radiology/laboratory orders for later migrations. Do not place medical content in `profiles`, `notifications`, provider-directory rows, or audit metadata.
+Parts 1–4 include the platform foundation, Admin/master data, private specialty-led cases and discovery, offers, and CareBridge's internal booking journey. Payments, prescriptions, invoices, real travel or hospital booking integrations, and operational radiology/laboratory orders remain intentionally deferred to later parts. Do not place medical content in `profiles`, `notifications`, provider-directory rows, or audit metadata.

@@ -206,7 +206,7 @@ export const fr = {
     foundationNotice: 'Ce tableau de bord présente la base sécurisée. Les parcours métier seront ajoutés plus tard.',
     lastUpdated: 'Mis à jour à l’instant',
     navigation: {
-      overview: 'Vue d’ensemble', cases: 'Dossiers médicaux', providers: 'Prestataires', appointments: 'Rendez-vous', documents: 'Documents', patients: 'Patients', team: 'Équipe', doctors: 'Médecins', hospitals: 'Hôpitaux', pharmacy: 'Services de pharmacie', prescriptions: 'Ordonnances', catalog: 'Catalogue de soins', verification: 'Vérification', users: 'Utilisateurs et rôles', audit: 'Journaux d’audit',
+      overview: 'Vue d’ensemble', cases: 'Dossiers médicaux', providers: 'Prestataires', appointments: 'Rendez-vous', documents: 'Documents', patients: 'Patients', team: 'Équipe', doctors: 'Médecins', hospitals: 'Hôpitaux', pharmacy: 'Services de pharmacie', prescriptions: 'Ordonnances', catalog: 'Catalogue de soins', verification: 'Vérification', users: 'Utilisateurs et rôles', audit: 'Journaux d’audit', offers: 'Offres', bookings: 'Réservations', assignedCases: 'Dossiers attribués', notifications: 'Notifications',
     },
     stats: {
       profileTitle: 'Préparation du profil', profileValue: 'Base prête', profileHint: 'Profil sécurisé et préférence linguistique',
@@ -232,7 +232,7 @@ export const fr = {
       patientTitle: 'Portail patient', patientDescription: 'Un espace privé pour les futurs dossiers, offres, documents, rendez-vous et préparatifs de voyage.',
       hospitalTitle: 'Portail hôpital', hospitalDescription: 'Opérations limitées à l’hôpital, filiales, équipes, services et coordination internationale.',
       doctorTitle: 'Portail médecin', doctorDescription: 'Profil professionnel, affiliations, disponibilités et future collaboration avec les patients.',
-      pharmacyTitle: 'Portail pharmacie', pharmacyDescription: 'Profil, futures ordonnances, délivrance et coordination patient.',
+      pharmacyTitle: 'Portail pharmacie', pharmacyDescription: 'Profil, futures ordonnances, délivrance et coordination patient.', providerTitle: 'Espace prestataire', providerDescription: 'Dossiers limités, offres médicales, réservations et coordination pour votre organisation.',
     },
   },
   notifications: {

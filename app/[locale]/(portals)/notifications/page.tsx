@@ -16,5 +16,5 @@ export default async function NotificationsPage({ params }: { params: Promise<{ 
   const context = await requireAuth(locale);
   const portal = resolvePortalForRoles(context.roles);
 
-  return <DashboardShell context={context} dictionary={dictionary} locale={locale} portal={portal}><div className="mx-auto max-w-5xl"><PageHeader description={dictionary.notifications.pageDescription} title={dictionary.notifications.title} /><div className="mt-8"><NotificationCenter copy={dictionary.notifications} /></div></div></DashboardShell>;
+  return <DashboardShell context={context} dictionary={dictionary} locale={locale} portal={portal}><div className="mx-auto max-w-5xl"><PageHeader description={dictionary.notifications.pageDescription} title={dictionary.notifications.title} /><div className="mt-8"><NotificationCenter copy={dictionary.notifications} locale={locale} portal={portal} /></div></div></DashboardShell>;
 }

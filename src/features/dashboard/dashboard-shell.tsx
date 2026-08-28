@@ -10,6 +10,7 @@ import { LanguageSelector } from '@/src/components/language-selector';
 import { Badge } from '@/src/components/ui/badge';
 import { SignOutButton } from '@/src/features/auth/sign-out-button';
 import { NotificationIndicator } from '@/src/features/notifications/notification-indicator';
+import { InstallApp } from '@/src/features/pwa/install-app';
 import { getPortalConfig } from './config';
 
 interface DashboardShellProps {
@@ -50,7 +51,8 @@ export function DashboardShell({ portal, locale, dictionary, context, children }
             <div className="hidden lg:block"><p className="text-sm font-semibold text-slate-950">{dictionary.dashboard.greeting}</p><p className="mt-0.5 text-xs text-slate-500">{dictionary.dashboard.lastUpdated}</p></div>
             <div className="flex items-center gap-2 sm:gap-3">
               <LanguageSelector compact locale={locale} labels={dictionary.language} />
-              <NotificationIndicator copy={dictionary.notifications} locale={locale} />
+              <InstallApp compact copy={dictionary.install} />
+              <NotificationIndicator copy={dictionary.notifications} locale={locale} portal={portal} />
               <div className="hidden items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm sm:flex"><span className="grid size-8 place-items-center rounded-lg bg-slate-100 text-slate-600"><UserRound aria-hidden="true" className="size-4" /></span><div className="max-w-36"><p className="truncate text-xs font-semibold text-slate-900">{displayName}</p><p className="truncate text-[11px] text-slate-500">{context.email}</p></div></div>
               <div className="hidden xl:block"><SignOutButton label={dictionary.common.signOut} locale={locale} /></div>
             </div>

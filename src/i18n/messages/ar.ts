@@ -144,7 +144,7 @@ export const ar = {
     foundationNotice: 'تعرض هذه اللوحة البنية الآمنة. ستصل مسارات العمل الكاملة في مراحل لاحقة.',
     lastUpdated: 'تم التحديث الآن',
     navigation: {
-      overview: 'نظرة عامة', cases: 'الحالات الطبية', providers: 'مقدمو الرعاية', appointments: 'المواعيد', documents: 'الوثائق', patients: 'المرضى', team: 'الفريق', doctors: 'الأطباء', hospitals: 'المستشفيات', pharmacy: 'خدمات الصيدلية', prescriptions: 'الوصفات', catalog: 'دليل الرعاية', verification: 'التحقق', users: 'المستخدمون والأدوار', audit: 'سجل التدقيق',
+      overview: 'نظرة عامة', cases: 'الحالات الطبية', providers: 'مقدمو الرعاية', appointments: 'المواعيد', documents: 'الوثائق', patients: 'المرضى', team: 'الفريق', doctors: 'الأطباء', hospitals: 'المستشفيات', pharmacy: 'خدمات الصيدلية', prescriptions: 'الوصفات', catalog: 'دليل الرعاية', verification: 'التحقق', users: 'المستخدمون والأدوار', audit: 'سجل التدقيق', offers: 'العروض', bookings: 'الحجوزات', assignedCases: 'الحالات المعينة', notifications: 'الإشعارات',
     },
     stats: {
       profileTitle: 'جاهزية الملف', profileValue: 'البنية جاهزة', profileHint: 'ملف آمن وتفضيل اللغة',
@@ -166,7 +166,7 @@ export const ar = {
       patientTitle: 'بوابة المريض', patientDescription: 'مكان خاص للحالات والعروض والوثائق والمواعيد والاستعداد للسفر مستقبلًا.',
       hospitalTitle: 'بوابة المستشفى', hospitalDescription: 'عمليات محددة بنطاق المستشفى وفروعه وفريقه وخدماته والتنسيق الدولي.',
       doctorTitle: 'بوابة الطبيب', doctorDescription: 'الملف المهني والارتباط بالمستشفيات والتوافر والتعاون المستقبلي مع المرضى.',
-      pharmacyTitle: 'بوابة الصيدلية', pharmacyDescription: 'ملف الصيدلية والوصفات والصرف والتنسيق مع المرضى مستقبلًا.',
+      pharmacyTitle: 'بوابة الصيدلية', pharmacyDescription: 'ملف الصيدلية والوصفات والصرف والتنسيق مع المرضى مستقبلًا.', providerTitle: 'مساحة مقدم الرعاية', providerDescription: 'الحالات والعروض والحجوزات والتنسيق ضمن نطاق مؤسستك.',
     },
   },
   notifications: {

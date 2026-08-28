@@ -4,25 +4,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Bell, CheckCheck } from 'lucide-react';
 import type { Locale } from '@/src/i18n/config';
+import type { PortalKey } from '@/src/config/roles';
 import type { Dictionary } from '@/src/i18n/messages/en';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import type { NotificationRecord } from '@/src/types/domain';
 import { EmptyState } from '@/src/components/ui/empty-state';
+import { notificationHref, notificationText } from './notification-copy';
 
 interface NotificationIndicatorProps {
   locale: Locale;
   copy: Dictionary['notifications'];
+  portal: PortalKey;
 }
-
-function notificationText(record: NotificationRecord, copy: Dictionary['notifications']) {
-  if (record.title_key === 'notifications.foundationTitle') {
-    return { title: copy.foundationTitle, message: copy.foundationMessage };
-  }
-
-  return { title: copy.foundationTitle, message: copy.foundationMessage };
-}
-
-export function NotificationIndicator({ locale, copy }: NotificationIndicatorProps) {
+export function NotificationIndicator({ locale, copy, portal }: NotificationIndicatorProps) {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationRecord[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -92,7 +86,7 @@ export function NotificationIndicator({ locale, copy }: NotificationIndicatorPro
         <div className="absolute end-0 top-14 z-40 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
           <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><h2 className="font-semibold text-slate-950">{copy.title}</h2><button className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700" onClick={markAllRead} type="button"><CheckCheck aria-hidden="true" className="size-4" />{copy.markAllRead}</button></div>
           {notifications.length === 0 ? <div className="p-4"><EmptyState description={copy.emptyDescription} title={copy.emptyTitle} /></div> : (
-            <ul className="divide-y divide-slate-100">{notifications.map((record) => { const text = notificationText(record, copy); return <li className="p-5" key={record.id}><div className="flex gap-3"><span className={`mt-1 size-2 shrink-0 rounded-full ${record.read_at ? 'bg-slate-200' : 'bg-blue-600'}`} /><div><p className="text-sm font-semibold text-slate-900">{text.title}</p><p className="mt-1 text-xs leading-5 text-slate-600">{text.message}</p><p className="mt-2 text-[11px] text-slate-400">{copy.justNow}</p></div></div></li>; })}</ul>
+            <ul className="divide-y divide-slate-100">{notifications.map((record) => { const value = notificationText(record, locale, copy); return <li key={record.id}><Link className="block p-5 hover:bg-slate-50" href={notificationHref(record,locale,portal)} onClick={()=>setOpen(false)}><div className="flex gap-3"><span className={`mt-1 size-2 shrink-0 rounded-full ${record.read_at ? 'bg-slate-200' : 'bg-blue-600'}`} /><div><p className="text-sm font-semibold text-slate-900">{value.title}</p><p className="mt-1 text-xs leading-5 text-slate-600">{value.message}</p><p className="mt-2 text-[11px] text-slate-400">{new Intl.DateTimeFormat(locale,{dateStyle:'medium',timeStyle:'short'}).format(new Date(record.created_at))}</p></div></div></Link></li>; })}</ul>
           )}
           <Link className="block border-t border-slate-100 px-5 py-4 text-center text-sm font-semibold text-blue-700" href={`/${locale}/notifications`} onClick={() => setOpen(false)}>{copy.viewCenter}</Link>
         </div>

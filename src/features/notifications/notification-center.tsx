@@ -3,13 +3,17 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BellRing, CheckCheck } from 'lucide-react';
 import type { Dictionary } from '@/src/i18n/messages/en';
+import type { Locale } from '@/src/i18n/config';
+import type { PortalKey } from '@/src/config/roles';
+import Link from 'next/link';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import type { NotificationRecord } from '@/src/types/domain';
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent } from '@/src/components/ui/card';
 import { EmptyState } from '@/src/components/ui/empty-state';
+import { notificationHref, notificationText } from './notification-copy';
 
-export function NotificationCenter({ copy }: { copy: Dictionary['notifications'] }) {
+export function NotificationCenter({ copy, locale, portal }: { copy: Dictionary['notifications']; locale: Locale; portal: PortalKey }) {
   const [records, setRecords] = useState<NotificationRecord[]>([]);
 
   const load = useCallback(async () => {
@@ -40,7 +44,7 @@ export function NotificationCenter({ copy }: { copy: Dictionary['notifications']
     <Card>
       <CardContent>
         <div className="mb-5 flex justify-end"><Button onClick={markAllRead} type="button" variant="subtle"><CheckCheck aria-hidden="true" className="size-4" />{copy.markAllRead}</Button></div>
-        <ul className="divide-y divide-slate-100">{records.map((record) => <li className="flex gap-4 py-5 first:pt-0 last:pb-0" key={record.id}><span className={`mt-2 size-2 shrink-0 rounded-full ${record.read_at ? 'bg-slate-200' : 'bg-blue-600'}`} /><div><p className="font-semibold text-slate-950">{copy.foundationTitle}</p><p className="mt-1 text-sm leading-6 text-slate-600">{copy.foundationMessage}</p><p className="mt-2 text-xs text-slate-400">{copy.justNow}</p></div></li>)}</ul>
+        <ul className="divide-y divide-slate-100">{records.map((record) => {const value=notificationText(record,locale,copy);return <li key={record.id}><Link className="flex gap-4 py-5 first:pt-0 last:pb-0" href={notificationHref(record,locale,portal)}><span className={`mt-2 size-2 shrink-0 rounded-full ${record.read_at ? 'bg-slate-200' : 'bg-blue-600'}`} /><div><p className="font-semibold text-slate-950">{value.title}</p><p className="mt-1 text-sm leading-6 text-slate-600">{value.message}</p><p className="mt-2 text-xs text-slate-400">{new Intl.DateTimeFormat(locale,{dateStyle:'medium',timeStyle:'short'}).format(new Date(record.created_at))}</p></div></Link></li>})}</ul>
       </CardContent>
     </Card>
   );

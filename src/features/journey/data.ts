@@ -1,0 +1,45 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Locale } from '@/src/i18n/config';
+import { localized } from '@/src/features/cases/data';
+
+export type OfferStatus = 'DRAFT' | 'SENT' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN';
+export type BookingStatus = 'PENDING_CONFIRMATION' | 'CONFIRMED' | 'SCHEDULED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type ProviderType = 'HOSPITAL' | 'DOCTOR' | 'PHARMACY' | 'RADIOLOGY_CENTER' | 'MEDICAL_LABORATORY';
+
+export interface OfferRecord {
+  id: string; case_id: string; recommendation_id: string | null; provider_type: ProviderType; hospital_id: string | null; pharmacy_id: string | null; radiology_center_id: string | null; medical_laboratory_id: string | null; doctor_id: string | null; treatment_id: string; created_by: string; title: string; description: string; estimated_cost: number; currency: string; estimated_stay_days: number | null; proposed_start_date: string | null; proposed_end_date: string | null; included_services: string[]; excluded_services: string[]; provider_notes: string | null; decision_note: string | null; valid_until: string; status: OfferStatus; created_at: string; updated_at: string;
+  medical_case?: { title: string; patient_id: string } | null; treatment?: { name_i18n: Record<string, string> } | null; hospital?: { name_i18n: Record<string, string>; verification_state: string } | null; pharmacy?: { name_i18n: Record<string, string>; verification_state: string } | null; radiology_center?: { name_i18n: Record<string, string>; verification_state: string } | null; medical_laboratory?: { name_i18n: Record<string, string>; verification_state: string } | null; doctor?: { display_name: string | null; first_name: string; last_name: string; verification_state: string } | null;
+}
+export interface BookingRecord {
+  id: string; booking_reference: string; patient_id: string; case_id: string; offer_id: string; provider_type: ProviderType; doctor_id: string | null; treatment_id: string; planned_arrival: string | null; planned_care_date: string | null; estimated_completion: string | null; status: BookingStatus; patient_notes: string | null; provider_notes: string | null; created_at: string; updated_at: string;
+  medical_case?: { title: string } | null; offer?: { title: string } | null; treatment?: { name_i18n: Record<string, string> } | null; hospital?: { name_i18n: Record<string, string> } | null; pharmacy?: { name_i18n: Record<string, string> } | null; radiology_center?: { name_i18n: Record<string, string> } | null; medical_laboratory?: { name_i18n: Record<string, string> } | null; doctor?: { display_name: string | null; first_name: string; last_name: string } | null; events?: Array<{ id: string; from_status: BookingStatus | null; to_status: BookingStatus; note: string | null; created_at: string }>;
+}
+export interface ProviderScope { provider_type: Exclude<ProviderType, 'DOCTOR'>; entity_id: string; label: string; verified: boolean }
+
+const offerSelect = '*,medical_case:medical_cases(title,patient_id),treatment:treatments(name_i18n),hospital:hospitals(name_i18n,verification_state),pharmacy:pharmacies(name_i18n,verification_state),radiology_center:radiology_centers(name_i18n,verification_state),medical_laboratory:medical_laboratories(name_i18n,verification_state),doctor:doctors(display_name,first_name,last_name,verification_state)';
+const bookingSelect = '*,medical_case:medical_cases(title),offer:offers(title),treatment:treatments(name_i18n),hospital:hospitals(name_i18n),pharmacy:pharmacies(name_i18n),radiology_center:radiology_centers(name_i18n),medical_laboratory:medical_laboratories(name_i18n),doctor:doctors(display_name,first_name,last_name)';
+
+export function providerName(record: OfferRecord | BookingRecord, locale: Locale) {
+  const facility = record.hospital ?? record.pharmacy ?? record.radiology_center ?? record.medical_laboratory;
+  if (facility) return localized(facility.name_i18n, locale);
+  return record.doctor?.display_name || [record.doctor?.first_name, record.doctor?.last_name].filter(Boolean).join(' ') || record.provider_type;
+}
+export async function loadOffers(supabase: SupabaseClient, caseId?: string) { let query = supabase.from('offers').select(offerSelect).order('updated_at', { ascending: false }); if (caseId) query = query.eq('case_id', caseId); const { data } = await query.limit(100); return (data ?? []) as unknown as OfferRecord[]; }
+export async function loadOffer(supabase: SupabaseClient, offerId: string) { const { data } = await supabase.from('offers').select(offerSelect).eq('id', offerId).maybeSingle(); return (data as unknown as OfferRecord | null) ?? null; }
+export async function loadBookings(supabase: SupabaseClient) { const { data } = await supabase.from('bookings').select(bookingSelect).order('updated_at', { ascending: false }).limit(100); return (data ?? []) as unknown as BookingRecord[]; }
+export async function loadBooking(supabase: SupabaseClient, bookingId: string) { const [{ data }, { data: events }] = await Promise.all([supabase.from('bookings').select(bookingSelect).eq('id', bookingId).maybeSingle(), supabase.from('booking_events').select('*').eq('booking_id', bookingId).order('created_at')]); return data ? { ...(data as unknown as BookingRecord), events: (events ?? []) as BookingRecord['events'] } : null; }
+
+export async function loadProviderScopes(supabase: SupabaseClient, userId: string, locale: Locale) {
+  const [hospitals, pharmacies, radiology, laboratories] = await Promise.all([
+    supabase.from('hospital_memberships').select('hospital_id,hospital:hospitals(name_i18n,verification_state)').eq('user_id', userId).eq('is_active', true),
+    supabase.from('pharmacies').select('id,name_i18n,verification_state').eq('owner_user_id', userId).eq('status', 'ACTIVE'),
+    supabase.from('radiology_centers').select('id,name_i18n,verification_state').eq('owner_user_id', userId).eq('status', 'ACTIVE'),
+    supabase.from('medical_laboratories').select('id,name_i18n,verification_state').eq('owner_user_id', userId).eq('status', 'ACTIVE'),
+  ]);
+  const scopes: ProviderScope[] = [];
+  for (const row of hospitals.data ?? []) { const hospital = (row as unknown as { hospital_id: string; hospital: { name_i18n: Record<string,string>; verification_state: string } }).hospital; if (hospital) scopes.push({ provider_type: 'HOSPITAL', entity_id: (row as { hospital_id: string }).hospital_id, label: localized(hospital.name_i18n, locale), verified: hospital.verification_state === 'VERIFIED' }); }
+  for (const [type, rows] of [['PHARMACY', pharmacies.data], ['RADIOLOGY_CENTER', radiology.data], ['MEDICAL_LABORATORY', laboratories.data]] as const) for (const row of rows ?? []) { const value = row as { id: string; name_i18n: Record<string,string>; verification_state: string }; scopes.push({ provider_type: type, entity_id: value.id, label: localized(value.name_i18n, locale), verified: value.verification_state === 'VERIFIED' }); }
+  return scopes;
+}
+export async function loadProviderCases(supabase: SupabaseClient) { const { data } = await supabase.from('case_provider_assignments').select('*,medical_case:medical_cases(id,title,status,specialty_id,specialty:specialties(name_i18n))').eq('status', 'ACTIVE').order('assigned_at', { ascending: false }); return (data ?? []) as unknown as Array<{ id: string; case_id: string; provider_type: ProviderType; hospital_id: string|null; pharmacy_id: string|null; radiology_center_id:string|null; medical_laboratory_id:string|null; medical_case: { id:string; title:string; status:string; specialty_id:string; specialty:{name_i18n:Record<string,string>}|null } }> ; }
+export async function loadOfferOptions(supabase: SupabaseClient, caseId: string, locale: Locale) { const [{ data: medicalCase }, { data: doctors }, { data: recommendations }] = await Promise.all([supabase.from('medical_cases').select('id,title,specialty_id').eq('id', caseId).maybeSingle(), supabase.from('case_doctor_assignments').select('doctor_id,doctor:doctors(display_name,first_name,last_name)').eq('case_id', caseId).eq('status','ACTIVE'), supabase.from('treatment_recommendations').select('id,treatment_id').eq('case_id',caseId).eq('status','SUBMITTED')]); if (!medicalCase) return null; const { data: treatments } = await supabase.from('treatments').select('id,name_i18n').eq('specialty_id', medicalCase.specialty_id).eq('status','ACTIVE'); const treatmentRows=(treatments??[]) as Array<{id:string;name_i18n:Record<string,string>}>; const doctorRows=(doctors??[]) as unknown as Array<{doctor_id:string;doctor:{display_name:string|null;first_name:string;last_name:string}|null}>; return { medicalCase, treatments: treatmentRows.map((row)=>({id:row.id,label:localized(row.name_i18n,locale)})), doctors: doctorRows.map((row)=>({id:row.doctor_id,label:row.doctor?.display_name || [row.doctor?.first_name,row.doctor?.last_name].filter(Boolean).join(' ')})), recommendations: recommendations ?? [] }; }

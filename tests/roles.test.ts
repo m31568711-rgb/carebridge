@@ -4,9 +4,10 @@ import { hasAllowedRole, portalRoles, resolvePortalForRoles } from '@/src/config
 describe('role routing', () => {
   it('routes each role to its intended portal', () => {
     expect(resolvePortalForRoles(['PATIENT'])).toBe('patient');
-    expect(resolvePortalForRoles(['HOSPITAL_COORDINATOR'])).toBe('hospital');
+    expect(resolvePortalForRoles(['HOSPITAL_COORDINATOR'])).toBe('provider');
     expect(resolvePortalForRoles(['DOCTOR'])).toBe('doctor');
-    expect(resolvePortalForRoles(['PHARMACY'])).toBe('pharmacy');
+    expect(resolvePortalForRoles(['PHARMACY'])).toBe('provider');
+    expect(resolvePortalForRoles(['PROVIDER'])).toBe('provider');
     expect(resolvePortalForRoles(['ADMIN'])).toBe('admin');
   });
 
