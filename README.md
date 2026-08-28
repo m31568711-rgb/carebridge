@@ -56,7 +56,7 @@ No service-role credential is read by application code. Never prefix a secret wi
 
 ### Apply the schema
 
-Apply all versioned migrations in order through `202608270004_patient_cases_discovery.sql` using the CLI:
+Apply all versioned migrations in order through `202608300002_part6_clinical_hardening.sql` using the CLI:
 
 ```bash
 npx supabase init
@@ -66,7 +66,7 @@ npx supabase db push
 
 For a clean local Supabase environment, `npx supabase db reset` applies migrations and then `supabase/seed.sql`. In a hosted project, run the seed explicitly only if the generic country, city, specialty, and treatment examples are wanted.
 
-The migration chain creates Storage buckets (including private `patient-medical` evidence), adds `notifications` to the `supabase_realtime` publication, and installs case/provider RLS and audit triggers. It is designed for a fresh project; review policy names before applying it to a project that already has similarly named Storage policies.
+The migration chain creates private Storage buckets for patient evidence, payment proofs, and clinical results, adds `notifications` to the `supabase_realtime` publication, and installs case, journey, finance, travel, and clinical RLS/audit triggers. It is designed for a fresh project; review policy names before applying it to a project that already has similarly named Storage policies.
 
 ### Configure Auth
 
@@ -127,7 +127,7 @@ Roles are defined once in `src/config/roles.ts`:
 - `PHARMACY`
 - `PROVIDER` (generic provider-staff application experience; facility access still requires an explicit ownership or membership relationship)
 
-`/portal` resolves the correct area on the server. Every dashboard calls a server-side role guard before rendering. Frontend visibility is only a usability layer; database access is controlled independently by RLS. A future `LAB` role should be introduced through a new enum migration and a new provider module, without modifying existing migrations.
+`/portal` resolves the correct area on the server. Every dashboard calls a server-side role guard before rendering. Frontend visibility is only a usability layer; database access is controlled independently by RLS. Diagnostic staff use the existing provider role plus explicit laboratory/radiology ownership or `diagnostic_provider_memberships`; the role alone grants no clinical order access.
 
 ## Security and RLS overview
 
@@ -180,8 +180,14 @@ Part 4 adds a unified role dispatcher and provider workspace, explicitly scoped 
 
 The install action now appears only after the browser emits `beforeinstallprompt` and disappears after installation or when running standalone. Secure API responses and medical records are not added to the offline cache.
 
+## Part 6 operational medical workflow
+
+Part 6 adds private doctor encounters, normalized draft/issued prescriptions and medication items, assigned laboratory and radiology orders, release-gated results, private clinical-result documents, reusable follow-up appointments, journey completion, notifications, safe audit events, and server-side operational summaries. Patients see only their own issued/released records. Doctors are limited to the booking doctor relationship. Diagnostic users are limited to their owned or explicitly assigned laboratory/radiology organization, and hospital coordinators receive no implicit doctor-level access.
+
+Clinical result objects use `{patient_uuid}/{lab|radiology}/{result_uuid}/{safe_unique_filename}` in the non-public `clinical-results` bucket. Table triggers and Storage RLS independently validate patient, result, diagnostic-provider, MIME, size, and path scope. The `clinical.support` admin privilege is explicit; an ordinary admin role does not itself reveal clinical contents.
+
 ## Phase boundaries
 
 Part 5 adds normalized care-journey modes, scoped appointments and schedule lists, invoice items, manual payment tracking, private payment proofs, optional international travel/accommodation/companion coordination, local or airport transport, and a role-aware journey timeline. `LOCAL_CARE` never requires or renders flight/hotel coordination; `INTERNATIONAL_MEDICAL_TRAVEL` keeps every travel field optional, including accommodation.
 
-Parts 1–5 now cover the platform foundation, Admin/master data, private specialty-led cases and discovery, offers/bookings, scheduling, payment tracking, and manual travel coordination. Real payment gateways, prescriptions, airline/hotel/transport APIs, and operational radiology/laboratory orders remain intentionally deferred. Do not place sensitive medical, proof-document, companion-contact, or travel-note content in profiles, notifications, public provider rows, or audit metadata.
+Parts 1–6 now cover the platform foundation, Admin/master data, private specialty-led cases and discovery, offers/bookings, scheduling, payment tracking, manual travel coordination, and an internal operational medical workflow. Real e-prescribing/pharmacy dispensing, LIS, PACS/DICOM integration, external laboratory/radiology APIs, real payment gateways, and production infrastructure remain intentionally deferred. Do not place sensitive medical, result, proof-document, companion-contact, or travel-note content in profiles, notifications, public provider rows, or audit metadata.

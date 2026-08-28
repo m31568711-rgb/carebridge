@@ -144,7 +144,7 @@ export const ar = {
     foundationNotice: 'تعرض هذه اللوحة البنية الآمنة. ستصل مسارات العمل الكاملة في مراحل لاحقة.',
     lastUpdated: 'تم التحديث الآن',
     navigation: {
-      overview: 'نظرة عامة', cases: 'الحالات الطبية', providers: 'مقدمو الرعاية', appointments: 'المواعيد', documents: 'الوثائق', patients: 'المرضى', team: 'الفريق', doctors: 'الأطباء', hospitals: 'المستشفيات', pharmacy: 'خدمات الصيدلية', prescriptions: 'الوصفات', catalog: 'دليل الرعاية', verification: 'التحقق', users: 'المستخدمون والأدوار', audit: 'سجل التدقيق', offers: 'العروض', bookings: 'الحجوزات', assignedCases: 'الحالات المعينة', notifications: 'الإشعارات',
+      overview: 'نظرة عامة', cases: 'الحالات الطبية', providers: 'مقدمو الرعاية', appointments: 'المواعيد', documents: 'الوثائق', patients: 'المرضى', team: 'الفريق', doctors: 'الأطباء', hospitals: 'المستشفيات', pharmacy: 'خدمات الصيدلية', prescriptions: 'الوصفات', catalog: 'دليل الرعاية', verification: 'التحقق', users: 'المستخدمون والأدوار', audit: 'سجل التدقيق', offers: 'العروض', bookings: 'الحجوزات', assignedCases: 'الحالات المعينة', notifications: 'الإشعارات', clinical: 'المراجعات السريرية', diagnostics: 'العمليات التشخيصية',
     },
     stats: {
       profileTitle: 'جاهزية الملف', profileValue: 'البنية جاهزة', profileHint: 'ملف آمن وتفضيل اللغة',

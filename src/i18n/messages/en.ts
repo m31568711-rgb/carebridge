@@ -234,6 +234,8 @@ export const en = {
       bookings: 'Bookings',
       assignedCases: 'Assigned cases',
       notifications: 'Notifications',
+      clinical: 'Clinical reviews',
+      diagnostics: 'Diagnostic operations',
     },
     stats: {
       profileTitle: 'Profile readiness',

@@ -1,6 +1,6 @@
 # Security and RLS model
 
-This document describes the current Parts 1–3 authorization boundary. It is not a substitute for a production penetration test, compliance review, data-processing agreement, incident-response plan, or jurisdiction-specific medical privacy assessment.
+This document describes the current Parts 1–6 authorization boundary. It is not a substitute for a production penetration test, compliance review, data-processing agreement, incident-response plan, or jurisdiction-specific medical privacy assessment.
 
 ## Trust boundaries
 
@@ -30,6 +30,11 @@ This document describes the current Parts 1–3 authorization boundary. It is no
 | Notifications | None | Recipient only; `read_at` is the only client-updatable field | Can create operational notifications |
 | Audit logs | None | None | Read-only; trusted server writes |
 | App settings | Public rows only | Public rows only | Full management |
+| Doctor encounters | None | Booking doctor only | Explicit `clinical.support` only |
+| Prescriptions | None | Patient sees issued/completed; booking doctor manages | Explicit `clinical.support` only |
+| Lab/radiology orders | None | Patient owner, booking doctor, or assigned diagnostic organization | Explicit `clinical.support` only |
+| Lab/radiology results | None | Patient only after release; booking doctor and assigned diagnostic organization | Explicit `clinical.support` only |
+| Clinical follow-ups | None | Patient owner; booking doctor manages | Explicit `clinical.support` only |
 
 ## Important invariants
 
@@ -55,8 +60,10 @@ RLS decides which rows may be updated. Explicit PostgreSQL column grants further
 - Provider path: `{provider_kind}/{provider_uuid}/{filename}`
 - Provider kind is one of `hospital`, `doctor`, `pharmacy`, `radiology_center`, or `medical_laboratory`
 - Patient medical path: `{patient_uuid}/{case_uuid}/{safe_unique_filename}` in private `patient-medical`
+- Payment proof path: `{patient_uuid}/{booking_uuid}/{payment_uuid}/{safe_unique_filename}` in private `payment-proofs`
+- Clinical result path: `{patient_uuid}/{lab|radiology}/{result_uuid}/{safe_unique_filename}` in private `clinical-results`
 
-Storage policies parse these conventions and check provider ownership, hospital membership, patient ownership, or an active doctor assignment. `provider-private` and `patient-medical` are never public. Medical downloads use short-lived signed URLs.
+Storage policies parse these conventions and check provider ownership, hospital membership, patient ownership, active doctor assignment, released-result state, or assigned diagnostic membership. All medical/payment buckets are non-public. Medical downloads use short-lived signed URLs.
 
 ## Security checklist before production
 

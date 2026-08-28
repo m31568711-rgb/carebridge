@@ -39,3 +39,4 @@ describe('fictional Part 3 provider seed', () => {
 });
 
 describe('fictional Part 5 templates',()=>{it('documents local and optional international coordination without auth-dependent seed users',()=>{expect(seed).toContain("'part5.demo_templates'");expect(seed).toContain('"journeyType":"LOCAL_CARE"');expect(seed).toContain('"accommodationMode":"NOT_REQUIRED"');expect(seed).toContain('"accommodationMode":"COORDINATED"');});});
+describe('fictional Part 6 templates',()=>{it('keeps operational medical examples fictional and auth-independent',()=>{expect(seed).toContain("'part6.demo_templates'");expect(seed).toContain('CareBridge Demo Medicine');expect(seed).toContain('CareBridge Demo Blood Panel');expect(seed).toContain('CareBridge Demo Ultrasound');});});

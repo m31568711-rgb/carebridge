@@ -22,6 +22,8 @@ const part5Migration = readFileSync(fileURLToPath(new URL('../supabase/migration
 const part5NotificationFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290002_part5_payment_completion_notification.sql', import.meta.url)), 'utf8');
 const part5TriggerFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290003_part5_polymorphic_event_triggers.sql', import.meta.url)), 'utf8');
 const part5ProofFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290004_part5_payment_proof_path.sql', import.meta.url)), 'utf8');
+const part6Migration = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608300001_operational_clinical_workflow.sql', import.meta.url)), 'utf8');
+const part6Hardening = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608300002_part6_clinical_hardening.sql', import.meta.url)), 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -159,4 +161,15 @@ describe('Part 5 care operations migration',()=>{
   it('notifies the patient when manual tracking reaches paid',()=>{expect(part5NotificationFix).toContain("target_patient,'payment.completed'");expect(part5NotificationFix).toContain("next_status='PAID'");});
   it('handles heterogeneous trigger rows without dereferencing missing columns',()=>{expect(part5TriggerFix).toContain('new_data jsonb:=to_jsonb(new)');expect(part5TriggerFix).not.toContain('new.status');expect(part5TriggerFix).toContain("then 'appointment' else 'booking'");});
   it('validates all three payment-proof path scope segments',()=>{expect(part5ProofFix).toContain('path_payment:=parts[3]::uuid');expect(part5ProofFix).toContain('from public.payment_records');});
+});
+
+describe('Part 6 operational clinical workflow migration',()=>{
+  it.each(['clinical_encounters','prescriptions','prescription_items','lab_orders','lab_order_tests','lab_results','radiology_orders','radiology_results','clinical_result_documents','clinical_follow_ups'])('normalizes and protects %s',(table)=>{expect(part6Migration).toContain(`create table public.${table}`);expect(part6Migration).toContain(`alter table public.${table} enable row level security;`);});
+  it('keeps doctor notes private and provider coordinators outside clinical scope',()=>{expect(part6Migration).toContain("select public.is_booking_doctor(target_booking) or public.has_admin_privilege('clinical.support')");expect(part6Migration).not.toMatch(/lab_orders_read[^;]+is_booking_provider/);expect(part6Migration).not.toMatch(/radiology_orders_read[^;]+is_booking_provider/);});
+  it('releases results explicitly and protects exact private storage paths',()=>{expect(part6Migration).toContain('r.released_at is not null');expect(part6Migration).toContain("values('clinical-results','clinical-results',false,26214400");expect(part6Migration).toContain('protect_clinical_result_document');expect(part6Migration).toContain('array_length(parts,1)<>3');expect(part6Migration).not.toContain('createSignedUrl');});
+  it('protects clinical completion from patient booking updates',()=>{expect(part6Migration).toContain('create function public.protect_booking_clinical_status');expect(part6Migration).toContain("raise exception 'clinical journey status change is not permitted'");});
+  it('keeps sensitive contents out of general audit metadata',()=>{expect(part6Migration).toContain('execute function public.audit_admin_change()');expect(part6Migration).not.toMatch(/insert into public\.audit_logs[^;]*(?:clinical_notes|diagnosis_summary|result_notes|report_notes)/);});
+  it('does not grant clinical data to anonymous users',()=>{expect(part6Migration).not.toMatch(/grant (?:select|insert|update|delete)[^;]*(?:clinical_encounters|prescriptions|lab_orders|radiology_orders|lab_results)[^;]*to anon/);});
+  it('lets diagnostic triggers verify relationships without broad booking visibility',()=>{expect(part6Hardening).toContain('create function public.clinical_scope_matches');expect(part6Hardening).toContain('security definer');expect(part6Hardening).toContain("doctor cannot manage laboratory processing status");expect(part6Hardening).toContain("doctor cannot manage radiology processing status");});
+  it('locks released results, result paths, and follow-up transitions',()=>{expect(part6Hardening).toContain("released laboratory result is immutable");expect(part6Hardening).toContain("released radiology result is immutable");expect(part6Hardening).toContain("object_name!~'^[0-9a-f-]{36}/(lab|radiology)");expect(part6Hardening).toContain("raise exception 'invalid follow-up transition'");});
 });

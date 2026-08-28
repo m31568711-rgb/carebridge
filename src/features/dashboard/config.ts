@@ -3,10 +3,12 @@ import {
   Building2,
   CalendarDays,
   ClipboardList,
+  ClipboardCheck,
   FileClock,
   FileText,
   HeartPulse,
   Hospital,
+  Microscope,
   LayoutDashboard,
   Pill,
   Settings2,
@@ -47,6 +49,7 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: UserRound, label: navigation.assignedCases, href: '' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
       { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
+      { icon: ClipboardCheck, label: navigation.clinical, href: '/clinical' },
     ],
     pharmacy: [
       { icon: Pill, label: navigation.prescriptions },
@@ -59,6 +62,7 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: FileText, label: navigation.offers, href: '/offers' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
       { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
+      { icon: Microscope, label: navigation.diagnostics, href: '/diagnostics' },
     ],
   } as const;
 
