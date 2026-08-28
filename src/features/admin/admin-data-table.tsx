@@ -12,6 +12,7 @@ import type { AdminModuleDefinition } from './config';
 import type { LookupMap } from './data';
 import { formatCell, formatEnum, localizedValue } from './format';
 import type { AdminDictionary } from './messages';
+import { ReportToolbar } from '@/src/features/reports/report-toolbar';
 
 interface Props {
   copy: AdminDictionary;
@@ -66,6 +67,7 @@ export function AdminDataTable({ copy, count, definition, direction, filter, loc
 
   return (
     <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-white shadow-[var(--shadow-card)]">
+      <div className="flex flex-col justify-between gap-3 border-b border-[var(--border)] bg-white p-4 sm:flex-row sm:items-center"><p className="text-xs text-[#667c8d]">{count} {copy.common.records}</p><ReportToolbar columns={definition.listColumns.map(column=>({key:column,label:copy.fields[columnLabels[column]??'displayName']}))} filters={[query,filter].filter(Boolean)} locale={locale} reportName={copy.modules[definition.titleKey][0]} rows={rows.map(row=>Object.fromEntries(definition.listColumns.map(column=>[column,formatCell(column,row[column],locale,lookups)])))}/></div>
       <form className="grid gap-3 border-b border-[var(--border)] bg-[#fbfdfe] p-4 sm:grid-cols-[minmax(0,1fr)_220px_auto]" method="get">
         <label className="relative"><span className="sr-only">{copy.common.search}</span><Search className="pointer-events-none absolute start-3.5 top-1/2 size-4 -translate-y-1/2 text-[#7890a2]" /><Input className="ps-10" defaultValue={query} name="q" placeholder={copy.common.search} /></label>
         {definition.filterField ? <Select defaultValue={filter} name="filter"><option value="">{copy.common.all}</option>{filterOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</Select> : <span />}

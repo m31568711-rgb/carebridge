@@ -125,11 +125,11 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           </div>
         </section>
 
-        <section className="bg-slate-950 py-20 text-white lg:py-28" id="journey">
+        <section className="bg-[#0b2239] py-20 text-white lg:py-28" id="journey">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="max-w-3xl"><p className="section-eyebrow text-blue-300">{landing.journey.eyebrow}</p><h2 className="section-title text-white">{landing.journey.title}</h2></div>
-            <ol className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 md:grid-cols-2 lg:grid-cols-4">
-              {journeySteps.map(({ icon: Icon, title, description }, index) => <li className="bg-slate-950 p-7" key={title}><div className="flex items-center justify-between"><span className="grid size-11 place-items-center rounded-2xl bg-blue-500/15 text-blue-300"><Icon aria-hidden="true" className="size-5" /></span><span className="text-sm font-semibold text-slate-500">0{index + 1}</span></div><h3 className="mt-7 text-lg font-semibold">{title}</h3><p className="mt-3 text-sm leading-6 text-slate-400">{description}</p></li>)}
+            <ol className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-white/15 bg-white/15 shadow-2xl shadow-slate-950/20 md:grid-cols-2 lg:grid-cols-4">
+              {journeySteps.map(({ icon: Icon, title, description }, index) => <li className="bg-[#0d2944] p-7" key={title}><div className="flex items-center justify-between"><span className="grid size-11 place-items-center rounded-2xl bg-blue-300/15 text-blue-200 ring-1 ring-blue-200/15"><Icon aria-hidden="true" className="size-5" /></span><span className="text-sm font-semibold text-blue-200">0{index + 1}</span></div><h3 className="mt-7 text-lg font-semibold text-white">{title}</h3><p className="mt-3 text-sm leading-7 text-slate-200">{description}</p></li>)}
             </ol>
           </div>
         </section>

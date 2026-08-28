@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: '/',
     name: 'CareBridge — International care, thoughtfully coordinated',
     short_name: 'CareBridge',
-    description: 'A secure, multilingual foundation for international healthcare journeys.',
+    description: 'Secure, multilingual coordination for international healthcare journeys.',
     start_url: '/en',
     scope: '/',
     display: 'standalone',

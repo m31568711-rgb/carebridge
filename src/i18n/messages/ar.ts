@@ -24,8 +24,8 @@ export const ar = {
     profile: 'الملف الشخصي',
     settings: 'الإعدادات',
     help: 'المساعدة والدعم',
-    comingSoon: 'قادم في مرحلة لاحقة',
-    demoLabel: 'معاينة البنية الأساسية',
+    comingSoon: 'قريبًا',
+    demoLabel: 'نظرة على المنصة',
     statuses: { active: 'نشط', pending: 'قيد الانتظار', verified: 'موثّق', unread: 'غير مقروء' },
   },
   language: { label: 'اللغة', en: 'English', fr: 'Français', ar: 'العربية' },
@@ -62,14 +62,14 @@ export const ar = {
     why: {
       eyebrow: 'لماذا كيربريدج',
       title: 'مصممة حول الإنسان، لا حول الأوراق.',
-      description: 'بنية مترابطة لمقارنة الرعاية وتنسيق مقدميها والاستعداد من أول استفسار حتى المتابعة.',
+      description: 'تجربة مترابطة تساعدك على مقارنة خيارات العلاج وتنسيق الرعاية والاستعداد لكل خطوة، من الاستفسار الأول حتى المتابعة.',
       cards: {
         clarityTitle: 'خيارات واضحة',
-        clarityDescription: 'راجع معلومات منظمة حول التخصصات ومقدمي الرعاية والمواقع وخيارات العلاج المستقبلية.',
+        clarityDescription: 'اطّلع على معلومات واضحة حول التخصصات والمنشآت الطبية والوجهات وخيارات العلاج.',
         coordinationTitle: 'رحلة واحدة منسّقة',
-        coordinationDescription: 'اربط المواعيد والوثائق والاستعداد للسفر والتواصل في مكان واحد مستقبلًا.',
+        coordinationDescription: 'تابع مواعيدك ووثائقك وترتيبات السفر والتواصل مع فريق الرعاية من مكان واحد.',
         securityTitle: 'الأمان منذ البداية',
-        securityDescription: 'تؤسس الصلاحيات حسب الدور وسياسات الحد الأدنى من الوصول لرحلات رعاية أكثر أمانًا.',
+        securityDescription: 'تحمي ضوابط الوصول الدقيقة معلوماتك الحساسة طوال رحلة العلاج.',
       },
     },
     journey: {
@@ -78,10 +78,10 @@ export const ar = {
       steps: {
         discoverTitle: 'اكتشف',
         discoverDescription: 'استكشف التخصصات ووجهات الرعاية التي تناسب احتياجاتك.',
-        connectTitle: 'اتصل',
-        connectDescription: 'أنشئ حسابك واستعد لمشاركة المعلومات بأمان.',
+        connectTitle: 'تواصل',
+        connectDescription: 'أنشئ حسابك وشارك معلوماتك الطبية بأمان مع الفريق المختص.',
         coordinateTitle: 'نسّق',
-        coordinateDescription: 'أدر مستقبلًا تواصل مقدمي الرعاية والمواعيد والاستعداد للسفر.',
+        coordinateDescription: 'نسّق التواصل والمواعيد وترتيبات السفر في مكان واحد.',
         continueTitle: 'واصل',
         continueDescription: 'ابقَ على اتصال خلال العلاج والمتابعة.',
       },
@@ -89,7 +89,7 @@ export const ar = {
     specialties: {
       eyebrow: 'تخصصات مختارة',
       title: 'استكشف الرعاية حسب التخصص.',
-      description: 'توضح هذه الفئات التجريبية كيفية تنظيم اكتشاف العلاج في المراحل اللاحقة.',
+      description: 'تصفّح أبرز التخصصات وابدأ البحث عن خيارات الرعاية المناسبة لك.',
       items: {
         cardiology: 'أمراض القلب', orthopedics: 'جراحة العظام', oncology: 'الأورام', dentistry: 'طب الأسنان', fertility: 'علاج الخصوبة', ophthalmology: 'طب العيون',
       },
@@ -97,8 +97,8 @@ export const ar = {
     providers: {
       eyebrow: 'مقدمو الرعاية الصحية',
       title: 'شبكة موثوقة قابلة للنمو.',
-      description: 'ستجمع ملفات المستشفيات والأطباء الاعتمادات والمواقع والخدمات ودعم المرضى الدوليين في عرض موحّد.',
-      hospitalLabel: 'معاينة ملف المستشفى', doctorLabel: 'معاينة ملف الطبيب', pharmacyLabel: 'معاينة ملف الصيدلية', profileStatus: 'بنية تحقق منظمة',
+      description: 'تجمع ملفات المستشفيات والأطباء معلومات الاعتماد والمواقع والخدمات ودعم المرضى الدوليين في عرض واضح وموحّد.',
+      hospitalLabel: 'ملف المستشفى', doctorLabel: 'ملف الطبيب', pharmacyLabel: 'ملف الصيدلية', profileStatus: 'تحقق منظّم من مقدمي الرعاية',
     },
     howItWorks: {
       eyebrow: 'كيف تعمل المنصة',
@@ -106,19 +106,19 @@ export const ar = {
       steps: {
         accountTitle: 'أنشئ حسابك الآمن', accountDescription: 'اختر لغتك المفضلة وأعد ملفك كمريض.',
         exploreTitle: 'استكشف الرعاية المناسبة', exploreDescription: 'تصفح مقدمي الرعاية والتخصصات والوجهات بتجربة موحّدة.',
-        prepareTitle: 'استعد لرحلتك', prepareDescription: 'ستربط المراحل القادمة السجلات والعروض والمدفوعات والزيارات والسفر.',
+        prepareTitle: 'استعد لرحلة العلاج', prepareDescription: 'تابع سجلك الطبي وعروض العلاج والمدفوعات والمواعيد وترتيبات السفر.',
       },
     },
     trust: {
       eyebrow: 'الثقة والأمان',
       title: 'الرحلات الحساسة تستحق حماية مدروسة.',
-      description: 'تعتمد كيربريدج على اتصال مشفر ومصادقة Supabase وسياسات على مستوى الصفوف وصلاحيات حسب الدور وأحداث قابلة للتدقيق.',
+      description: 'تحمي كيربريدج رحلة علاجك من خلال تسجيل دخول آمن، وصلاحيات دقيقة، وسجلات خاصة، وإجراءات موثّقة.',
       accessTitle: 'أقل قدر من الصلاحيات', accessDescription: 'يحصل المستخدم فقط على الوصول المتوافق مع دوره ونطاق مؤسسته.',
       privacyTitle: 'خاص تلقائيًا', privacyDescription: 'لا تصبح معلومات المريض عامة ولا تُشارك لمجرد أن المستخدم مقدم رعاية.',
-      auditTitle: 'إجراءات مسؤولة', auditDescription: 'تدعم بنية التدقيق القابلة للتوسع الأحداث الإدارية والتجارية المهمة.',
+      auditTitle: 'إجراءات موثّقة', auditDescription: 'تُسجّل الإجراءات الإدارية وعمليات تنسيق الرعاية المهمة بما يعزز الشفافية والمساءلة.',
     },
     cta: {
-      eyebrow: 'ابدأ بثقة', title: 'يجب أن تكون رحلة رعايتك مترابطة من الخطوة الأولى.', description: 'أنشئ حسابًا للوصول إلى البنية الآمنة لبوابة المريض.', primaryAction: 'أنشئ حسابك', secondaryAction: 'تسجيل الدخول',
+      eyebrow: 'ابدأ بثقة', title: 'رحلة علاج مترابطة منذ الخطوة الأولى.', description: 'أنشئ حسابك لتتابع رحلة علاجك بأمان من مكان واحد.', primaryAction: 'إنشاء حساب', secondaryAction: 'تسجيل الدخول',
     },
   },
   auth: {
@@ -129,7 +129,7 @@ export const ar = {
       title: 'مرحبًا بعودتك', description: 'سجّل الدخول للمتابعة إلى بوابة كيربريدج.', action: 'تسجيل الدخول بأمان', forgotPassword: 'نسيت كلمة المرور؟', noAccount: 'جديد في كيربريدج؟', createAccount: 'إنشاء حساب',
     },
     signup: {
-      title: 'أنشئ حساب المريض', description: 'ابدأ بملف آمن. ستُضاف رحلات الرعاية في مراحل لاحقة.', action: 'إنشاء الحساب', agreement: 'بالمتابعة، توافق على استخدام كيربريدج بمسؤولية والحفاظ على أمان حسابك.', hasAccount: 'لديك حساب بالفعل؟', signIn: 'سجّل الدخول', successTitle: 'تم إنشاء الحساب',
+      title: 'أنشئ حساب المريض', description: 'ابدأ ملفك الصحي الآمن وتابع رحلة علاجك خطوة بخطوة.', action: 'إنشاء الحساب', agreement: 'بالمتابعة، توافق على استخدام كيربريدج بمسؤولية والحفاظ على أمان حسابك.', hasAccount: 'لديك حساب بالفعل؟', signIn: 'تسجيل الدخول', successTitle: 'تم إنشاء الحساب',
     },
     forgot: {
       title: 'إعادة تعيين كلمة المرور', description: 'أدخل بريدك لنرسل رابط استرداد آمنًا.', action: 'إرسال رابط الاسترداد', backToLogin: 'العودة إلى تسجيل الدخول', successTitle: 'تم إرسال الرابط',
@@ -141,36 +141,36 @@ export const ar = {
   },
   dashboard: {
     greeting: 'مرحبًا بك في مساحة كيربريدج',
-    foundationNotice: 'تعرض هذه اللوحة البنية الآمنة. ستصل مسارات العمل الكاملة في مراحل لاحقة.',
+    foundationNotice: 'يمكنك الوصول إلى خدماتك المتاحة ومتابعة آخر التحديثات من هذه الصفحة.',
     lastUpdated: 'تم التحديث الآن',
     navigation: {
       overview: 'نظرة عامة', cases: 'الحالات الطبية', providers: 'مقدمو الرعاية', appointments: 'المواعيد', documents: 'الوثائق', patients: 'المرضى', team: 'الفريق', doctors: 'الأطباء', hospitals: 'المستشفيات', pharmacy: 'خدمات الصيدلية', prescriptions: 'الوصفات', catalog: 'دليل الرعاية', verification: 'التحقق', users: 'المستخدمون والأدوار', audit: 'سجل التدقيق', offers: 'العروض', bookings: 'الحجوزات', assignedCases: 'الحالات المعينة', notifications: 'الإشعارات', clinical: 'المراجعات السريرية', diagnostics: 'العمليات التشخيصية',
     },
     stats: {
-      profileTitle: 'جاهزية الملف', profileValue: 'البنية جاهزة', profileHint: 'ملف آمن وتفضيل اللغة',
-      journeyTitle: 'حالة الرحلة', journeyValue: 'جاهز للبدء', journeyHint: 'تصل رحلات الرعاية في مرحلة لاحقة',
-      notificationsTitle: 'الإشعارات', notificationsValue: 'كل شيء محدّث', notificationsHint: 'مركز إشعارات جاهز للتحديث الفوري',
+      profileTitle: 'اكتمال الملف', profileValue: 'جاهز', profileHint: 'بيانات الحساب وتفضيلات التواصل',
+      journeyTitle: 'رحلة العلاج', journeyValue: 'جاهزة للمتابعة', journeyHint: 'آخر تطورات حالتك في مكان واحد',
+      notificationsTitle: 'الإشعارات', notificationsValue: 'أنت على اطلاع', notificationsHint: 'تابع المواعيد والنتائج والتحديثات المهمة',
       securityTitle: 'أمان الحساب', securityValue: 'محمي', securityHint: 'الوصول حسب الدور نشط',
     },
-    nextStepsTitle: 'إمكانات البنية الأساسية', nextStepsDescription: 'المنصة جاهزة لمسارات العمل المستقبلية دون تنفيذها الآن.',
-    activityTitle: 'النشاط الأخير', activityEmptyTitle: 'لا يوجد نشاط بعد', activityEmptyDescription: 'ستظهر أحداث الرحلة المهمة هنا عند تفعيل الوحدات المستقبلية.',
-    quickActionsTitle: 'إجراءات سريعة', quickActionsDescription: 'راجع البنية الآمنة المتاحة لدورك.',
+    nextStepsTitle: 'خدماتك', nextStepsDescription: 'اختر الخدمة التي تريد متابعتها.',
+    activityTitle: 'آخر التحديثات', activityEmptyTitle: 'لا توجد تحديثات حاليًا', activityEmptyDescription: 'ستظهر هنا تحديثات المواعيد والحالات والنتائج عند توفرها.',
+    quickActionsTitle: 'وصول سريع', quickActionsDescription: 'انتقل مباشرة إلى المهام والخدمات الأكثر استخدامًا.',
     modules: {
       profileTitle: 'أكمل ملفك', profileDescription: 'حافظ على دقة الهوية وتفضيلات التواصل.',
-      discoverTitle: 'استكشف الرعاية', discoverDescription: 'استكشف دليل مقدمي الرعاية والتخصصات.',
+      discoverTitle: 'استكشف خيارات الرعاية', discoverDescription: 'ابحث في دليل المنشآت الطبية والأطباء والتخصصات.',
       teamTitle: 'أدر وصول المؤسسة', teamDescription: 'جهّز أدوارًا محددة النطاق لفريق مقدم الرعاية.',
-      verifyTitle: 'راجع تحقق مقدمي الرعاية', verifyDescription: 'جهّز الوثائق والاعتمادات لمسارات المراجعة المستقبلية.',
+      verifyTitle: 'راجع اعتماد مقدمي الرعاية', verifyDescription: 'راجع وثائق المنشآت الطبية واعتماداتها وحالة التحقق منها.',
     },
     portals: {
       adminTitle: 'بوابة الإدارة', adminDescription: 'حوكمة المنصة والتحقق من مقدمي الرعاية والأدوار والإعدادات والرقابة القابلة للتدقيق.',
-      patientTitle: 'بوابة المريض', patientDescription: 'مكان خاص للحالات والعروض والوثائق والمواعيد والاستعداد للسفر مستقبلًا.',
+      patientTitle: 'مساحة المريض', patientDescription: 'مكان آمن لمتابعة الحالة الطبية والعروض والوثائق والمواعيد وترتيبات السفر.',
       hospitalTitle: 'بوابة المستشفى', hospitalDescription: 'عمليات محددة بنطاق المستشفى وفروعه وفريقه وخدماته والتنسيق الدولي.',
-      doctorTitle: 'بوابة الطبيب', doctorDescription: 'الملف المهني والارتباط بالمستشفيات والتوافر والتعاون المستقبلي مع المرضى.',
-      pharmacyTitle: 'بوابة الصيدلية', pharmacyDescription: 'ملف الصيدلية والوصفات والصرف والتنسيق مع المرضى مستقبلًا.', providerTitle: 'مساحة مقدم الرعاية', providerDescription: 'الحالات والعروض والحجوزات والتنسيق ضمن نطاق مؤسستك.',
+      doctorTitle: 'مساحة الطبيب', doctorDescription: 'الحالات المسندة والمواعيد والمراجعات السريرية والمتابعة.',
+      pharmacyTitle: 'مساحة الصيدلية', pharmacyDescription: 'الوصفات والصرف والتنسيق مع المرضى ضمن نطاق الصيدلية.', providerTitle: 'مساحة المنشأة الطبية', providerDescription: 'الحالات والعروض الطبية والحجوزات وتنسيق رحلة العلاج ضمن نطاق منشأتك.',
     },
   },
   notifications: {
-    title: 'الإشعارات', open: 'فتح الإشعارات', unreadCount: 'إشعارات غير مقروءة', emptyTitle: 'أنت على اطلاع', emptyDescription: 'ستظهر تحديثات الحساب والرحلة هنا.', markAllRead: 'تحديد الكل كمقروء', viewCenter: 'فتح مركز الإشعارات', pageDescription: 'راجع تحديثات الحساب والرحلة في مكان واحد.', foundationTitle: 'مساحتك الآمنة جاهزة', foundationMessage: 'كيربريدج مستعدة للمرحلة التالية من رحلتك.', justNow: 'الآن',
+    title: 'الإشعارات', open: 'فتح الإشعارات', unreadCount: 'إشعارات غير مقروءة', emptyTitle: 'لا توجد إشعارات جديدة', emptyDescription: 'أنت على اطلاع بآخر مستجدات رحلة العلاج.', markAllRead: 'تحديد الكل كمقروء', viewCenter: 'عرض كل الإشعارات', pageDescription: 'تابع تحديثات المواعيد والنتائج ورحلة العلاج في مكان واحد.', foundationTitle: 'تحديث جديد', foundationMessage: 'لديك تحديث جديد في كيربريدج.', justNow: 'الآن',
   },
   install: {
     title: 'ثبّت كيربريدج', description: 'أضف واجهة التطبيق الآمنة إلى هذا الجهاز للوصول بسرعة.', action: 'تثبيت التطبيق', dismiss: 'ليس الآن', unavailableTitle: 'أضف كيربريدج إلى شاشتك الرئيسية', unavailableDescription: 'استخدم قائمة المتصفح واختر «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق».', offlineTitle: 'أنت غير متصل حاليًا', offlineDescription: 'تُبقي كيربريدج واجهة التطبيق العامة فقط متاحة دون اتصال. أعد الاتصال للوصول إلى بيانات الحساب الآمنة.', returnHome: 'حاول فتح الصفحة الرئيسية مرة أخرى',
@@ -179,6 +179,6 @@ export const ar = {
     loadingTitle: 'جارٍ تحميل مساحتك', loadingDescription: 'نجهّز لك عرضًا آمنًا.', errorTitle: 'تعذر تحميل هذا القسم', errorDescription: 'حاول مرة أخرى، وتواصل مع الدعم إذا استمرت المشكلة.', retry: 'حاول مرة أخرى', emptyTitle: 'لا يوجد شيء هنا بعد', emptyDescription: 'ستظهر المعلومات الجديدة هنا عند توفرها.',
   },
   footer: {
-    description: 'بنية متعددة اللغات لرحلات رعاية صحية دولية أكثر أمانًا ووضوحًا.', platform: 'المنصة', company: 'الشركة', support: 'الدعم', about: 'عن كيربريدج', privacy: 'الخصوصية', terms: 'الشروط', accessibility: 'إمكانية الوصول', contact: 'تواصل مع الدعم', rights: 'كيربريدج. جميع الحقوق محفوظة.',
+    description: 'منصة متعددة اللغات لرحلات علاج دولية أكثر أمانًا ووضوحًا.', platform: 'المنصة', company: 'الشركة', support: 'الدعم', about: 'عن كيربريدج', privacy: 'الخصوصية', terms: 'الشروط', accessibility: 'إمكانية الوصول', contact: 'تواصل مع الدعم', rights: 'كيربريدج. جميع الحقوق محفوظة.',
   },
 } satisfies Dictionary;

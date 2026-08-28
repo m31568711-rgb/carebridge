@@ -154,6 +154,25 @@ textarea {
   }
 }
 
+@media print {
+  aside,
+  header,
+  nav,
+  button,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  body,
+  main {
+    background: white !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+}
+
 ::selection {
   background: #cfe5f1;
   color: var(--foreground);

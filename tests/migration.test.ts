@@ -24,6 +24,8 @@ const part5TriggerFix = readFileSync(fileURLToPath(new URL('../supabase/migratio
 const part5ProofFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290004_part5_payment_proof_path.sql', import.meta.url)), 'utf8');
 const part6Migration = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608300001_operational_clinical_workflow.sql', import.meta.url)), 'utf8');
 const part6Hardening = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608300002_part6_clinical_hardening.sql', import.meta.url)), 'utf8');
+const polishAttachments = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310001_clinical_consultation_attachments.sql', import.meta.url)), 'utf8');
+const polishAttachmentPath = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310002_clinical_attachment_storage_path.sql', import.meta.url)), 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -172,4 +174,10 @@ describe('Part 6 operational clinical workflow migration',()=>{
   it('does not grant clinical data to anonymous users',()=>{expect(part6Migration).not.toMatch(/grant (?:select|insert|update|delete)[^;]*(?:clinical_encounters|prescriptions|lab_orders|radiology_orders|lab_results)[^;]*to anon/);});
   it('lets diagnostic triggers verify relationships without broad booking visibility',()=>{expect(part6Hardening).toContain('create function public.clinical_scope_matches');expect(part6Hardening).toContain('security definer');expect(part6Hardening).toContain("doctor cannot manage laboratory processing status");expect(part6Hardening).toContain("doctor cannot manage radiology processing status");});
   it('locks released results, result paths, and follow-up transitions',()=>{expect(part6Hardening).toContain("released laboratory result is immutable");expect(part6Hardening).toContain("released radiology result is immutable");expect(part6Hardening).toContain("object_name!~'^[0-9a-f-]{36}/(lab|radiology)");expect(part6Hardening).toContain("raise exception 'invalid follow-up transition'");});
+});
+
+describe('demo polish consultation attachments',()=>{
+  it('keeps consultation attachments private and doctor-scoped',()=>{expect(polishAttachments).toContain('alter table public.clinical_attachments enable row level security;');expect(polishAttachments).toContain('public.can_manage_clinical_booking(booking_id)');expect(polishAttachments).not.toContain('is_booking_provider');});
+  it('shares only attachments explicitly released to the patient',()=>{expect(polishAttachments).toContain('patient_id=auth.uid() and patient_visible');expect(polishAttachments).toContain("values('clinical-attachments','clinical-attachments',false,15728640");});
+  it('validates exact storage scope without public access',()=>{expect(polishAttachments).toContain('a.object_path=object_name');expect(polishAttachments).toContain('public.can_access_clinical_attachment_object(name,true)');expect(polishAttachmentPath).toContain('array_length(p,1)<>2');expect(polishAttachments+polishAttachmentPath).not.toMatch(/grant .* to anon/);});
 });

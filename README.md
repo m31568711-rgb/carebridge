@@ -162,6 +162,20 @@ The manifest, PNG icon placeholders, install prompt, service-worker registration
 
 It does not cache API routes, Auth callbacks, Supabase requests, navigated private responses, or medical records. Replace the placeholder icons in `public/icons` when final brand assets are available.
 
+## Admin bulk import
+
+Authorized Admin and SUPER_ADMIN users can open `/admin/import` to import hospitals, doctors, pharmacies, medical laboratories, and radiology centers from CSV or Excel `.xlsx` files. Downloadable templates use stable business labels rather than internal identifiers. Countries resolve by ISO code; cities, specialties, and hospitals resolve by their business names or codes.
+
+Each file is limited to 5 MB and 500 rows. The preview flags missing values, invalid email addresses, and duplicates within the file. The server repeats validation, rejects duplicate or unresolved records, and inserts only valid rows as drafts through the signed-in administrator's normal RLS permissions. Existing database audit triggers record successful changes.
+
+## Private upload responsibilities
+
+- Patients upload case-related medical reports, prior results, images, and DICOM files to the private `patient-medical` bucket.
+- Laboratory and radiology staff release their official result files through the private `clinical-results` workflow.
+- Authorized provider/finance users manage provider documents and payment evidence through their scoped private workflows.
+- Doctors can add PDF or image consultation attachments to a booking, encounter, appointment, or follow-up. Patient access is explicit per attachment; provider coordinators do not inherit clinical access.
+- Admin users manage authorized provider and accreditation evidence without making private objects public.
+
 ## Validation commands
 
 ```bash
