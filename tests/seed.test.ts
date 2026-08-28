@@ -37,3 +37,5 @@ describe('fictional Part 3 provider seed', () => {
     expect(seed).toContain("'ACTIVE', 'PENDING_REVIEW'");
   });
 });
+
+describe('fictional Part 5 templates',()=>{it('documents local and optional international coordination without auth-dependent seed users',()=>{expect(seed).toContain("'part5.demo_templates'");expect(seed).toContain('"journeyType":"LOCAL_CARE"');expect(seed).toContain('"accommodationMode":"NOT_REQUIRED"');expect(seed).toContain('"accommodationMode":"COORDINATED"');});});

@@ -201,7 +201,8 @@ on conflict (hospital_id,branch_id,treatment_id) do update set starting_price=ex
 
 insert into public.app_settings(key,value,description_key,is_public) values
 ('platform.supported_languages','["en","fr","ar"]','settings.supportedLanguages',true),
-('platform.demo_data','{"fictional":true,"label":"CareBridge demonstration data"}','settings.demoData',false)
+('platform.demo_data','{"fictional":true,"label":"CareBridge demonstration data"}','settings.demoData',false),
+('part5.demo_templates','{"fictional":true,"localCare":{"journeyType":"LOCAL_CARE","appointment":"CONSULTATION","travel":null},"internationalNoAccommodation":{"journeyType":"INTERNATIONAL_MEDICAL_TRAVEL","accommodationMode":"NOT_REQUIRED"},"internationalCoordinated":{"journeyType":"INTERNATIONAL_MEDICAL_TRAVEL","accommodationMode":"COORDINATED","transport":"AIRPORT_PICKUP"},"invoice":{"currency":"USD","status":"ISSUED","manualMethods":["BANK_TRANSFER","CASH","CARD_AT_PROVIDER","OTHER"]}}','settings.part5DemoTemplates',false)
 on conflict (key) do update set value=excluded.value,is_public=excluded.is_public;
 
 -- Deterministic coordinates support Part 3 list/map discovery without relying on a map vendor.

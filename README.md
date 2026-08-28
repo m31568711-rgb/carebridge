@@ -182,4 +182,6 @@ The install action now appears only after the browser emits `beforeinstallprompt
 
 ## Phase boundaries
 
-Parts 1–4 include the platform foundation, Admin/master data, private specialty-led cases and discovery, offers, and CareBridge's internal booking journey. Payments, prescriptions, invoices, real travel or hospital booking integrations, and operational radiology/laboratory orders remain intentionally deferred to later parts. Do not place medical content in `profiles`, `notifications`, provider-directory rows, or audit metadata.
+Part 5 adds normalized care-journey modes, scoped appointments and schedule lists, invoice items, manual payment tracking, private payment proofs, optional international travel/accommodation/companion coordination, local or airport transport, and a role-aware journey timeline. `LOCAL_CARE` never requires or renders flight/hotel coordination; `INTERNATIONAL_MEDICAL_TRAVEL` keeps every travel field optional, including accommodation.
+
+Parts 1–5 now cover the platform foundation, Admin/master data, private specialty-led cases and discovery, offers/bookings, scheduling, payment tracking, and manual travel coordination. Real payment gateways, prescriptions, airline/hotel/transport APIs, and operational radiology/laboratory orders remain intentionally deferred. Do not place sensitive medical, proof-document, companion-contact, or travel-note content in profiles, notifications, public provider rows, or audit metadata.

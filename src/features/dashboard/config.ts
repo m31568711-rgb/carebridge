@@ -35,6 +35,7 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: Building2, label: navigation.providers, href: '/providers' },
       { icon: FileText, label: navigation.offers, href: '/offers' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
+      { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
     ],
     hospital: [
       { icon: ClipboardList, label: navigation.cases, href: '' },
@@ -45,6 +46,7 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
     doctor: [
       { icon: UserRound, label: navigation.assignedCases, href: '' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
+      { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
     ],
     pharmacy: [
       { icon: Pill, label: navigation.prescriptions },
@@ -56,6 +58,7 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: ClipboardList, label: navigation.cases, href: '' },
       { icon: FileText, label: navigation.offers, href: '/offers' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
+      { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
     ],
   } as const;
 

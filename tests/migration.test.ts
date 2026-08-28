@@ -18,6 +18,10 @@ const part4DoctorScopePath = fileURLToPath(new URL('../supabase/migrations/20260
 const part4DoctorScope = readFileSync(part4DoctorScopePath, 'utf8');
 const part4DoctorGrantPath = fileURLToPath(new URL('../supabase/migrations/202608280004_part4_offer_doctor_grant.sql', import.meta.url));
 const part4DoctorGrant = readFileSync(part4DoctorGrantPath, 'utf8');
+const part5Migration = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290001_care_operations_payments_travel.sql', import.meta.url)), 'utf8');
+const part5NotificationFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290002_part5_payment_completion_notification.sql', import.meta.url)), 'utf8');
+const part5TriggerFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290003_part5_polymorphic_event_triggers.sql', import.meta.url)), 'utf8');
+const part5ProofFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290004_part5_payment_proof_path.sql', import.meta.url)), 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -144,4 +148,15 @@ describe('API role grants migration', () => {
     expect(apiGrantsMigration).toContain('revoke update on table public.profiles from authenticated;');
     expect(apiGrantsMigration).toContain('grant update (read_at) on table public.notifications to authenticated;');
   });
+});
+
+describe('Part 5 care operations migration',()=>{
+  it.each(['appointments','invoices','invoice_items','payment_records','payment_documents','travel_plans','transport_arrangements','journey_events'])('normalizes and protects %s',(table)=>{expect(part5Migration).toContain(`create table public.${table}`);expect(part5Migration).toContain(`alter table public.${table} enable row level security;`);});
+  it('separates scheduling, finance, and travel authorization',()=>{expect(part5Migration).toContain('create function public.can_schedule_booking');expect(part5Migration).toContain('create function public.can_manage_booking_finance');expect(part5Migration).toContain('create function public.can_manage_booking_travel');expect(part5Migration).not.toMatch(/can_manage_booking_finance[\s\S]{0,180}is_booking_doctor/);});
+  it('keeps payment proof private and constrained',()=>{expect(part5Migration).toContain("values('payment-proofs','payment-proofs',false,10485760");expect(part5Migration).toContain('public.can_access_payment_proof(name,true)');expect(part5Migration).toContain('create function public.protect_payment_document');});
+  it('prevents browser-written totals and overpayments',()=>{expect(part5Migration).toContain("raise exception 'invoice totals are server managed'");expect(part5Migration).toContain("raise exception 'payment exceeds outstanding amount'");});
+  it('does not grant private operations to anonymous users',()=>{expect(part5Migration).not.toMatch(/grant (?:select|insert|update|delete)[^;]*(?:appointments|invoices|payment_records|travel_plans)[^;]*to anon/);});
+  it('notifies the patient when manual tracking reaches paid',()=>{expect(part5NotificationFix).toContain("target_patient,'payment.completed'");expect(part5NotificationFix).toContain("next_status='PAID'");});
+  it('handles heterogeneous trigger rows without dereferencing missing columns',()=>{expect(part5TriggerFix).toContain('new_data jsonb:=to_jsonb(new)');expect(part5TriggerFix).not.toContain('new.status');expect(part5TriggerFix).toContain("then 'appointment' else 'booking'");});
+  it('validates all three payment-proof path scope segments',()=>{expect(part5ProofFix).toContain('path_payment:=parts[3]::uuid');expect(part5ProofFix).toContain('from public.payment_records');});
 });
