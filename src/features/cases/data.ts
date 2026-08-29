@@ -6,12 +6,16 @@ export type MedicalCaseStatus = 'DRAFT' | 'SUBMITTED' | 'UNDER_REVIEW' | 'RECOMM
 export interface SelectOption { id: string; label: string; countryId?: string }
 export interface MedicalCaseRecord {
   id: string; patient_id: string; specialty_id: string; title: string; description: string; symptoms_notes: string | null;
+  chronic_conditions: string | null; current_medications: string | null; allergies: string | null;
   preferred_country_id: string | null; preferred_city_id: string | null; location_preference: string | null;
+  preferred_latitude: number | null; preferred_longitude: number | null;
   status: MedicalCaseStatus; created_at: string; updated_at: string; submitted_at: string | null; closed_at: string | null;
   specialty?: { name_i18n: Record<string, string> } | null;
   country?: { name_i18n: Record<string, string> } | null;
   city?: { name_i18n: Record<string, string> } | null;
 }
+
+export interface PatientProfileRecord { first_name: string | null; last_name: string | null; date_of_birth: string | null; gender: string | null; country_id: string | null; city_id: string | null; address_text: string | null; location_details: string | null; google_place_id: string | null; latitude: number | null; longitude: number | null }
 
 export interface CaseDocumentRecord {
   id: string; case_id: string; document_type: 'MEDICAL_REPORT' | 'LAB_RESULT' | 'RADIOLOGY' | 'PRESCRIPTION' | 'OTHER';
@@ -54,6 +58,11 @@ export async function loadPatientCases(supabase: SupabaseClient, patientId: stri
     .select('id,patient_id,specialty_id,title,description,symptoms_notes,preferred_country_id,preferred_city_id,location_preference,status,created_at,updated_at,submitted_at,closed_at,specialty:specialties(name_i18n)')
     .eq('patient_id', patientId).order('updated_at', { ascending: false }).limit(50);
   return (data ?? []) as unknown as MedicalCaseRecord[];
+}
+
+export async function loadPatientProfile(supabase: SupabaseClient, patientId: string) {
+  const { data } = await supabase.from('profiles').select('first_name,last_name,date_of_birth,gender,country_id,city_id,address_text,location_details,google_place_id,latitude,longitude').eq('id', patientId).maybeSingle();
+  return data as PatientProfileRecord | null;
 }
 
 export async function loadMedicalCase(supabase: SupabaseClient, caseId: string) {

@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Locale } from '@/src/i18n/config';
 import { adminModules, type AdminModuleDefinition, type LookupKey } from './config';
 
-export interface LookupOption { value: string; label: string; }
+export interface LookupOption { value: string; label: string; countryId?: string; }
 export type LookupMap = Partial<Record<LookupKey, LookupOption[]>>;
 
 function translated(value: unknown, locale: Locale) {
@@ -13,7 +13,7 @@ function translated(value: unknown, locale: Locale) {
 
 const lookupSelect: Record<LookupKey, { table: string; select: string; order: string }> = {
   countries: { table: 'countries', select: 'id,name_i18n,iso2', order: 'iso2' },
-  cities: { table: 'cities', select: 'id,name_i18n', order: 'created_at' },
+  cities: { table: 'cities', select: 'id,country_id,name_i18n', order: 'created_at' },
   specialties: { table: 'specialties', select: 'id,name_i18n,code', order: 'display_order' },
   treatments: { table: 'treatments', select: 'id,name_i18n,code', order: 'created_at' },
   hospitals: { table: 'hospitals', select: 'id,display_name_i18n,legal_name', order: 'created_at' },
@@ -35,7 +35,7 @@ export async function loadLookups(supabase: SupabaseClient, definition: AdminMod
     const config = lookupSelect[key];
     const { data } = await supabase.from(config.table).select(config.select).order(config.order).limit(250);
     const options = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
-      value: String(key === 'languages' ? row.code : row.id), label: lookupLabel(key, row, locale),
+      value: String(key === 'languages' ? row.code : row.id), label: lookupLabel(key, row, locale), countryId: key === 'cities' ? String(row.country_id) : undefined,
     }));
     return [key, options] as const;
   }));

@@ -6,6 +6,7 @@ import { getJourneyDictionary } from '@/src/features/journey/messages';
 import { getOperationsDictionary } from '@/src/features/operations/messages';
 
 export function notificationText(record: NotificationRecord, locale: Locale, copy: Dictionary['notifications']) {
+  if(record.title_key?.startsWith('core.notifications.')){const event=record.title_key.replace('core.notifications.','').replace(/Title$/,'');const phrases:Record<Locale,Record<string,string>>={en:{caseAssigned:'A medical case was assigned for your review',providerAssigned:'A medical case was shared with your care team',recommendation:'Your treatment recommendation is ready',offerReady:'A reviewed case is ready for an offer'},fr:{caseAssigned:'Un dossier médical vous a été attribué',providerAssigned:'Un dossier médical a été partagé avec votre équipe',recommendation:'Votre recommandation de traitement est disponible',offerReady:'Un dossier examiné est prêt pour une offre'},ar:{caseAssigned:'أُسندت إليك حالة طبية لمراجعتها',providerAssigned:'تمت مشاركة حالة طبية مع فريق الرعاية',recommendation:'التوصية العلاجية جاهزة',offerReady:'حالة طبية مراجَعة جاهزة لإعداد عرض'}};const message=phrases[locale][event]??copy.foundationTitle;return{title:message,message}}
   const journey = getJourneyDictionary(locale).notifications;
   const key = record.title_key?.replace('part4.notifications.', '') as keyof typeof journey | undefined;
   const messageKey = record.message_key?.replace('part4.notifications.', '') as keyof typeof journey | undefined;
@@ -18,6 +19,9 @@ export function notificationHref(record: NotificationRecord, locale: Locale, por
   if (record.related_entity_type === 'offer' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/offers/${record.related_entity_id}`;
   if (record.related_entity_type === 'booking' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/bookings/${record.related_entity_id}`;
   if (record.related_entity_type === 'appointment' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/appointments/${record.related_entity_id}`;
+  if (record.related_entity_type === 'medical_case' && portal === 'patient') return `/${locale}/patient/cases/${record.related_entity_id}`;
+  if (record.related_entity_type === 'medical_case' && portal === 'doctor') return `/${locale}/doctor/cases/${record.related_entity_id}`;
+  if (record.related_entity_type === 'provider_case' && portal === 'provider') return `/${locale}/provider/cases/${record.related_entity_id}/offers/new`;
   if (record.related_entity_type === 'lab_order' && portal === 'provider') return `/${locale}/provider/diagnostics/lab/${record.related_entity_id}`;
   if (record.related_entity_type === 'radiology_order' && portal === 'provider') return `/${locale}/provider/diagnostics/radiology/${record.related_entity_id}`;
   return `/${locale}/notifications`;

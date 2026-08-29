@@ -26,6 +26,10 @@ const part6Migration = readFileSync(fileURLToPath(new URL('../supabase/migration
 const part6Hardening = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608300002_part6_clinical_hardening.sql', import.meta.url)), 'utf8');
 const polishAttachments = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310001_clinical_consultation_attachments.sql', import.meta.url)), 'utf8');
 const polishAttachmentPath = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310002_clinical_attachment_storage_path.sql', import.meta.url)), 'utf8');
+const coreDemoPolish = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310003_core_demo_cycle_polish.sql', import.meta.url)), 'utf8');
+const coreCityFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310004_core_city_trigger_fix.sql', import.meta.url)), 'utf8');
+const coreNotificationFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310005_core_notification_trigger_fix.sql', import.meta.url)), 'utf8');
+const providerRecommendationScope = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310006_provider_recommendation_scope.sql', import.meta.url)), 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -180,4 +184,11 @@ describe('demo polish consultation attachments',()=>{
   it('keeps consultation attachments private and doctor-scoped',()=>{expect(polishAttachments).toContain('alter table public.clinical_attachments enable row level security;');expect(polishAttachments).toContain('public.can_manage_clinical_booking(booking_id)');expect(polishAttachments).not.toContain('is_booking_provider');});
   it('shares only attachments explicitly released to the patient',()=>{expect(polishAttachments).toContain('patient_id=auth.uid() and patient_visible');expect(polishAttachments).toContain("values('clinical-attachments','clinical-attachments',false,15728640");});
   it('validates exact storage scope without public access',()=>{expect(polishAttachments).toContain('a.object_path=object_name');expect(polishAttachments).toContain('public.can_access_clinical_attachment_object(name,true)');expect(polishAttachmentPath).toContain('array_length(p,1)<>2');expect(polishAttachments+polishAttachmentPath).not.toMatch(/grant .* to anon/);});
+});
+
+describe('core demo cycle polish',()=>{
+  it('adds patient demographics and useful clinical history without a patient treatment field',()=>{expect(coreDemoPolish).toContain('add column if not exists date_of_birth');expect(coreDemoPolish).toContain('add column if not exists chronic_conditions');expect(coreDemoPolish).not.toMatch(/medical_cases add column[^;]*treatment_id/);});
+  it('enforces country and city consistency in the database',()=>{expect(coreDemoPolish).toContain('validate_country_city_pair');expect(coreDemoPolish).toContain('selected city does not belong to selected country');expect(coreCityFix).toContain('row_data:=to_jsonb(new)');});
+  it('notifies each role through authorized core records',()=>{expect(coreDemoPolish).toContain("'case.assigned'");expect(coreDemoPolish).toContain("'recommendation.available'");expect(coreDemoPolish).toContain("'case.ready_for_offer'");expect(coreNotificationFix).toContain('new_data jsonb:=to_jsonb(new)');});
+  it('shares submitted recommendations only with the explicitly assigned provider',()=>{expect(providerRecommendationScope).toContain("status='SUBMITTED'");expect(providerRecommendationScope).toContain("a.status='ACTIVE'");expect(providerRecommendationScope).toContain('public.is_case_provider');});
 });

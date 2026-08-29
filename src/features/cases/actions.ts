@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { isLocale, type Locale } from '@/src/i18n/config';
 import { requireRoles } from '@/src/lib/auth/context';
 import { getSupabaseServerClient } from '@/src/lib/supabase/server';
-import { allowedCaseMimeTypes, caseDocumentSchema, maxCaseFileBytes, medicalCaseSchema, recommendationSchema, safeObjectFilename } from './validation';
+import { allowedCaseMimeTypes, caseDocumentSchema, maxCaseFileBytes, medicalCaseSchema, patientProfileSchema, recommendationSchema, safeObjectFilename } from './validation';
 
 export interface CaseActionState { error?: string; success?: string }
 
@@ -20,20 +20,28 @@ function casePayload(formData: FormData) {
     title: String(formData.get('title') ?? ''),
     description: String(formData.get('description') ?? ''),
     symptoms_notes: String(formData.get('symptoms_notes') ?? ''),
+    chronic_conditions: String(formData.get('chronic_conditions') ?? ''),
+    current_medications: String(formData.get('current_medications') ?? ''),
+    allergies: String(formData.get('allergies') ?? ''),
     preferred_country_id: String(formData.get('preferred_country_id') ?? ''),
     preferred_city_id: String(formData.get('preferred_city_id') ?? ''),
     location_preference: String(formData.get('location_preference') ?? ''),
   });
 }
 
+function profilePayload(formData: FormData) { const values = Object.fromEntries(['first_name','last_name','date_of_birth','gender','country_id','city_id','address_text','location_details','google_place_id','latitude','longitude'].map((key) => [key, String(formData.get(key) ?? '')])); values.address_text = String(formData.get('location_preference') ?? values.address_text); return patientProfileSchema.safeParse(values); }
+
 export async function createMedicalCaseAction(_state: CaseActionState, formData: FormData): Promise<CaseActionState> {
   const locale = localeFrom(formData);
   const context = await requireRoles(locale, ['PATIENT']);
   const parsed = casePayload(formData);
-  if (!parsed.success) return { error: 'invalid' };
+  const profile = profilePayload(formData);
+  if (!parsed.success || !profile.success) return { error: 'invalid' };
   const supabase = await getSupabaseServerClient();
   if (!supabase) return { error: 'unavailable' };
-  const { data, error } = await supabase.from('medical_cases').insert({ ...parsed.data, patient_id: context.userId, status: 'DRAFT' }).select('id').single();
+  const { error: profileError } = await supabase.from('profiles').update(profile.data).eq('id', context.userId);
+  if (profileError) return { error: 'save' };
+  const { data, error } = await supabase.from('medical_cases').insert({ ...parsed.data, preferred_latitude: profile.data.latitude, preferred_longitude: profile.data.longitude, patient_id: context.userId, status: 'DRAFT' }).select('id').single();
   if (error || !data) return { error: 'save' };
   redirect(`/${locale}/patient/cases/${data.id}?saved=1`);
 }
@@ -46,7 +54,8 @@ export async function updateMedicalCaseAction(_state: CaseActionState, formData:
   if (!parsed.success || !caseId) return { error: 'invalid' };
   const supabase = await getSupabaseServerClient();
   if (!supabase) return { error: 'unavailable' };
-  const { error } = await supabase.from('medical_cases').update(parsed.data).eq('id', caseId).eq('patient_id', context.userId);
+  const location = { preferred_latitude: String(formData.get('latitude') ?? '') || null, preferred_longitude: String(formData.get('longitude') ?? '') || null };
+  const { error } = await supabase.from('medical_cases').update({ ...parsed.data, ...location }).eq('id', caseId).eq('patient_id', context.userId);
   if (error) return { error: 'save' };
   revalidatePath(`/${locale}/patient`);
   revalidatePath(`/${locale}/patient/cases/${caseId}`);
