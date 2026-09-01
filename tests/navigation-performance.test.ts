@@ -20,4 +20,12 @@ describe('authenticated navigation performance', () => {
     expect(loading).toContain('aria-busy="true"');
     expect(loading).toContain('animate-pulse');
   });
+
+  it('signs in through the same-origin server endpoint before navigation', () => {
+    const form = source('../src/features/auth/auth-form.tsx');
+    const route = source('../app/api/auth/login/route.ts');
+    expect(form).toContain("fetch('/api/auth/login'");
+    expect(route).toContain('supabase.auth.signInWithPassword(parsed.data)');
+    expect(route).toContain("origin !== request.nextUrl.origin");
+  });
 });

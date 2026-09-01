@@ -34,13 +34,6 @@ export function AuthForm({ mode, locale, dictionary }: AuthFormProps) {
     setError(null);
 
     const formData = new FormData(event.currentTarget);
-    const supabase = getSupabaseBrowserClient();
-
-    if (!supabase) {
-      setError(shared.unexpectedError);
-      setLoading(false);
-      return;
-    }
 
     try {
       const email = String(formData.get('email') ?? '');
@@ -49,11 +42,20 @@ export function AuthForm({ mode, locale, dictionary }: AuthFormProps) {
       if (mode === 'login') {
         const parsed = loginSchema.safeParse({ email, password });
         if (!parsed.success) throw new Error(shared.unexpectedError);
-        const result = await supabase.auth.signInWithPassword(parsed.data);
-        if (result.error) throw result.error;
+        const response = await fetch('/api/auth/login', {
+          body: JSON.stringify(parsed.data),
+          headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+        });
+        const result = await response.json().catch(() => null) as { error?: string } | null;
+        if (!response.ok) throw new Error(result?.error ?? shared.unexpectedError);
         router.replace(`/${locale}/portal`);
         router.refresh();
+        return;
       }
+
+      const supabase = getSupabaseBrowserClient();
+      if (!supabase) throw new Error(shared.unexpectedError);
 
       if (mode === 'signup') {
         const parsed = signupSchema.safeParse({
