@@ -1,9 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import { getSupabasePublicEnv } from '@/src/lib/env/public';
 
-export async function getSupabaseServerClient(): Promise<SupabaseClient | null> {
+export const getSupabaseServerClient = cache(async (): Promise<SupabaseClient | null> => {
   const env = getSupabasePublicEnv();
   if (!env) return null;
 
@@ -23,4 +24,4 @@ export async function getSupabaseServerClient(): Promise<SupabaseClient | null> 
       },
     },
   });
-}
+});

@@ -1,5 +1,5 @@
-import type { User } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 import type { AppRole } from '@/src/config/roles';
 import { hasAllowedRole } from '@/src/config/roles';
 import type { Locale } from '@/src/i18n/config';
@@ -34,30 +34,29 @@ function mapProfile(row: ProfileRow | null): UserProfile | null {
   };
 }
 
-export async function getAuthContext(): Promise<AuthContext | null> {
+export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
   const supabase = await getSupabaseServerClient();
   if (!supabase) return null;
 
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return null;
-
-  const user: User = data.user;
+  const { data, error } = await supabase.auth.getClaims();
+  const claims = data?.claims as { sub?: string; email?: string } | undefined;
+  if (error || !claims?.sub) return null;
   const [profileResult, roleResult] = await Promise.all([
     supabase
       .from('profiles')
       .select('id, first_name, last_name, display_name, preferred_language, avatar_path, account_status')
-      .eq('id', user.id)
+      .eq('id', claims.sub)
       .maybeSingle(),
-    supabase.from('user_roles').select('role').eq('user_id', user.id),
+    supabase.from('user_roles').select('role').eq('user_id', claims.sub),
   ]);
 
   return {
-    userId: user.id,
-    email: user.email ?? null,
+    userId: claims.sub,
+    email: claims.email ?? null,
     profile: mapProfile((profileResult.data as ProfileRow | null) ?? null),
     roles: ((roleResult.data ?? []) as RoleRow[]).map(({ role }) => role),
   };
-}
+});
 
 export async function requireAuth(locale: Locale) {
   const context = await getAuthContext();
