@@ -7,8 +7,3 @@ export const loginSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });
-
-export const signupSchema = loginSchema.extend({
-  firstName: z.string().trim().min(1).max(80),
-  lastName: z.string().trim().min(1).max(80),
-});

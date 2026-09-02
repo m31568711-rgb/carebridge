@@ -20,7 +20,7 @@ The application source uses standard Next.js App Router conventions. The default
 app/
   [locale]/
     (public)/           # Multilingual landing page
-    (auth)/             # Login, signup, recovery, reset, auth errors
+    (auth)/             # Login, recovery, reset, auth errors
     (portals)/          # Role-protected portal routes
     auth/callback/      # Supabase PKCE callback
     offline/            # Localized PWA fallback
@@ -76,7 +76,7 @@ In **Supabase → Authentication → URL Configuration**:
 - Add local redirect URLs such as `http://localhost:3000/**`.
 - Add the final production origin with `/**` after deployment.
 
-Enable email/password authentication. Configure an SMTP provider before production so confirmation and recovery emails are reliable. The signup flow writes basic name and language metadata; a database trigger creates the profile and assigns the `PATIENT` role.
+Enable email/password authentication and disable public email signups. Configure an SMTP provider before production so password recovery emails are reliable. New accounts are created only through the authorized Admin account-management workflow.
 
 ### Bootstrap the first administrator
 
@@ -89,6 +89,8 @@ on conflict (user_id, role) do nothing;
 ```
 
 Provider roles require both a global role in `user_roles` and, for hospital staff, a scoped row in `hospital_memberships`. Admin access is controlled by `ADMIN`/`SUPER_ADMIN`; scoped `admin_privileges` rows authorize master-data, provider, verification, document, and accreditation mutations. `SUPER_ADMIN` retains all administrative privileges.
+
+Admin and SUPER_ADMIN users manage application logins under `/admin/accounts/*`. Account creation runs through the authenticated `admin-account-management` Edge Function, creates the Supabase Auth identity, and links the existing profile, global role, doctor record, hospital membership, or diagnostic-provider membership as appropriate. Temporary passwords are never written to application tables, logs, or audit metadata.
 
 ### Moving to another Supabase project
 

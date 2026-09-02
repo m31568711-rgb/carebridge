@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AuthForm } from '@/src/features/auth/auth-form';
 import { AuthShell } from '@/src/features/auth/auth-shell';
@@ -9,12 +8,17 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
   const { locale: value } = await params;
   if (!isLocale(value)) notFound();
   const dictionary = getDictionary(value);
+  const accountNotice = value === 'ar'
+    ? 'تُنشئ إدارة كيربريدج الحسابات الجديدة وتفعّل صلاحياتها.'
+    : value === 'fr'
+      ? 'Les nouveaux comptes et leurs accès sont créés par l’administration CareBridge.'
+      : 'New accounts and access are created by CareBridge administration.';
 
   return (
     <AuthShell
       description={dictionary.auth.login.description}
       dictionary={dictionary}
-      footer={<>{dictionary.auth.login.noAccount} <Link className="font-semibold text-blue-700" href={`/${value}/signup`}>{dictionary.auth.login.createAccount}</Link></>}
+      footer={accountNotice}
       locale={value}
       title={dictionary.auth.login.title}
     >

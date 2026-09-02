@@ -10,9 +10,9 @@ import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import { Button } from '@/src/components/ui/button';
 import { FormField } from '@/src/components/ui/form-field';
 import { Input } from '@/src/components/ui/input';
-import { loginSchema, signupSchema } from './validation';
+import { loginSchema } from './validation';
 
-type Mode = 'login' | 'signup' | 'forgot' | 'reset';
+type Mode = 'login' | 'forgot' | 'reset';
 
 interface AuthFormProps {
   mode: Mode;
@@ -57,36 +57,6 @@ export function AuthForm({ mode, locale, dictionary }: AuthFormProps) {
       const supabase = getSupabaseBrowserClient();
       if (!supabase) throw new Error(shared.unexpectedError);
 
-      if (mode === 'signup') {
-        const parsed = signupSchema.safeParse({
-          email,
-          password,
-          firstName: String(formData.get('firstName') ?? ''),
-          lastName: String(formData.get('lastName') ?? ''),
-        });
-        if (!parsed.success) throw new Error(shared.unexpectedError);
-
-        const result = await supabase.auth.signUp({
-          email: parsed.data.email,
-          password: parsed.data.password,
-          options: {
-            data: {
-              first_name: parsed.data.firstName,
-              last_name: parsed.data.lastName,
-              preferred_language: locale,
-            },
-            emailRedirectTo: `${window.location.origin}/${locale}/auth/callback?next=/${locale}/portal`,
-          },
-        });
-        if (result.error) throw result.error;
-        if (result.data.session) {
-          router.replace(`/${locale}/patient`);
-          router.refresh();
-        } else {
-          setSuccess(true);
-        }
-      }
-
       if (mode === 'forgot') {
         const result = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/${locale}/auth/callback?next=/${locale}/reset-password`,
@@ -111,9 +81,7 @@ export function AuthForm({ mode, locale, dictionary }: AuthFormProps) {
   }
 
   if (success) {
-    const title = mode === 'signup'
-      ? dictionary.auth.signup.successTitle
-      : mode === 'forgot'
+    const title = mode === 'forgot'
         ? dictionary.auth.forgot.successTitle
         : dictionary.auth.reset.successTitle;
     const description = mode === 'reset' ? dictionary.auth.reset.successDescription : shared.checkEmail;
@@ -132,33 +100,20 @@ export function AuthForm({ mode, locale, dictionary }: AuthFormProps) {
 
   const actionLabel = mode === 'login'
     ? dictionary.auth.login.action
-    : mode === 'signup'
-      ? dictionary.auth.signup.action
-      : mode === 'forgot'
+    : mode === 'forgot'
         ? dictionary.auth.forgot.action
         : dictionary.auth.reset.action;
 
   return (
     <form className="space-y-5" noValidate onSubmit={onSubmit}>
-      {mode === 'signup' ? (
-        <div className="grid gap-5 sm:grid-cols-2">
-          <FormField id="firstName" label={shared.firstNameLabel} required>
-            <Input autoComplete="given-name" id="firstName" name="firstName" required />
-          </FormField>
-          <FormField id="lastName" label={shared.lastNameLabel} required>
-            <Input autoComplete="family-name" id="lastName" name="lastName" required />
-          </FormField>
-        </div>
-      ) : null}
-
       {mode !== 'reset' ? (
         <FormField id="email" label={shared.emailLabel} required>
           <Input autoComplete="email" id="email" name="email" placeholder={shared.emailPlaceholder} required type="email" />
         </FormField>
       ) : null}
 
-      {mode === 'login' || mode === 'signup' || mode === 'reset' ? (
-        <FormField id="password" hint={mode === 'signup' || mode === 'reset' ? shared.passwordHint : undefined} label={mode === 'reset' ? dictionary.auth.reset.newPasswordLabel : shared.passwordLabel} required>
+      {mode === 'login' || mode === 'reset' ? (
+        <FormField id="password" hint={mode === 'reset' ? shared.passwordHint : undefined} label={mode === 'reset' ? dictionary.auth.reset.newPasswordLabel : shared.passwordLabel} required>
           <Input autoComplete={mode === 'login' ? 'current-password' : 'new-password'} id="password" minLength={8} name="password" placeholder={shared.passwordPlaceholder} required type="password" />
         </FormField>
       ) : null}
@@ -181,7 +136,6 @@ export function AuthForm({ mode, locale, dictionary }: AuthFormProps) {
         {loading ? shared.submitting : actionLabel}
       </Button>
 
-      {mode === 'signup' ? <p className="text-center text-xs leading-5 text-slate-500">{dictionary.auth.signup.agreement}</p> : null}
     </form>
   );
 }

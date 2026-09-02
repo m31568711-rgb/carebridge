@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Stethoscope,
   UserRound,
+  UsersRound,
   X,
 } from "lucide-react";
 import { Brand } from "@/src/components/brand";
@@ -90,6 +91,12 @@ const groups: readonly {
   },
 ];
 
+const accountNavigation = {
+  en: { title: 'Account management', patients: 'Patients', doctors: 'Doctor accounts', provider_staff: 'Provider / hospital staff', laboratory_staff: 'Laboratory staff', radiology_staff: 'Radiology staff' },
+  fr: { title: 'Gestion des comptes', patients: 'Patients', doctors: 'Comptes médecins', provider_staff: 'Personnel hôpital / prestataire', laboratory_staff: 'Personnel de laboratoire', radiology_staff: 'Personnel de radiologie' },
+  ar: { title: 'إدارة الحسابات', patients: 'المرضى', doctors: 'حسابات الأطباء', provider_staff: 'فريق المستشفى ومقدم الرعاية', laboratory_staff: 'فريق المختبر', radiology_staff: 'فريق مركز الأشعة' },
+} as const;
+
 export function AdminShell({
   adminCopy,
   children,
@@ -131,6 +138,15 @@ export function AdminShell({
           <LayoutDashboard className="size-[1.1rem]" />
           {adminCopy.navigation.overview}
         </Link>
+        <div className="mt-6">
+          <p className="px-3 text-[0.66rem] font-bold uppercase tracking-[0.12em] text-[#8a9ba8]">{accountNavigation[locale].title}</p>
+          <div className="mt-2 space-y-0.5">
+            {(Object.entries(accountNavigation[locale]).filter(([key]) => key !== 'title') as Array<[string, string]>).map(([type, label]) => {
+              const href = `/${locale}/admin/accounts/${type}`;
+              return <Link className={`flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition ${pathname === href ? 'bg-[#eaf3f9] text-[var(--primary)]' : 'text-[#53697b] hover:bg-[#f0f5f8] hover:text-[var(--foreground)]'}`} href={href} key={type} onClick={() => setMobileOpen(false)}><UsersRound className="size-[1.05rem] shrink-0" />{label}</Link>;
+            })}
+          </div>
+        </div>
         <Link
           className={`mt-1 flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition ${pathname === `/${locale}/admin/import` ? "bg-[#eaf3f9] text-[var(--primary)]" : "text-[#53697b] hover:bg-[#f0f5f8] hover:text-[var(--foreground)]"}`}
           href={`/${locale}/admin/import`}
@@ -183,15 +199,16 @@ export function AdminShell({
   );
 
   const currentSegment = pathname.split("/").filter(Boolean).at(-1) ?? "admin";
+  const accountLabel = pathname.includes('/admin/accounts/') ? accountNavigation[locale][currentSegment as keyof typeof accountNavigation.en] : undefined;
   const activeItem = groups
     .flatMap((group) => group.items)
     .find(([module]) => module === currentSegment);
   const breadcrumb =
-    currentSegment === "import"
+    accountLabel ?? (currentSegment === "import"
       ? adminCopy.navigation.bulkImport
       : activeItem
         ? adminCopy.navigation[activeItem[1]]
-        : adminCopy.navigation.overview;
+        : adminCopy.navigation.overview);
 
   return (
     <div className="min-h-screen bg-[#f5f8fb] text-[var(--foreground)]">

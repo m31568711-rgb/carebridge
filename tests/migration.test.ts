@@ -30,6 +30,8 @@ const coreDemoPolish = readFileSync(fileURLToPath(new URL('../supabase/migration
 const coreCityFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310004_core_city_trigger_fix.sql', import.meta.url)), 'utf8');
 const coreNotificationFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310005_core_notification_trigger_fix.sql', import.meta.url)), 'utf8');
 const providerRecommendationScope = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310006_provider_recommendation_scope.sql', import.meta.url)), 'utf8');
+const adminAccountManagement = readFileSync(fileURLToPath(new URL('../supabase/migrations/202609020001_admin_account_management.sql', import.meta.url)), 'utf8');
+const adminAccountServiceGrants = readFileSync(fileURLToPath(new URL('../supabase/migrations/202609020002_admin_account_service_grants.sql', import.meta.url)), 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -191,4 +193,10 @@ describe('core demo cycle polish',()=>{
   it('enforces country and city consistency in the database',()=>{expect(coreDemoPolish).toContain('validate_country_city_pair');expect(coreDemoPolish).toContain('selected city does not belong to selected country');expect(coreCityFix).toContain('row_data:=to_jsonb(new)');});
   it('notifies each role through authorized core records',()=>{expect(coreDemoPolish).toContain("'case.assigned'");expect(coreDemoPolish).toContain("'recommendation.available'");expect(coreDemoPolish).toContain("'case.ready_for_offer'");expect(coreNotificationFix).toContain('new_data jsonb:=to_jsonb(new)');});
   it('shares submitted recommendations only with the explicitly assigned provider',()=>{expect(providerRecommendationScope).toContain("status='SUBMITTED'");expect(providerRecommendationScope).toContain("a.status='ACTIVE'");expect(providerRecommendationScope).toContain('public.is_case_provider');});
+});
+
+describe('Admin account management',()=>{
+  it('exposes account listings only through an admin-checked function',()=>{expect(adminAccountManagement).toContain('if not public.is_platform_admin()');expect(adminAccountManagement).toContain('join auth.users u');expect(adminAccountManagement).toContain('revoke all on function public.admin_list_accounts(text) from public;');});
+  it('uses existing roles and provider relationships',()=>{expect(adminAccountManagement).toContain('public.user_roles');expect(adminAccountManagement).toContain('public.hospital_memberships');expect(adminAccountManagement).toContain('public.diagnostic_provider_memberships');});
+  it('gives the trusted function only the service grants needed for normalized linkage',()=>{expect(adminAccountServiceGrants).toContain('grant select, update on table public.profiles to service_role;');expect(adminAccountServiceGrants).toContain('grant select, insert, delete on table public.user_roles to service_role;');expect(adminAccountServiceGrants).not.toContain('to authenticated');});
 });

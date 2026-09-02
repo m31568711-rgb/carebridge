@@ -34,13 +34,10 @@ export function SiteHeader({ locale, dictionary }: SiteHeaderProps) {
           <Link className="hidden min-h-10 items-center rounded-xl px-3 text-sm font-semibold text-[#40576a] transition hover:bg-[#edf3f7] sm:inline-flex" href={`/${locale}/login`}>
             {dictionary.common.signIn}
           </Link>
-          <Link className="hidden min-h-10 items-center rounded-xl bg-[var(--primary)] px-3.5 text-sm font-semibold text-white shadow-[0_10px_24px_-14px_rgba(22,75,122,.8)] transition hover:bg-[var(--primary-hover)] sm:inline-flex" href={`/${locale}/signup`}>
-            {dictionary.common.signUp}
-          </Link>
           <button aria-expanded={open} aria-label={open ? dictionary.common.close : dictionary.common.openMenu} className="grid size-10 place-items-center rounded-xl border border-[var(--border)] text-[var(--foreground)] lg:hidden" onClick={() => setOpen((value) => !value)} type="button">{open ? <X className="size-5" /> : <Menu className="size-5" />}</button>
         </div>
       </div>
-      {open ? <div className="border-t border-[var(--border)] bg-white px-5 py-4 shadow-lg lg:hidden"><nav className="grid gap-1">{nav.map((item) => <a className="rounded-xl px-3 py-3 text-sm font-medium text-[#40576a] hover:bg-[#f2f7fb]" href={item.href} key={item.href} onClick={() => setOpen(false)}>{item.label}</a>)}</nav><div className="mt-3 grid grid-cols-2 gap-2 border-t border-[var(--border)] pt-4"><Link className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--border)] text-sm font-semibold" href={`/${locale}/login`}>{dictionary.common.signIn}</Link><Link className="inline-flex min-h-10 items-center justify-center rounded-xl bg-[var(--primary)] text-sm font-semibold text-white" href={`/${locale}/signup`}>{dictionary.common.signUp}</Link></div></div> : null}
+      {open ? <div className="border-t border-[var(--border)] bg-white px-5 py-4 shadow-lg lg:hidden"><nav className="grid gap-1">{nav.map((item) => <a className="rounded-xl px-3 py-3 text-sm font-medium text-[#40576a] hover:bg-[#f2f7fb]" href={item.href} key={item.href} onClick={() => setOpen(false)}>{item.label}</a>)}</nav><div className="mt-3 border-t border-[var(--border)] pt-4"><Link className="inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-semibold text-white" href={`/${locale}/login`}>{dictionary.common.signIn}</Link></div></div> : null}
     </header>
   );
 }
