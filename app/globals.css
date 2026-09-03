@@ -117,10 +117,10 @@ textarea {
 }
 
 .type-display {
-  font-size: clamp(2.45rem, 5.2vw, 4.75rem);
+  font-size: clamp(2.2rem, 4.15vw, 3.75rem);
   font-weight: 600;
-  letter-spacing: -0.052em;
-  line-height: 1.04;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
 }
 
 .type-h1 { font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 600; line-height: 1.1; letter-spacing: -0.04em; }
@@ -131,7 +131,7 @@ textarea {
 .type-small { font-size: 0.8125rem; line-height: 1.55; }
 .type-caption { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; line-height: 1.4; }
 
-[dir='rtl'] .type-display { font-size: clamp(2.15rem, 4.7vw, 4.05rem); letter-spacing: -0.02em; line-height: 1.22; }
+[dir='rtl'] .type-display { font-size: clamp(2.05rem, 3.8vw, 3.4rem); letter-spacing: -0.015em; line-height: 1.24; }
 [dir='rtl'] .type-h1 { font-size: clamp(1.85rem, 3.7vw, 2.9rem); line-height: 1.25; }
 [dir='rtl'] .type-h2 { font-size: clamp(1.55rem, 2.8vw, 2.25rem); line-height: 1.3; }
 

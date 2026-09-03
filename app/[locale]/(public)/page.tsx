@@ -79,39 +79,39 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
     <div className="min-h-screen bg-white text-slate-950">
       <SiteHeader dictionary={dictionary} locale={locale} />
       <main id="main-content">
-        <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f4f8fb_0%,#fff_100%)]">
-          <div aria-hidden="true" className="absolute start-1/2 top-20 size-[38rem] rounded-full bg-[#dcebf3]/70 blur-3xl" />
-          <div className="relative mx-auto grid max-w-7xl gap-12 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:px-12 lg:pb-28 lg:pt-24">
-            <div className="relative z-10 max-w-3xl">
-              <Badge className="px-4 py-2 uppercase tracking-[0.13em]" variant="blue">{landing.hero.eyebrow}</Badge>
-              <h1 className="type-display mt-7 max-w-[14ch] text-balance text-[var(--foreground)]">{landing.hero.title}</h1>
-              <p className="mt-6 max-w-2xl text-base leading-7 text-[var(--muted)] sm:text-lg sm:leading-8">{landing.hero.description}</p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <a className="inline-flex min-h-13 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-6 text-sm font-semibold text-white shadow-[var(--shadow-button)] transition hover:bg-[var(--primary-strong)]" href="#find-care">
+        <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f3f8fb_0%,#fff_100%)]">
+          <div aria-hidden="true" className="absolute start-[54%] top-10 size-[32rem] rounded-full bg-[#dcebf3]/60 blur-3xl" />
+          <div className="relative mx-auto grid max-w-7xl gap-9 px-5 py-12 sm:px-8 sm:py-14 lg:grid-cols-[minmax(0,1fr)_minmax(25rem,.92fr)] lg:items-center lg:gap-12 lg:px-12 lg:py-16 xl:gap-16">
+            <div className="relative z-10 max-w-[39rem] text-start">
+              <Badge className="px-3.5 py-1.5 uppercase tracking-[0.12em]" variant="blue">{landing.hero.eyebrow}</Badge>
+              <h1 className="type-display mt-5 max-w-[16ch] text-balance text-[var(--foreground)]">{landing.hero.title}</h1>
+              <p className="mt-5 max-w-[37rem] text-base leading-7 text-[var(--muted)] sm:text-[1.0625rem] sm:leading-8">{landing.hero.description}</p>
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <a className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-6 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(22,75,122,.8)] transition hover:bg-[var(--primary-hover)]" href="#find-care">
                   {landing.hero.primaryAction}<ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
                 </a>
-                <a className="inline-flex min-h-13 items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-blue-200" href="#how-it-works">{landing.hero.secondaryAction}</a>
+                <a className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300/80 bg-white/80 px-6 text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:bg-white hover:text-blue-800" href="#how-it-works">{landing.hero.secondaryAction}</a>
               </div>
-              <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-600">
+              <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2.5 text-[0.8125rem] font-medium text-slate-600 sm:text-sm">
                 {assurances.map((item) => <span className="flex items-center gap-2" key={item}><CheckCircle2 aria-hidden="true" className="size-4 text-emerald-500" />{item}</span>)}
               </div>
             </div>
 
-            <div className="relative" id="find-care">
-              <div aria-hidden="true" className="absolute -inset-10 rounded-full bg-blue-200/35 blur-3xl" />
-              <Card className="relative overflow-hidden rounded-[1.75rem] border-white/80 shadow-[0_35px_100px_-45px_rgba(22,75,122,.38)]">
+            <div className="relative mx-auto w-full max-w-[32rem] lg:mx-0" id="find-care">
+              <div aria-hidden="true" className="absolute -inset-7 rounded-full bg-blue-200/30 blur-3xl" />
+              <Card className="relative overflow-hidden rounded-[1.5rem] border-white/90 shadow-[0_28px_80px_-42px_rgba(22,75,122,.45)]">
                 <ProviderVisualPlaceholder label={landing.providers.doctorLabel} />
-                <CardContent className="p-5 sm:p-7">
-                  <div className="mb-7 flex items-center justify-between gap-4">
+                <CardContent className="p-5 sm:p-6">
+                  <div className="mb-5 flex items-center justify-between gap-4">
                     <div><p className="text-sm font-semibold text-blue-700">{landing.search.eyebrow}</p><p className="mt-1 text-sm text-slate-500">{landing.search.helper}</p></div>
-                    <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-blue-50 text-blue-700"><Sparkles aria-hidden="true" className="size-5" /></span>
+                    <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-50 text-blue-700"><Sparkles aria-hidden="true" className="size-5" /></span>
                   </div>
-                  <div className="space-y-4">
-                    <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">{landing.search.treatmentLabel}</span><span className="flex min-h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-400"><Stethoscope aria-hidden="true" className="size-5 text-blue-600" />{landing.search.treatmentPlaceholder}</span></label>
-                    <label className="block"><span className="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">{landing.search.destinationLabel}</span><span className="flex min-h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-400"><MapPin aria-hidden="true" className="size-5 text-blue-600" />{landing.search.destinationPlaceholder}</span></label>
-                    <button className="inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--primary-strong)]" type="button"><Search aria-hidden="true" className="size-4" />{landing.search.action}</button>
+                  <div className="space-y-3.5">
+                    <label className="block"><span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">{landing.search.treatmentLabel}</span><span className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-400"><Stethoscope aria-hidden="true" className="size-5 text-blue-600" />{landing.search.treatmentPlaceholder}</span></label>
+                    <label className="block"><span className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500">{landing.search.destinationLabel}</span><span className="flex min-h-12 items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-400"><MapPin aria-hidden="true" className="size-5 text-blue-600" />{landing.search.destinationPlaceholder}</span></label>
+                    <button className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[var(--primary)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--primary-hover)]" type="button"><Search aria-hidden="true" className="size-4" />{landing.search.action}</button>
                   </div>
-                  <div className="mt-7 rounded-2xl bg-blue-50 p-5"><p className="font-semibold text-slate-900">{landing.search.assuranceTitle}</p><p className="mt-2 text-sm leading-6 text-slate-600">{landing.search.assuranceDescription}</p></div>
+                  <div className="mt-5 rounded-xl bg-blue-50/80 p-4"><p className="text-sm font-semibold text-slate-900">{landing.search.assuranceTitle}</p><p className="mt-1.5 text-sm leading-6 text-slate-600">{landing.search.assuranceDescription}</p></div>
                 </CardContent>
               </Card>
             </div>

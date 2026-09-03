@@ -2,7 +2,7 @@ import { Globe2, HeartPulse, MapPin, Stethoscope } from 'lucide-react';
 
 export function ProviderVisualPlaceholder({ label }: { label: string }) {
   return (
-    <div aria-label={label} className="relative min-h-64 overflow-hidden rounded-t-[1.65rem] bg-[linear-gradient(145deg,#dcecf4_0%,#f8fbfd_58%,#e8f2f7_100%)]" data-replaceable-visual="provider-hero" role="img">
+    <div aria-label={label} className="relative min-h-52 overflow-hidden rounded-t-[1.4rem] bg-[linear-gradient(145deg,#dcecf4_0%,#f8fbfd_58%,#e8f2f7_100%)] sm:min-h-56" data-replaceable-visual="provider-hero" role="img">
       <div aria-hidden="true" className="absolute -end-12 -top-16 size-56 rounded-full border-[32px] border-white/45" />
       <div aria-hidden="true" className="absolute -bottom-20 start-8 size-52 rounded-full bg-[#bcd8e5]/55 blur-3xl" />
       <div className="absolute end-5 top-5 flex items-center gap-2 rounded-full border border-white/80 bg-white/85 px-3 py-2 text-xs font-semibold text-[var(--primary)] shadow-sm backdrop-blur"><Globe2 className="size-4" />CareBridge Global</div>
