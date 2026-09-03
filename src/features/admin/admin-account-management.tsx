@@ -10,10 +10,7 @@ import { Input } from '@/src/components/ui/input';
 import { Select } from '@/src/components/ui/select';
 import type { Locale } from '@/src/i18n/config';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
-
-export const accountTypes = ['patients', 'doctors', 'provider_staff', 'laboratory_staff', 'radiology_staff'] as const;
-export type AccountType = (typeof accountTypes)[number];
-export function isAccountType(value: string): value is AccountType { return accountTypes.includes(value as AccountType); }
+import type { AccountType } from './account-types';
 
 export interface ManagedAccountRow {
   user_id: string;

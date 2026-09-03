@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { AdminAccountManagement, isAccountType, type ManagedAccountRow, type ProviderOption } from '@/src/features/admin/admin-account-management';
+import { isAccountType } from '@/src/features/admin/account-types';
+import { AdminAccountManagement, type ManagedAccountRow, type ProviderOption } from '@/src/features/admin/admin-account-management';
 import { localizedValue } from '@/src/features/admin/format';
 import { isLocale } from '@/src/i18n/config';
 import { getSupabaseServerClient } from '@/src/lib/supabase/server';

@@ -75,6 +75,15 @@ try {
     if (scenario.accountType === 'patients') assert(profile.date_of_birth === '1990-05-12' && profile.gender === 'FEMALE', 'patient demographics are linked');
     assert(roles?.length === 1 && roles[0].role === scenario.expectedRole, `${scenario.accountType} has exactly the expected role`);
     assert(!listError && accounts?.some((account) => account.user_id === createBody.userId && account.email === email), `${scenario.accountType} appears in its Admin list`);
+    const updatedPhone = `+20 100 111 ${String(createdIds.length).padStart(4, '0')}`;
+    const profileUpdate = await adminClient.from('profiles').update({ phone: updatedPhone }).eq('id', createBody.userId).select('phone').single();
+    assert(!profileUpdate.error && profileUpdate.data?.phone === updatedPhone, `${scenario.accountType} Admin update persists`);
+    const deactivated = await adminClient.rpc('admin_update_profile_status', { target_user_id: createBody.userId, new_status: 'SUSPENDED' });
+    assert(!deactivated.error, `${scenario.accountType} can be deactivated without deleting its identity`);
+    const suspended = await adminClient.from('profiles').select('account_status').eq('id', createBody.userId).single();
+    assert(suspended.data?.account_status === 'SUSPENDED', `${scenario.accountType} deactivation persists`);
+    const reactivated = await adminClient.rpc('admin_update_profile_status', { target_user_id: createBody.userId, new_status: 'ACTIVE' });
+    assert(!reactivated.error, `${scenario.accountType} can be reactivated`);
     if (scenario.accountType === 'doctors') assert((await adminClient.from('doctors').select('id').eq('user_id', createBody.userId)).data?.length === 1, 'doctor profile relationship is linked');
     if (scenario.accountType === 'provider_staff') assert((await adminClient.from('hospital_memberships').select('id').eq('user_id', createBody.userId).eq('hospital_id', scenario.relationshipId)).data?.length === 1, 'hospital membership is linked');
     if (scenario.accountType === 'laboratory_staff') assert((await adminClient.from('diagnostic_provider_memberships').select('id').eq('user_id', createBody.userId).eq('medical_laboratory_id', scenario.relationshipId)).data?.length === 1, 'laboratory membership is linked');
@@ -102,4 +111,4 @@ try {
   for (const userId of createdIds.reverse()) await service.auth.admin.deleteUser(userId);
 }
 
-console.log('All five Admin account types, Auth/profile/role/provider linkage, role-based login, non-admin denial, public-signup denial, account listings, cleanup, and persistent demo accounts validated.');
+console.log('All five Admin account types passed create, list/read, update, deactivate/reactivate, Auth/profile/role/provider linkage, role-based login, non-admin denial, public-signup denial, cleanup, and persistent demo-account preservation.');
