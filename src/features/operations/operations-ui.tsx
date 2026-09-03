@@ -809,8 +809,7 @@ function Travel({
             <Info l={copy.flight}>
               {[t?.airline, t?.arrival_flight_number].filter(Boolean).join(" ")}
             </Info>
-            <Info l={copy.accommodation}>{t?.accommodation_mode}</Info>
-            <Info l={copy.accommodationName}>{t?.accommodation_name}</Info>
+            <div><dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">{copy.accommodation}</dt><dd className="mt-1"><Link className="text-sm font-semibold text-blue-700" href={`/${locale}/patient/accommodation`}>{copy.accommodation}</Link></dd></div>
             <Info l={copy.companion}>{t?.companion_name}</Info>
           </dl>
         ) : (
@@ -866,48 +865,6 @@ function Travel({
                   name="arrival_terminal"
                 />
               </Field>
-              <Field label={copy.accommodation}>
-                <Select
-                  defaultValue={t?.accommodation_mode ?? "NOT_REQUIRED"}
-                  name="accommodation_mode"
-                >
-                  <option value="NOT_REQUIRED">{copy.notRequired}</option>
-                  <option value="SELF_ARRANGED">{copy.selfArranged}</option>
-                  <option value="COORDINATED">{copy.coordinated}</option>
-                </Select>
-              </Field>
-              <Field label={copy.accommodationName}>
-                <Input
-                  defaultValue={t?.accommodation_name ?? ""}
-                  name="accommodation_name"
-                />
-              </Field>
-              <Field label={copy.address}>
-                <Input
-                  defaultValue={t?.accommodation_address ?? ""}
-                  name="accommodation_address"
-                />
-              </Field>
-              <Field label={copy.checkIn}>
-                <Input
-                  defaultValue={t?.check_in_date ?? ""}
-                  name="check_in_date"
-                  type="date"
-                />
-              </Field>
-              <Field label={copy.checkOut}>
-                <Input
-                  defaultValue={t?.check_out_date ?? ""}
-                  name="check_out_date"
-                  type="date"
-                />
-              </Field>
-              <Field label={copy.reference}>
-                <Input
-                  defaultValue={t?.accommodation_reference ?? ""}
-                  name="accommodation_reference"
-                />
-              </Field>
               <Field label={copy.name}>
                 <Input
                   defaultValue={t?.companion_name ?? ""}
@@ -931,6 +888,16 @@ function Travel({
               defaultValue={t?.travel_notes ?? ""}
               name="travel_notes"
             />
+            <input
+              name="accommodation_mode"
+              type="hidden"
+              value={t?.accommodation_mode ?? "NOT_REQUIRED"}
+            />
+            <input name="accommodation_name" type="hidden" value={t?.accommodation_name ?? ""}/>
+            <input name="accommodation_address" type="hidden" value={t?.accommodation_address ?? ""}/>
+            <input name="check_in_date" type="hidden" value={t?.check_in_date ?? ""}/>
+            <input name="check_out_date" type="hidden" value={t?.check_out_date ?? ""}/>
+            <input name="accommodation_reference" type="hidden" value={t?.accommodation_reference ?? ""}/>
             <input
               name="accommodation_notes"
               type="hidden"

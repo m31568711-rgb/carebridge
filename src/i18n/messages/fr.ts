@@ -206,7 +206,7 @@ export const fr = {
     foundationNotice: 'Retrouvez ici les services et mises à jour utiles à votre rôle.',
     lastUpdated: 'Mis à jour à l’instant',
     navigation: {
-      overview: 'Vue d’ensemble', cases: 'Dossiers médicaux', providers: 'Prestataires', appointments: 'Rendez-vous', documents: 'Documents', patients: 'Patients', team: 'Équipe', doctors: 'Médecins', hospitals: 'Hôpitaux', pharmacy: 'Services de pharmacie', prescriptions: 'Ordonnances', catalog: 'Catalogue de soins', verification: 'Vérification', users: 'Utilisateurs et rôles', audit: 'Journaux d’audit', offers: 'Offres', bookings: 'Réservations', assignedCases: 'Dossiers attribués', notifications: 'Notifications', clinical: 'Revues cliniques', diagnostics: 'Opérations diagnostiques',
+      overview: 'Vue d’ensemble', cases: 'Dossiers médicaux', providers: 'Prestataires', appointments: 'Rendez-vous', documents: 'Documents', patients: 'Patients', team: 'Équipe', doctors: 'Médecins', hospitals: 'Hôpitaux', pharmacy: 'Services de pharmacie', prescriptions: 'Ordonnances', catalog: 'Catalogue de soins', verification: 'Vérification', users: 'Utilisateurs et rôles', audit: 'Journaux d’audit', offers: 'Offres', bookings: 'Réservations', assignedCases: 'Dossiers attribués', notifications: 'Notifications', clinical: 'Revues cliniques', diagnostics: 'Opérations diagnostiques', accommodation: 'Hébergement', travel: 'Voyage et passeport',
     },
     stats: {
       profileTitle: 'État du profil', profileValue: 'Prêt', profileHint: 'Profil sécurisé et préférence linguistique',

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, type ComponentType, type ReactNode } from "react";
 import {
   BadgeCheck,
+  BedDouble,
   BookOpenCheck,
   Building2,
   ChevronRight,
@@ -18,6 +19,7 @@ import {
   MapPinned,
   Menu,
   Pill,
+  Plane,
   ScanLine,
   ShieldCheck,
   Stethoscope,
@@ -97,6 +99,12 @@ const accountNavigation = {
   ar: { title: 'إدارة الحسابات', patients: 'المرضى', doctors: 'حسابات الأطباء', provider_staff: 'فريق المستشفى ومقدم الرعاية', laboratory_staff: 'فريق المختبر', radiology_staff: 'فريق مركز الأشعة' },
 } as const;
 
+const journeyNavigation = {
+  en: { title: 'Journey operations', accommodation: 'Accommodation', travel: 'Travel & passport' },
+  fr: { title: 'Opérations du parcours', accommodation: 'Hébergement', travel: 'Voyage et passeport' },
+  ar: { title: 'عمليات رحلة العلاج', accommodation: 'الإقامة', travel: 'السفر وجواز السفر' },
+} as const;
+
 export function AdminShell({
   adminCopy,
   children,
@@ -155,6 +163,15 @@ export function AdminShell({
           <FileSpreadsheet className="size-[1.1rem]" />
           {adminCopy.navigation.bulkImport}
         </Link>
+        <div className="mt-6">
+          <p className="px-3 text-[0.66rem] font-bold uppercase tracking-[0.12em] text-[#8a9ba8]">{journeyNavigation[locale].title}</p>
+          <div className="mt-2 space-y-0.5">
+            {([['accommodation', journeyNavigation[locale].accommodation, BedDouble], ['travel', journeyNavigation[locale].travel, Plane]] as const).map(([path,label,Icon]) => {
+              const href=`/${locale}/admin/${path}`;
+              return <Link className={`flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition ${pathname===href?'bg-[#eaf3f9] text-[var(--primary)]':'text-[#53697b] hover:bg-[#f0f5f8] hover:text-[var(--foreground)]'}`} href={href} key={path} onClick={()=>setMobileOpen(false)}><Icon className="size-[1.05rem] shrink-0"/>{label}</Link>;
+            })}
+          </div>
+        </div>
         {groups.map((group) => (
           <div className="mt-6" key={group.title}>
             <p className="px-3 text-[0.66rem] font-bold uppercase tracking-[0.12em] text-[#8a9ba8]">

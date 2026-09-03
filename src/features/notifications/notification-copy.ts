@@ -6,6 +6,7 @@ import { getJourneyDictionary } from '@/src/features/journey/messages';
 import { getOperationsDictionary } from '@/src/features/operations/messages';
 
 export function notificationText(record: NotificationRecord, locale: Locale, copy: Dictionary['notifications']) {
+  if(record.title_key?.startsWith('travel.notifications.')){const event=record.title_key.replace('travel.notifications.','').replace(/Title$/,'');const phrases:Record<Locale,Record<string,string>>={en:{adminRequest:'A patient updated an accommodation request',accommodation:'Accommodation arrangements were updated',adminTravel:'A patient updated travel coordination details'},fr:{adminRequest:'Un patient a mis à jour une demande d’hébergement',accommodation:'Les dispositions d’hébergement ont été mises à jour',adminTravel:'Un patient a mis à jour ses informations de voyage'},ar:{adminRequest:'حدّث مريض طلب الإقامة',accommodation:'تم تحديث ترتيبات الإقامة',adminTravel:'حدّث مريض بيانات تنسيق السفر'}};const message=phrases[locale][event]??copy.foundationTitle;return{title:message,message}}
   if(record.title_key?.startsWith('core.notifications.')){const event=record.title_key.replace('core.notifications.','').replace(/Title$/,'');const phrases:Record<Locale,Record<string,string>>={en:{caseAssigned:'A medical case was assigned for your review',providerAssigned:'A medical case was shared with your care team',recommendation:'Your treatment recommendation is ready',offerReady:'A reviewed case is ready for an offer'},fr:{caseAssigned:'Un dossier médical vous a été attribué',providerAssigned:'Un dossier médical a été partagé avec votre équipe',recommendation:'Votre recommandation de traitement est disponible',offerReady:'Un dossier examiné est prêt pour une offre'},ar:{caseAssigned:'أُسندت إليك حالة طبية لمراجعتها',providerAssigned:'تمت مشاركة حالة طبية مع فريق الرعاية',recommendation:'التوصية العلاجية جاهزة',offerReady:'حالة طبية مراجَعة جاهزة لإعداد عرض'}};const message=phrases[locale][event]??copy.foundationTitle;return{title:message,message}}
   const journey = getJourneyDictionary(locale).notifications;
   const key = record.title_key?.replace('part4.notifications.', '') as keyof typeof journey | undefined;
@@ -16,6 +17,10 @@ export function notificationText(record: NotificationRecord, locale: Locale, cop
 }
 export function notificationHref(record: NotificationRecord, locale: Locale, portal: PortalKey) {
   if (!record.related_entity_id) return `/${locale}/notifications`;
+  if (record.type.startsWith('accommodation.') && portal === 'patient') return `/${locale}/patient/accommodation`;
+  if (record.type.startsWith('accommodation.') && portal === 'admin') return `/${locale}/admin/accommodation`;
+  if (record.type.startsWith('travel.') && portal === 'patient') return `/${locale}/patient/travel`;
+  if (record.type.startsWith('travel.') && portal === 'admin') return `/${locale}/admin/travel`;
   if (record.related_entity_type === 'offer' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/offers/${record.related_entity_id}`;
   if (record.related_entity_type === 'booking' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/bookings/${record.related_entity_id}`;
   if (record.related_entity_type === 'appointment' && ['patient','provider','doctor'].includes(portal)) return `/${locale}/${portal}/appointments/${record.related_entity_id}`;

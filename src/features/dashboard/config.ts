@@ -6,6 +6,8 @@ import {
   ClipboardCheck,
   FileClock,
   FileText,
+  BedDouble,
+  Plane,
   HeartPulse,
   Hospital,
   Microscope,
@@ -38,6 +40,8 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: FileText, label: navigation.offers, href: '/offers' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
       { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
+      { icon: BedDouble, label: navigation.accommodation, href: '/accommodation' },
+      { icon: Plane, label: navigation.travel, href: '/travel' },
     ],
     hospital: [
       { icon: ClipboardList, label: navigation.cases, href: '' },
