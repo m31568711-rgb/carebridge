@@ -21,6 +21,7 @@ import {
   Menu,
   Pill,
   Plane,
+  ReceiptText,
   ScanLine,
   ShieldCheck,
   Stethoscope,
@@ -105,6 +106,7 @@ const journeyNavigation = {
   fr: { title: 'Opérations du parcours', journeys: 'Parcours de soins', accommodation: 'Hébergement', travel: 'Voyage et passeport' },
   ar: { title: 'عمليات رحلة العلاج', journeys: 'رحلات العلاج', accommodation: 'الإقامة', travel: 'السفر وجواز السفر' },
 } as const;
+const financeNavigation={en:{title:'Customer finance',accounts:'Customer accounts'},fr:{title:'Finance client',accounts:'Comptes clients'},ar:{title:'المالية والعملاء',accounts:'حسابات العملاء'}} as const;
 
 export function AdminShell({
   adminCopy,
@@ -155,6 +157,10 @@ export function AdminShell({
               return <Link className={`flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition ${pathname === href ? 'bg-[#eaf3f9] text-[var(--primary)]' : 'text-[#53697b] hover:bg-[#f0f5f8] hover:text-[var(--foreground)]'}`} href={href} key={type} onClick={() => setMobileOpen(false)}><UsersRound className="size-[1.05rem] shrink-0" />{label}</Link>;
             })}
           </div>
+        </div>
+        <div className="mt-6">
+          <p className="px-3 text-[0.66rem] font-bold uppercase tracking-[0.12em] text-[#8a9ba8]">{financeNavigation[locale].title}</p>
+          <Link className={`mt-2 flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition ${pathname===`/${locale}/admin/customer-accounts`?'bg-[#eaf3f9] text-[var(--primary)]':'text-[#53697b] hover:bg-[#f0f5f8] hover:text-[var(--foreground)]'}`} href={`/${locale}/admin/customer-accounts`} onClick={()=>setMobileOpen(false)}><ReceiptText className="size-[1.05rem] shrink-0"/>{financeNavigation[locale].accounts}</Link>
         </div>
         <Link
           className={`mt-1 flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition ${pathname === `/${locale}/admin/import` ? "bg-[#eaf3f9] text-[var(--primary)]" : "text-[#53697b] hover:bg-[#f0f5f8] hover:text-[var(--foreground)]"}`}
@@ -222,8 +228,9 @@ export function AdminShell({
     .flatMap((group) => group.items)
     .find(([module]) => module === currentSegment);
   const journeyLabel = pathname.includes('/admin/journeys') ? journeyNavigation[locale].journeys : undefined;
+  const financeLabel=pathname.includes('/admin/customer-accounts')?financeNavigation[locale].accounts:undefined;
   const breadcrumb =
-    accountLabel ?? journeyLabel ?? (currentSegment === "import"
+    accountLabel ?? journeyLabel ?? financeLabel ?? (currentSegment === "import"
       ? adminCopy.navigation.bulkImport
       : activeItem
         ? adminCopy.navigation[activeItem[1]]

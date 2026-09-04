@@ -1,0 +1,28 @@
+import type {SupabaseClient} from '@supabase/supabase-js';
+
+export type ServiceCategory='DOCTOR'|'HOSPITAL'|'PROCEDURE'|'LABORATORY'|'RADIOLOGY'|'ACCOMMODATION'|'TRAVEL'|'TRANSPORT'|'OTHER';
+export interface CustomerInvoiceItem{id:string;description:string;service_category:ServiceCategory;quantity:number;unit_amount:number;base_unit_amount:number;carebridge_fee_percent:number;carebridge_fee_amount:number;line_amount:number;display_order:number}
+export interface CustomerPayment{id:string;amount:number;paid_at:string;method:string;reference_number:string|null}
+export interface CustomerInvoice{id:string;invoice_number:string;booking_id:string;currency:string;total_amount:number;amount_paid:number;status:string;due_date:string|null;created_at:string;items:CustomerInvoiceItem[];payments:CustomerPayment[]}
+export interface CustomerAccountRow{patientId:string;patientName:string;bookingReferences:string[];currency:string;totalBilled:number;totalPaid:number;remaining:number;status:string;lastPaymentDate:string|null;invoices:CustomerInvoice[]}
+export interface CustomerAccountDetail{patientId:string;patientName:string;email:string|null;phone:string|null;rows:CustomerAccountRow[];journeys:Array<{id:string;booking_reference:string;journey_status:string;journey_type:string;expected_start_date:string|null;expected_end_date:string|null}>}
+interface AdminPatientAccount{user_id:string;email:string|null;full_name:string;phone:string|null}
+
+const name=(p:{display_name:string|null;first_name:string|null;last_name:string|null})=>p.display_name||[p.first_name,p.last_name].filter(Boolean).join(' ')||'Patient';
+const money=(v:number|string|null|undefined)=>Number(v??0);
+
+export async function loadCustomerAccounts(s:SupabaseClient):Promise<CustomerAccountRow[]>{
+ const {data:rawPatientAccounts,error:patientError}=await s.rpc('admin_list_accounts',{requested_type:'patients'});if(patientError)throw patientError;const patientAccounts=(rawPatientAccounts??[]) as unknown as AdminPatientAccount[];
+ const {data,error}=await s.from('invoices').select('id,invoice_number,booking_id,patient_id,currency,total_amount,amount_paid,status,due_date,created_at,items:invoice_items(id,description,service_category,quantity,unit_amount,base_unit_amount,carebridge_fee_percent,carebridge_fee_amount,line_amount,display_order),payments:payment_records(id,amount,paid_at,method,reference_number),booking:bookings(booking_reference)').order('created_at',{ascending:false}).limit(1000);
+ if(error)throw error;
+ const invoices=(data??[]) as unknown as Array<CustomerInvoice&{patient_id:string;booking:{booking_reference:string}|null}>;
+ const profilesById=new Map<string,{display_name:string|null;first_name:string|null;last_name:string|null}>(patientAccounts.map((p:AdminPatientAccount)=>[p.user_id,{display_name:p.full_name,first_name:null,last_name:null}]));
+ const grouped=new Map<string,CustomerAccountRow>();
+ for(const invoice of invoices){const key=`${invoice.patient_id}:${invoice.currency}`;const current=grouped.get(key)??{patientId:invoice.patient_id,patientName:name(profilesById.get(invoice.patient_id)??{display_name:null,first_name:null,last_name:null}),bookingReferences:[],currency:invoice.currency,totalBilled:0,totalPaid:0,remaining:0,status:'SETTLED',lastPaymentDate:null,invoices:[]};const normalized:{[K in keyof CustomerInvoice]:CustomerInvoice[K]}={...invoice,total_amount:money(invoice.total_amount),amount_paid:money(invoice.amount_paid),items:(invoice.items??[]).map(item=>({...item,quantity:money(item.quantity),unit_amount:money(item.unit_amount),base_unit_amount:money(item.base_unit_amount),carebridge_fee_percent:money(item.carebridge_fee_percent),carebridge_fee_amount:money(item.carebridge_fee_amount),line_amount:money(item.line_amount)})),payments:(invoice.payments??[]).map(payment=>({...payment,amount:money(payment.amount)}))};current.invoices.push(normalized);current.totalBilled+=normalized.total_amount;current.totalPaid+=normalized.amount_paid;current.remaining=Math.max(0,current.totalBilled-current.totalPaid);const ref=invoice.booking?.booking_reference;if(ref&&!current.bookingReferences.includes(ref))current.bookingReferences.push(ref);for(const payment of normalized.payments)if(!current.lastPaymentDate||payment.paid_at>current.lastPaymentDate)current.lastPaymentDate=payment.paid_at;if(['OVERDUE'].includes(normalized.status))current.status='OVERDUE';else if(current.remaining>0&&current.status!=='OVERDUE')current.status=current.totalPaid>0?'PARTIALLY_PAID':'OUTSTANDING';grouped.set(key,current);}
+ for(const patient of patientAccounts)if(![...grouped.values()].some(row=>row.patientId===patient.user_id))grouped.set(`${patient.user_id}:—`,{patientId:patient.user_id,patientName:patient.full_name,bookingReferences:[],currency:'—',totalBilled:0,totalPaid:0,remaining:0,status:'SETTLED',lastPaymentDate:null,invoices:[]});
+ return [...grouped.values()].sort((a,b)=>a.patientName.localeCompare(b.patientName));
+}
+export async function loadCustomerAccount(s:SupabaseClient,patientId:string):Promise<CustomerAccountDetail|null>{
+ const [patients,accounts,journeys]=await Promise.all([s.rpc('admin_list_accounts',{requested_type:'patients'}),loadCustomerAccounts(s),s.from('bookings').select('id,booking_reference,journey_status,journey_type,expected_start_date,expected_end_date').eq('patient_id',patientId).order('updated_at',{ascending:false}).limit(100)]);const profile=((patients.data??[]) as unknown as AdminPatientAccount[]).find((p:AdminPatientAccount)=>p.user_id===patientId);if(!profile)return null;
+ return{patientId,patientName:profile.full_name,email:profile.email??null,phone:profile.phone??null,rows:accounts.filter(x=>x.patientId===patientId),journeys:journeys.data??[]};
+}

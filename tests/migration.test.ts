@@ -32,6 +32,8 @@ const coreNotificationFix = readFileSync(fileURLToPath(new URL('../supabase/migr
 const providerRecommendationScope = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310006_provider_recommendation_scope.sql', import.meta.url)), 'utf8');
 const adminAccountManagement = readFileSync(fileURLToPath(new URL('../supabase/migrations/202609020001_admin_account_management.sql', import.meta.url)), 'utf8');
 const adminAccountServiceGrants = readFileSync(fileURLToPath(new URL('../supabase/migrations/202609020002_admin_account_service_grants.sql', import.meta.url)), 'utf8');
+const customerAccountsFinance = readFileSync(fileURLToPath(new URL('../supabase/migrations/202609080001_customer_accounts_finance.sql', import.meta.url)), 'utf8');
+const customerAccountsFinanceScopeFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202609080002_customer_accounts_finance_scope_fix.sql', import.meta.url)), 'utf8');
 
 const exposedTables = [
   'countries', 'cities', 'profiles', 'user_roles', 'specialties', 'treatments',
@@ -199,4 +201,11 @@ describe('Admin account management',()=>{
   it('exposes account listings only through an admin-checked function',()=>{expect(adminAccountManagement).toContain('if not public.is_platform_admin()');expect(adminAccountManagement).toContain('join auth.users u');expect(adminAccountManagement).toContain('revoke all on function public.admin_list_accounts(text) from public;');});
   it('uses existing roles and provider relationships',()=>{expect(adminAccountManagement).toContain('public.user_roles');expect(adminAccountManagement).toContain('public.hospital_memberships');expect(adminAccountManagement).toContain('public.diagnostic_provider_memberships');});
   it('gives the trusted function only the service grants needed for normalized linkage',()=>{expect(adminAccountServiceGrants).toContain('grant select, update on table public.profiles to service_role;');expect(adminAccountServiceGrants).toContain('grant select, insert, delete on table public.user_roles to service_role;');expect(adminAccountServiceGrants).not.toContain('to authenticated');});
+});
+
+describe('customer accounts finance',()=>{
+  it('stores base cost and the applied CareBridge fee on every new service item',()=>{expect(customerAccountsFinance).toContain('base_unit_amount');expect(customerAccountsFinance).toContain('carebridge_fee_percent');expect(customerAccountsFinance).toContain('carebridge_fee_amount');expect(customerAccountsFinance).toContain('carebridge_fee_percent in (0,30)');expect(customerAccountsFinance).toContain('quantity*base_unit_amount*(1+carebridge_fee_percent/100)');});
+  it('preserves issued and paid financial history by allowing hard deletion only for drafts',()=>{expect(customerAccountsFinance).toContain('function public.protect_invoice_delete');expect(customerAccountsFinance).toContain("old.status<>'DRAFT'");expect(customerAccountsFinance).toContain('only draft invoices can be deleted');});
+  it('does not introduce anonymous finance access',()=>{expect(customerAccountsFinance).not.toMatch(/grant .*invoice.*to anon/);expect(customerAccountsFinance).not.toMatch(/grant .*payment.*to anon/);});
+  it('lets a finance-scoped admin validate invoice links without broad booking reads',()=>{expect(customerAccountsFinanceScopeFix).toContain('security definer');expect(customerAccountsFinanceScopeFix).toContain('public.can_manage_booking_finance');expect(customerAccountsFinanceScopeFix).not.toMatch(/grant .* to anon/);});
 });

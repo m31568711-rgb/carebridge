@@ -1,0 +1,5 @@
+import{readFileSync}from'node:fs';
+for(const line of readFileSync('.env.local','utf8').split(/\r?\n/)){const m=line.match(/^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);if(m&&!process.env[m[1]])process.env[m[1]]=m[2].replace(/^(['"])(.*)\1$/,'$2')}
+for(const key of['SUPABASE_PROJECT_REF','SUPABASE_ACCESS_TOKEN'])if(!process.env[key])throw new Error(`Missing ${key}`);
+for(const file of['supabase/migrations/202609080001_customer_accounts_finance.sql','supabase/migrations/202609080002_customer_accounts_finance_scope_fix.sql']){const query=readFileSync(file,'utf8');const response=await fetch(`https://api.supabase.com/v1/projects/${process.env.SUPABASE_PROJECT_REF}/database/query`,{method:'POST',headers:{Authorization:`Bearer ${process.env.SUPABASE_ACCESS_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({query})});if(!response.ok){if(file.endsWith('001_customer_accounts_finance.sql')&&String(await response.text()).includes('already exists'))continue;throw new Error(`Migration failed (${response.status}) for ${file}`);}}
+console.log('Customer Accounts finance migration applied to CareBridge-Dev.');
