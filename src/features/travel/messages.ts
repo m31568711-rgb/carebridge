@@ -5,6 +5,17 @@ const en = {
   manageAccommodationDescription: 'Add properties, room types, photos, or a patient booking without crowding the page.',
   close: 'Close',
   noBookings: 'No patient accommodation bookings yet.',
+  edit: 'Edit',
+  delete: 'Delete',
+  editProperty: 'Edit accommodation',
+  editRoom: 'Edit room type',
+  deletePropertyTitle: 'Delete accommodation?',
+  deleteRoomTitle: 'Delete room type?',
+  deletePropertyDescription: 'Delete {name}, its room types, and its photos? This cannot be undone.',
+  deleteRoomDescription: 'Delete {name}? This cannot be undone.',
+  confirmDelete: 'Delete permanently',
+  cancelDialog: 'Keep it',
+  deleteBlocked: 'This item is linked to an accommodation booking and cannot be deleted. Deactivate it instead.',
   accommodation: 'Accommodation', travelPassport: 'Travel & passport', accommodationDescription: 'Manage trusted stays, room availability, and patient accommodation bookings.', travelDescription: 'Coordinate international travel and collect passport details only when CareBridge arranges the trip.', addProperty: 'Add accommodation', propertyName: 'Hotel / property name', city: 'City', address: 'Location / address', notes: 'Notes', active: 'Active', inactive: 'Inactive', save: 'Save', saved: 'Changes saved.', failed: 'The change could not be saved.', invalid: 'Check the entered information.', photo: 'Property photo', uploadPhoto: 'Upload photo', roomOption: 'Room option', addRoom: 'Add room type', property: 'Property', roomType: 'Room type', availableRooms: 'Available rooms', pricePerNight: 'Price per night', currency: 'Currency', mealPlan: 'Meal plan', wellness: 'Wellness / recovery services', currentOptions: 'Available accommodation', noOptions: 'No accommodation options are currently available.', patientBookings: 'Patient accommodation bookings', newBooking: 'Arrange accommodation', patientJourney: 'Patient / journey', choose: 'Choose', checkIn: 'Check-in', checkOut: 'Check-out', rooms: 'Rooms', guests: 'Guests', nights: 'Nights', estimatedTotal: 'Calculated total', finalPrice: 'Negotiated / final price', status: 'Status', arrangement: 'Arrangement', notRequired: 'Not required', patientWillChoose: 'Patient will choose later', patientSelected: 'Selected by patient', carebridgeArranged: 'Arranged by CareBridge', requestStay: 'Request this stay', accommodationAlreadyArranged: 'Accommodation is already arranged for this journey.', choosePreference: 'Accommodation preference', browseDescription: 'Browse currently active options. Availability is checked again when you submit the request.', cancel: 'Cancel booking', travelArrangement: 'Travel arrangement', selfArranged: 'Patient self-arranged', tripType: 'Trip type', oneWay: 'One-way', returnOnly: 'Return only', roundTrip: 'Round trip', origin: 'Origin', destination: 'Destination', outboundDeparture: 'Outbound departure', outboundArrival: 'Outbound arrival', returnDeparture: 'Return departure', returnArrival: 'Return arrival', originAirport: 'Origin airport', destinationAirport: 'Destination airport', airline: 'Airline', returnAirline: 'Return airline', flightNumber: 'Flight number', returnFlightNumber: 'Return flight number', ticketReference: 'Booking / ticket reference', cabinClass: 'Cabin / class', ticketPrice: 'Ticket price', bookingStatus: 'Booking status', passportDetails: 'Passport details', passportNotice: 'Passport information is requested only because CareBridge is arranging this international trip.', fullNamePassport: 'Full name as shown on passport', passportNumber: 'Passport number', nationality: 'Nationality', dateOfBirth: 'Date of birth', issueDate: 'Issue date', expiryDate: 'Expiry date', passportCopy: 'Private passport copy', ticketDocument: 'Ticket / itinerary', upload: 'Upload securely', localCareNotice: 'Local care does not require accommodation, flights, or passport information.', noInternationalJourneys: 'No international care journey is available.', held: 'Held', confirmed: 'Confirmed', checkedIn: 'Checked in', completed: 'Completed', cancelled: 'Cancelled', draft: 'Draft', ticketed: 'Ticketed', currentTravel: 'Travel coordination', noPassportRequired: 'No passport information is required for this arrangement.', secureDocuments: 'Private travel documents', availabilityError: 'The selected capacity is no longer available for these dates.',
 } as const;
 
@@ -16,6 +27,17 @@ const fr: TravelDictionary = {
   manageAccommodationDescription: 'Ajoutez un établissement, un type de chambre, une photo ou une réservation sans surcharger la page.',
   close: 'Fermer',
   noBookings: 'Aucune réservation d’hébergement pour le moment.',
+  edit: 'Modifier',
+  delete: 'Supprimer',
+  editProperty: 'Modifier l’hébergement',
+  editRoom: 'Modifier le type de chambre',
+  deletePropertyTitle: 'Supprimer l’hébergement ?',
+  deleteRoomTitle: 'Supprimer le type de chambre ?',
+  deletePropertyDescription: 'Supprimer {name}, ses types de chambres et ses photos ? Cette action est irréversible.',
+  deleteRoomDescription: 'Supprimer {name} ? Cette action est irréversible.',
+  confirmDelete: 'Supprimer définitivement',
+  cancelDialog: 'Conserver',
+  deleteBlocked: 'Cet élément est lié à une réservation et ne peut pas être supprimé. Désactivez-le à la place.',
 };
 
 const ar: TravelDictionary = {
@@ -24,6 +46,17 @@ const ar: TravelDictionary = {
   manageAccommodationDescription: 'أضف مكان إقامة أو نوع غرفة أو صورة أو حجز مريض من نافذة مرتبة دون ازدحام الصفحة.',
   close: 'إغلاق',
   noBookings: 'لا توجد حجوزات إقامة للمرضى حاليًا.',
+  edit: 'تعديل',
+  delete: 'حذف',
+  editProperty: 'تعديل مكان الإقامة',
+  editRoom: 'تعديل نوع الغرفة',
+  deletePropertyTitle: 'حذف مكان الإقامة؟',
+  deleteRoomTitle: 'حذف نوع الغرفة؟',
+  deletePropertyDescription: 'هل تريد حذف {name} وأنواع الغرف والصور التابعة له؟ لا يمكن التراجع عن هذا الإجراء.',
+  deleteRoomDescription: 'هل تريد حذف {name}؟ لا يمكن التراجع عن هذا الإجراء.',
+  confirmDelete: 'حذف نهائي',
+  cancelDialog: 'الاحتفاظ به',
+  deleteBlocked: 'هذا العنصر مرتبط بحجز إقامة ولا يمكن حذفه. يمكنك تعطيله بدلًا من ذلك.',
 };
 
 export type { TravelDictionary };

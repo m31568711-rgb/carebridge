@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 export type Arrangement = 'NOT_REQUIRED'|'PATIENT_WILL_CHOOSE'|'PATIENT_SELECTED'|'CAREBRIDGE_ARRANGED';
-export interface AccommodationProperty {id:string;property_name:string;location_address:string;city_id:string;is_active:boolean;city:{name_i18n:Record<string,string>;country:{name_i18n:Record<string,string>}|null}|null;photos:Array<{id:string;object_path:string}>}
+export interface AccommodationProperty {id:string;property_name:string;location_address:string;city_id:string;notes:string|null;is_active:boolean;city:{name_i18n:Record<string,string>;country:{name_i18n:Record<string,string>}|null}|null;photos:Array<{id:string;object_path:string}>}
 export interface AccommodationOption { id:string;property_id:string;room_type:string;available_rooms:number;price_per_night:number;currency:string;meal_plan:string;wellness_services:string[];notes:string|null;is_active:boolean;property:{id:string;property_name:string;location_address:string;city_id:string;is_active:boolean;city:{name_i18n:Record<string,string>;country:{name_i18n:Record<string,string>}|null}|null;photos:Array<{id:string;object_path:string}>}|null }
 export interface AccommodationBooking { id:string;booking_id:string;patient_id:string;room_option_id:string;arrangement:Arrangement;check_in_date:string;check_out_date:string;number_of_rooms:number;guests:number;nights:number;price_per_night:number;currency:string;total_amount:number;final_price:number|null;status:'HELD'|'CONFIRMED'|'CHECKED_IN'|'COMPLETED'|'CANCELLED';notes:string|null;room_option?:AccommodationOption|null;booking?:JourneyChoice|null }
 export interface JourneyChoice { id:string;booking_reference:string;patient_id:string;journey_type:'LOCAL_CARE'|'INTERNATIONAL_MEDICAL_TRAVEL';profile?:{display_name:string|null;first_name:string|null;last_name:string|null}|null;medical_case?:{title:string}|null }
@@ -16,7 +16,7 @@ const journeySelect='id,booking_reference,patient_id,journey_type,medical_case:m
 export async function loadAccommodationData(supabase:SupabaseClient, admin=false){
  const [options,properties,reservations,journeys,preferences,cities]=await Promise.all([
   supabase.from('accommodation_room_options').select(optionSelect).order('created_at',{ascending:false}).limit(200),
-  supabase.from('accommodation_properties').select('id,property_name,location_address,city_id,is_active,city:cities(name_i18n,country:countries(name_i18n)),photos:accommodation_photos(id,object_path)').order('created_at',{ascending:false}).limit(200),
+  supabase.from('accommodation_properties').select('id,property_name,location_address,city_id,notes,is_active,city:cities(name_i18n,country:countries(name_i18n)),photos:accommodation_photos(id,object_path)').order('created_at',{ascending:false}).limit(200),
   supabase.from('accommodation_bookings').select(reservationSelect).order('created_at',{ascending:false}).limit(200),
   supabase.from('bookings').select(journeySelect).eq('journey_type','INTERNATIONAL_MEDICAL_TRAVEL').order('updated_at',{ascending:false}).limit(200),
   supabase.from('journey_accommodation_preferences').select('*').limit(200),
