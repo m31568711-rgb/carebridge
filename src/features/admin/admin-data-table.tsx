@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { ArrowDownUp, Pencil, Power, Search } from 'lucide-react';
 import { Badge, type BadgeProps } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';

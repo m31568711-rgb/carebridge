@@ -1,6 +1,6 @@
 'use client';
 import {useActionState} from 'react';
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import {Activity,ClipboardPlus,FileText,FlaskConical,Microscope,Pill,ScanLine,ShieldCheck} from 'lucide-react';
 import {Badge} from '@/src/components/ui/badge';
 import {Button} from '@/src/components/ui/button';

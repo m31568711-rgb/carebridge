@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/src/react-app/compat/navigation';
 import { UserPlus } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/src/components/ui/card';

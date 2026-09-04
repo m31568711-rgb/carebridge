@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { AuthForm } from '@/src/features/auth/auth-form';
 import { AuthShell } from '@/src/features/auth/auth-shell';
 import { isLocale } from '@/src/i18n/config';

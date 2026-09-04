@@ -1,8 +1,8 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound, redirect } from '@/src/react-app/compat/navigation';
 import { resolvePortalForRoles, usesDiagnosticProviderLanding } from '@/src/config/roles';
 import { isLocale } from '@/src/i18n/config';
 import { requireAuth } from '@/src/lib/auth/context';
-import { getSupabaseServerClient } from '@/src/lib/supabase/server';
+import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +13,7 @@ export default async function PortalDispatcher({ params }: { params: Promise<{ l
   const portal = resolvePortalForRoles(context.roles);
 
   if (portal === 'provider' && usesDiagnosticProviderLanding(context.roles)) {
-    const supabase = await getSupabaseServerClient();
+    const supabase = await getSupabaseBrowserClient();
     if (supabase) {
       const [laboratory, radiology, membership] = await Promise.all([
         supabase.from('medical_laboratories').select('id').eq('owner_user_id', context.userId).eq('status', 'ACTIVE').limit(1).maybeSingle(),

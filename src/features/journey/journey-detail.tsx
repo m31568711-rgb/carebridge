@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Badge } from '@/src/components/ui/badge';import { Card,CardContent,CardHeader } from '@/src/components/ui/card';
 import type {Locale} from '@/src/i18n/config';import {localized} from '@/src/features/cases/data';import {setOfferStatusAction} from './actions';import type {BookingRecord,OfferRecord} from './data';import {providerName} from './data';import {BookingTimeline,BookingUpdateForm,OfferDecisionForm,OfferViewedTracker} from './journey-ui';import type {JourneyDictionary} from './messages';

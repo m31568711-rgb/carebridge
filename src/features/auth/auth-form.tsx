@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, type FormEvent } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link from '@/src/react-app/compat/link';
+import { useRouter } from '@/src/react-app/compat/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import type { Locale } from '@/src/i18n/config';
 import type { Dictionary } from '@/src/i18n/messages/en';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
+import { clearAuthContextCache } from '@/src/lib/auth/context';
 import { Button } from '@/src/components/ui/button';
 import { FormField } from '@/src/components/ui/form-field';
 import { Input } from '@/src/components/ui/input';
@@ -42,13 +43,11 @@ export function AuthForm({ mode, locale, dictionary }: AuthFormProps) {
       if (mode === 'login') {
         const parsed = loginSchema.safeParse({ email, password });
         if (!parsed.success) throw new Error(shared.unexpectedError);
-        const response = await fetch('/api/auth/login', {
-          body: JSON.stringify(parsed.data),
-          headers: { 'Content-Type': 'application/json' },
-          method: 'POST',
-        });
-        const result = await response.json().catch(() => null) as { error?: string } | null;
-        if (!response.ok) throw new Error(result?.error ?? shared.unexpectedError);
+        const supabase = getSupabaseBrowserClient();
+        if (!supabase) throw new Error(shared.unexpectedError);
+        const result = await supabase.auth.signInWithPassword(parsed.data);
+        if (result.error || !result.data.user) throw new Error(result.error?.message ?? shared.unexpectedError);
+        clearAuthContextCache();
         router.replace(`/${locale}/portal`);
         router.refresh();
         return;

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { DatabaseZap } from 'lucide-react';
 import { Brand } from '@/src/components/brand';
 import type { Locale } from '@/src/i18n/config';

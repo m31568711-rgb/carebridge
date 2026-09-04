@@ -1,15 +1,17 @@
 'use client';
 
 import { LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/src/react-app/compat/navigation';
 import type { Locale } from '@/src/i18n/config';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
+import { clearAuthContextCache } from '@/src/lib/auth/context';
 
 export function SignOutButton({ locale, label }: { locale: Locale; label: string }) {
   const router = useRouter();
 
   async function signOut() {
     await getSupabaseBrowserClient()?.auth.signOut();
+    clearAuthContextCache();
     router.replace(`/${locale}/login`);
     router.refresh();
   }

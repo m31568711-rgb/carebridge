@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import type { Locale } from '@/src/i18n/config';

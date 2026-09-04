@@ -1,16 +1,16 @@
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { isAccountType } from '@/src/features/admin/account-types';
 import { AdminAccountManagement, type ManagedAccountRow, type ProviderOption } from '@/src/features/admin/admin-account-management';
 import { localizedValue } from '@/src/features/admin/format';
 import { isLocale } from '@/src/i18n/config';
-import { getSupabaseServerClient } from '@/src/lib/supabase/server';
+import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminAccountsPage({ params }: { params: Promise<{ locale: string; accountType: string }> }) {
   const { locale, accountType } = await params;
   if (!isLocale(locale) || !isAccountType(accountType)) notFound();
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) notFound();
 
   const accountPromise = supabase.rpc('admin_list_accounts', { requested_type: accountType });

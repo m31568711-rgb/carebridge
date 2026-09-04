@@ -1,7 +1,7 @@
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { CalendarDays, CheckCircle2, Clock3, Hospital, XCircle } from 'lucide-react';
 import { Badge } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';

@@ -1,13 +1,13 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { Plus } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { AdminDataTable } from '@/src/features/admin/admin-data-table';
 import { AdminRecordForm } from '@/src/features/admin/admin-record-form';
 import { adminModules, isAdminModuleKey } from '@/src/features/admin/config';
 import { loadAdminRecord, loadAdminRows, loadLookups } from '@/src/features/admin/data';
 import { getAdminDictionary } from '@/src/features/admin/messages';
 import { isLocale } from '@/src/i18n/config';
-import { getSupabaseServerClient } from '@/src/lib/supabase/server';
+import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import { PageHeader } from '@/src/components/ui/page-header';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +20,7 @@ export default async function AdminModulePage({ params, searchParams }: { params
   if (!isLocale(locale) || !isAdminModuleKey(module)) notFound();
   const copy = getAdminDictionary(locale);
   const definition = adminModules[module];
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return null;
   const page = Math.max(1, Math.min(100000, Number.parseInt(queryParams.page ?? '1', 10) || 1));
   const direction = queryParams.dir === 'asc' ? 'asc' : 'desc';

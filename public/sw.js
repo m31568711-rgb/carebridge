@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carebridge-shell-v1';
+const CACHE_NAME = 'carebridge-react-shell-v2';
 const OFFLINE_ROUTES = ['/en/offline', '/fr/offline', '/ar/offline'];
 const SHELL_ASSETS = ['/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-maskable-512.png', ...OFFLINE_ROUTES];
 
@@ -31,7 +31,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  const isStaticShell = url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/') || url.pathname === '/manifest.webmanifest';
+  const isStaticShell = url.pathname.startsWith('/assets/') || url.pathname.startsWith('/icons/') || url.pathname === '/manifest.webmanifest';
   if (isStaticShell) {
     event.respondWith(caches.match(request).then((cached) => cached || fetch(request).then((response) => {
       const clone = response.clone();

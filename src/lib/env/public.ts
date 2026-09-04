@@ -1,5 +1,5 @@
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const supabaseUrl = import.meta.env.NEXT_PUBLIC_SUPABASE_URL as string | undefined;
+const supabasePublishableKey = import.meta.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY as string | undefined;
 
 export function getSupabasePublicEnv() {
   if (!supabaseUrl || !supabasePublishableKey) return null;
@@ -11,7 +11,7 @@ export function getSupabasePublicEnv() {
 }
 
 export function getApplicationUrl() {
-  const value = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const value = (import.meta.env.NEXT_PUBLIC_APP_URL as string | undefined) ?? window.location.origin;
 
   try {
     return new URL(value);

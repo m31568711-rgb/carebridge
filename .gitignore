@@ -11,7 +11,7 @@
 # testing
 /coverage
 
-# next.js
+# legacy build output (kept ignored for older checkouts)
 /.next/
 /.vinext/
 /out/

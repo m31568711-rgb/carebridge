@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { DashboardShell } from '@/src/features/dashboard/dashboard-shell';
 import { isLocale } from '@/src/i18n/config';
 import { getDictionary } from '@/src/i18n/dictionaries';

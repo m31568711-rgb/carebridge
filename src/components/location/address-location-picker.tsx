@@ -53,7 +53,7 @@ export function AddressLocationPicker(props: Props) {
   const [placeId, setPlaceId] = useState(String(props.placeId ?? ''));
   const [latitude, setLatitude] = useState(String(props.latitude ?? ''));
   const [longitude, setLongitude] = useState(String(props.longitude ?? ''));
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
+  const apiKey = (import.meta.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string | undefined) ?? '';
 
   useEffect(() => {
     if (!apiKey || props.disabled || !inputRef.current || !mapRef.current) return;

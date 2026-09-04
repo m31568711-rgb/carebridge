@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
-import { redirect } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
+import { redirect } from '@/src/react-app/compat/navigation';
 import { isLocale } from '@/src/i18n/config';
 
 export default async function SignupPage({ params }: { params: Promise<{ locale: string }> }) {

@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import type { ReactNode } from 'react';
 import { HeartPulse, LockKeyhole, ShieldCheck } from 'lucide-react';
 import type { Locale } from '@/src/i18n/config';

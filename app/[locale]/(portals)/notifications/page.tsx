@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { resolvePortalForRoles } from '@/src/config/roles';
 import { NotificationCenter } from '@/src/features/notifications/notification-center';
 import { DashboardShell } from '@/src/features/dashboard/dashboard-shell';

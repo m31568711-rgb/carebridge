@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { cn } from '@/src/lib/utils/cn';
 
 interface BrandProps {

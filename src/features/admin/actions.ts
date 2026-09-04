@@ -1,12 +1,11 @@
-'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath } from '@/src/react-app/compat/cache';
 import { z } from 'zod';
 import { adminModuleKeys, adminModules, type AdminModuleKey } from './config';
 import { validateAdminForm } from './validation';
 import { isLocale } from '@/src/i18n/config';
 import { requireRoles } from '@/src/lib/auth/context';
-import { getSupabaseServerClient } from '@/src/lib/supabase/server';
+import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 
 export interface AdminActionState {
   status: 'idle' | 'success' | 'error';
@@ -29,7 +28,7 @@ export async function saveAdminRecord(_previous: AdminActionState, formData: For
   const { module, locale, record_id: recordId } = header.data;
   const definition = adminModules[module];
   const context = await requireRoles(locale, ['SUPER_ADMIN', 'ADMIN']);
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return { status: 'error', message: 'configuration' };
 
   const validation = validateAdminForm(module, formData);
@@ -67,7 +66,7 @@ export async function setAdminRecordActive(formData: FormData) {
   if (!parsed.success || !isLocale(parsed.data.locale)) return;
   const { module, locale, id, active } = parsed.data;
   await requireRoles(locale, ['SUPER_ADMIN', 'ADMIN']);
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return;
   const definition = adminModules[module];
   if (!definition.statusField || definition.idFields.length !== 1) return;
@@ -84,7 +83,7 @@ export async function deleteAdminRecord(formData: FormData) {
   const definition = adminModules[moduleKey];
   if (!definition.idFields.length) return;
   await requireRoles(localeValue, ['SUPER_ADMIN', 'ADMIN']);
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return;
   let query = supabase.from(definition.table).delete();
   for (const key of definition.idFields) {

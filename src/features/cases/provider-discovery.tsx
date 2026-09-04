@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from '@/src/react-app/compat/navigation';
 import { useState } from 'react';
 import { LocateFixed, Map, Rows3 } from 'lucide-react';
 import { Button } from '@/src/components/ui/button';

@@ -5,27 +5,28 @@ import { describe, expect, it } from 'vitest';
 const source = (path: string) => readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf8');
 
 describe('authenticated navigation performance', () => {
-  it('uses verified JWT claims instead of a remote user lookup in the request path', () => {
-    expect(source('../proxy.ts')).toContain('auth.getClaims()');
-    expect(source('../src/lib/auth/context.ts')).toContain('auth.getClaims()');
+  it('runs as a React and Vite application without the Next.js runtime', () => {
+    const pkg = JSON.parse(source('../package.json')) as { dependencies: Record<string, string>; scripts: Record<string, string> };
+    expect(pkg.dependencies.next).toBeUndefined();
+    expect(pkg.scripts.build).toContain('vite.js build');
   });
 
-  it('deduplicates the Supabase client and auth context during one server render', () => {
-    expect(source('../src/lib/supabase/server.ts')).toContain('cache(async');
-    expect(source('../src/lib/auth/context.ts')).toContain('cache(async');
+  it('loads route modules lazily and navigates without full-page reloads', () => {
+    const router = source('../src/react-app/router.tsx');
+    const navigation = source('../src/react-app/navigation-store.ts');
+    expect(router).toContain("import.meta.glob('/app/**/page.tsx')");
+    expect(navigation).toContain("window.history[method]");
   });
 
-  it('provides a streaming boundary for dynamic portal routes', () => {
-    const loading = source('../app/[locale]/(portals)/loading.tsx');
-    expect(loading).toContain('aria-busy="true"');
-    expect(loading).toContain('animate-pulse');
+  it('reuses the browser Supabase client and caches the active auth context', () => {
+    expect(source('../src/lib/supabase/browser.ts')).toContain('if (client !== undefined) return client');
+    expect(source('../src/lib/auth/context.ts')).toContain('supabase.auth.getSession()');
+    expect(source('../src/lib/auth/context.ts')).toContain('cachedContext?.userId === user.id');
   });
 
-  it('signs in through the same-origin server endpoint before navigation', () => {
+  it('signs in directly with the publishable Supabase client and preserves RLS', () => {
     const form = source('../src/features/auth/auth-form.tsx');
-    const route = source('../app/api/auth/login/route.ts');
-    expect(form).toContain("fetch('/api/auth/login'");
-    expect(route).toContain('supabase.auth.signInWithPassword(parsed.data)');
-    expect(route).toContain("origin !== request.nextUrl.origin");
+    expect(form).toContain('supabase.auth.signInWithPassword(parsed.data)');
+    expect(source('../src/lib/supabase/browser.ts')).toContain('authorization boundary for every application data operation');
   });
 });

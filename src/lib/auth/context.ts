@@ -1,9 +1,8 @@
-import { redirect } from 'next/navigation';
-import { cache } from 'react';
+import { redirect } from '@/src/react-app/compat/navigation';
 import type { AppRole } from '@/src/config/roles';
 import { hasAllowedRole } from '@/src/config/roles';
 import type { Locale } from '@/src/i18n/config';
-import { getSupabaseServerClient } from '@/src/lib/supabase/server';
+import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import type { AuthContext, UserProfile } from '@/src/types/domain';
 
 interface ProfileRow {
@@ -34,29 +33,36 @@ function mapProfile(row: ProfileRow | null): UserProfile | null {
   };
 }
 
-export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
-  const supabase = await getSupabaseServerClient();
+let cachedContext: { userId: string; value: AuthContext } | null = null;
+
+export async function getAuthContext(): Promise<AuthContext | null> {
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return null;
 
-  const { data, error } = await supabase.auth.getClaims();
-  const claims = data?.claims as { sub?: string; email?: string } | undefined;
-  if (error || !claims?.sub) return null;
+  const { data, error } = await supabase.auth.getSession();
+  const user = data.session?.user;
+  if (error || !user) { cachedContext = null; return null; }
+  if (cachedContext?.userId === user.id) return cachedContext.value;
   const [profileResult, roleResult] = await Promise.all([
     supabase
       .from('profiles')
       .select('id, first_name, last_name, display_name, preferred_language, avatar_path, account_status')
-      .eq('id', claims.sub)
+      .eq('id', user.id)
       .maybeSingle(),
-    supabase.from('user_roles').select('role').eq('user_id', claims.sub),
+    supabase.from('user_roles').select('role').eq('user_id', user.id),
   ]);
 
-  return {
-    userId: claims.sub,
-    email: claims.email ?? null,
+  const value = {
+    userId: user.id,
+    email: user.email ?? null,
     profile: mapProfile((profileResult.data as ProfileRow | null) ?? null),
     roles: ((roleResult.data ?? []) as RoleRow[]).map(({ role }) => role),
   };
-});
+  cachedContext = { userId: user.id, value };
+  return value;
+}
+
+export function clearAuthContextCache() { cachedContext = null; }
 
 export async function requireAuth(locale: Locale) {
   const context = await getAuthContext();

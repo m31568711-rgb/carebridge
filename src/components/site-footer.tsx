@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import type { Locale } from '@/src/i18n/config';
 import type { Dictionary } from '@/src/i18n/messages/en';
 import { Brand } from './brand';

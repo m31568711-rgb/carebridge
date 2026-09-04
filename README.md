@@ -4,15 +4,15 @@ CareBridge is a production-oriented multilingual international medical tourism a
 
 ## Technology stack
 
-- Next.js 16 App Router with TypeScript and React 19
+- React 19 single-page application with TypeScript and Vite
 - Tailwind CSS 4 and a reusable accessible component system
 - Supabase PostgreSQL, Auth, Storage, Realtime, and Row Level Security
 - English, French, and Arabic with automatic RTL layout
 - Installable PWA shell with a conservative offline strategy
 - Vitest for foundation tests and ESLint for static analysis
-- Vinext/OpenAI Sites adapter for the included hosted preview path
+- Vite route-level code splitting and the OpenAI Sites deployment adapter
 
-The application source uses standard Next.js App Router conventions. The default `dev` and `build` scripts use the Sites-compatible Vinext adapter; `dev:next`, `build:next`, and `start:next` run the standard Next.js toolchain.
+The application is a lightweight client-rendered React SPA. Route modules are loaded lazily, Supabase Auth sessions persist in the browser, and PostgreSQL RLS remains the authorization boundary for all data access.
 
 ## Folder structure
 
@@ -22,9 +22,8 @@ app/
     (public)/           # Multilingual landing page
     (auth)/             # Login, recovery, reset, auth errors
     (portals)/          # Role-protected portal routes
-    auth/callback/      # Supabase PKCE callback
     offline/            # Localized PWA fallback
-  manifest.ts           # Web app manifest
+src/react-app/          # Vite entry point, router, and navigation adapters
 src/
   components/           # Shared brand, layout, and UI primitives
   config/               # Central role and portal configuration
@@ -46,9 +45,9 @@ Prerequisites: Node.js 22.13 or later, npm, and a Supabase project.
 
 1. Copy `.env.example` to `.env.local`.
 2. Fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` from **Supabase → Project Settings → API**.
-3. Set `NEXT_PUBLIC_APP_URL=http://localhost:3000` locally.
+3. Set `NEXT_PUBLIC_APP_URL=http://localhost:5173` locally.
 4. Install dependencies with `npm install`.
-5. Start the app with `npm run dev` or use `npm run dev:next` for the native Next.js development server.
+5. Start the app with `npm run dev`.
 
 No service-role credential is read by application code. Never prefix a secret with `NEXT_PUBLIC_`.
 
@@ -185,7 +184,6 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
-npm run build:next
 ```
 
 The scripts call their local Node entry points directly, which keeps them reliable even when the workspace path contains shell metacharacters.

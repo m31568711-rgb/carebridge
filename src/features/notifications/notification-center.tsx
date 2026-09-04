@@ -5,7 +5,7 @@ import { BellRing, CheckCheck } from 'lucide-react';
 import type { Dictionary } from '@/src/i18n/messages/en';
 import type { Locale } from '@/src/i18n/config';
 import type { PortalKey } from '@/src/config/roles';
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import type { NotificationRecord } from '@/src/types/domain';
 import { Button } from '@/src/components/ui/button';

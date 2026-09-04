@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import type { ReactNode } from 'react';
 import { Menu, UserRound } from 'lucide-react';
 import type { PortalKey } from '@/src/config/roles';

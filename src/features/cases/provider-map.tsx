@@ -5,7 +5,7 @@ import type { CaseDictionary } from './messages';
 
 const zoom = 2;
 const tileCount = 2 ** zoom;
-const tileTemplate = process.env.NEXT_PUBLIC_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const tileTemplate = (import.meta.env.NEXT_PUBLIC_MAP_TILE_URL as string | undefined) || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 function markerPosition(latitude: number, longitude: number) {
   const lat = Math.max(-85.0511, Math.min(85.0511, latitude));

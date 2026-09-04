@@ -1,6 +1,4 @@
-"use server";
-
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from "@/src/react-app/compat/cache";
 import { z } from "zod";
 import {
   bulkImportColumns,
@@ -10,7 +8,7 @@ import {
 } from "./bulk-import";
 import { isLocale } from "@/src/i18n/config";
 import { requireRoles } from "@/src/lib/auth/context";
-import { getSupabaseServerClient } from "@/src/lib/supabase/server";
+import { getSupabaseBrowserClient } from "@/src/lib/supabase/browser";
 
 export interface BulkImportState {
   status: "idle" | "success" | "error";
@@ -41,7 +39,7 @@ export async function confirmBulkImport(
   const locale = parsed.data.locale,
     entity = parsed.data.entity as BulkImportEntity;
   const context = await requireRoles(locale, ["ADMIN", "SUPER_ADMIN"]);
-  const s = await getSupabaseServerClient();
+  const s = await getSupabaseBrowserClient();
   if (!s) return { status: "error", message: "unavailable" };
   let rows: Record<string, unknown>[];
   try {

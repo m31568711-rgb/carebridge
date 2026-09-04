@@ -1,10 +1,9 @@
-'use server';
 
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { revalidatePath } from '@/src/react-app/compat/cache';
+import { redirect } from '@/src/react-app/compat/navigation';
 import { isLocale, type Locale } from '@/src/i18n/config';
 import { requireRoles } from '@/src/lib/auth/context';
-import { getSupabaseServerClient } from '@/src/lib/supabase/server';
+import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
 import { allowedCaseMimeTypes, caseDocumentSchema, maxCaseFileBytes, medicalCaseSchema, patientProfileSchema, recommendationSchema, safeObjectFilename } from './validation';
 
 export interface CaseActionState { error?: string; success?: string }
@@ -37,7 +36,7 @@ export async function createMedicalCaseAction(_state: CaseActionState, formData:
   const parsed = casePayload(formData);
   const profile = profilePayload(formData);
   if (!parsed.success || !profile.success) return { error: 'invalid' };
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return { error: 'unavailable' };
   const { error: profileError } = await supabase.from('profiles').update(profile.data).eq('id', context.userId);
   if (profileError) return { error: 'save' };
@@ -52,7 +51,7 @@ export async function updateMedicalCaseAction(_state: CaseActionState, formData:
   const caseId = String(formData.get('case_id') ?? '');
   const parsed = casePayload(formData);
   if (!parsed.success || !caseId) return { error: 'invalid' };
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return { error: 'unavailable' };
   const location = { preferred_latitude: String(formData.get('latitude') ?? '') || null, preferred_longitude: String(formData.get('longitude') ?? '') || null };
   const { error } = await supabase.from('medical_cases').update({ ...parsed.data, ...location }).eq('id', caseId).eq('patient_id', context.userId);
@@ -66,7 +65,7 @@ export async function submitMedicalCaseAction(formData: FormData) {
   const locale = localeFrom(formData);
   const context = await requireRoles(locale, ['PATIENT']);
   const caseId = String(formData.get('case_id') ?? '');
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase || !caseId) return;
   const { error } = await supabase.from('medical_cases').update({ status: 'SUBMITTED' }).eq('id', caseId).eq('patient_id', context.userId).eq('status', 'DRAFT');
   if (!error) {
@@ -81,7 +80,7 @@ export async function setMedicalCaseStatusAction(formData: FormData) {
   const caseId = String(formData.get('case_id') ?? '');
   const status = String(formData.get('status') ?? '');
   if (!caseId || !['CANCELLED', 'CLOSED'].includes(status)) return;
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return;
   await supabase.from('medical_cases').update({ status }).eq('id', caseId).eq('patient_id', context.userId);
   revalidatePath(`/${locale}/patient`);
@@ -95,7 +94,7 @@ export async function uploadCaseDocumentAction(_state: CaseActionState, formData
   const file = formData.get('file');
   const parsed = caseDocumentSchema.safeParse({ document_type: String(formData.get('document_type') ?? ''), notes: String(formData.get('notes') ?? '') });
   if (!parsed.success || !caseId || !(file instanceof File) || file.size < 1 || file.size > maxCaseFileBytes || !allowedCaseMimeTypes.includes(file.type as (typeof allowedCaseMimeTypes)[number])) return { error: 'invalid' };
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return { error: 'unavailable' };
   const { data: ownedCase } = await supabase.from('medical_cases').select('id').eq('id', caseId).eq('patient_id', context.userId).maybeSingle();
   if (!ownedCase) return { error: 'unauthorized' };
@@ -119,7 +118,7 @@ export async function deleteCaseDocumentAction(formData: FormData) {
   const context = await requireRoles(locale, ['PATIENT']);
   const caseId = String(formData.get('case_id') ?? '');
   const documentId = String(formData.get('document_id') ?? '');
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase || !caseId || !documentId) return;
   const { data: document } = await supabase.from('case_documents').select('object_path').eq('id', documentId).eq('case_id', caseId).eq('uploaded_by', context.userId).maybeSingle();
   if (!document) return;
@@ -138,7 +137,7 @@ export async function saveRecommendationAction(_state: CaseActionState, formData
     next_steps: String(formData.get('next_steps') ?? ''),
   });
   if (!caseId || !parsed.success) return { error: 'invalid' };
-  const supabase = await getSupabaseServerClient();
+  const supabase = await getSupabaseBrowserClient();
   if (!supabase) return { error: 'unavailable' };
   const { data: doctor } = await supabase.from('doctors').select('id').eq('user_id', context.userId).eq('status', 'ACTIVE').eq('verification_state', 'VERIFIED').maybeSingle();
   if (!doctor) return { error: 'unauthorized' };

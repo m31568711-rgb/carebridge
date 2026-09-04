@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { AlertTriangle } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { AuthShell } from '@/src/features/auth/auth-shell';
 import { isLocale } from '@/src/i18n/config';
 import { getDictionary } from '@/src/i18n/dictionaries';

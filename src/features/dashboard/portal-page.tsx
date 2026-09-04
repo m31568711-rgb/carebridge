@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import type { PortalKey } from '@/src/config/roles';
 import { portalRoles } from '@/src/config/roles';
 import { isLocale } from '@/src/i18n/config';

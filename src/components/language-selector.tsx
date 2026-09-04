@@ -1,7 +1,7 @@
 'use client';
 
 import { Languages } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from '@/src/react-app/compat/navigation';
 import type { Locale } from '@/src/i18n/config';
 import { locales, localizePath } from '@/src/i18n/config';
 import type { Dictionary } from '@/src/i18n/messages/en';

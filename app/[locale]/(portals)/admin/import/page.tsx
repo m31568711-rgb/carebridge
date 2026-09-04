@@ -1,4 +1,4 @@
-import {notFound} from 'next/navigation';
+import {notFound} from '@/src/react-app/compat/navigation';
 import {BulkImportPage} from '@/src/features/admin/bulk-import-page';
 import {isLocale} from '@/src/i18n/config';
 import {requireRoles} from '@/src/lib/auth/context';

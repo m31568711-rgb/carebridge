@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import {
   ArrowRight,
   BadgeCheck,
@@ -22,7 +22,7 @@ import {
   Stethoscope,
   UserRoundCheck,
 } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { Badge } from '@/src/components/ui/badge';
 import { Card, CardContent } from '@/src/components/ui/card';
 import { SiteFooter } from '@/src/components/site-footer';

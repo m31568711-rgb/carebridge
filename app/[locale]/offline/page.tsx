@@ -1,6 +1,6 @@
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { CloudOff } from 'lucide-react';
-import { notFound } from 'next/navigation';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { Brand } from '@/src/components/brand';
 import { isLocale } from '@/src/i18n/config';
 import { getDictionary } from '@/src/i18n/dictionaries';

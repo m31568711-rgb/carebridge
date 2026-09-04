@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import Link from '@/src/react-app/compat/link';
+import { notFound } from '@/src/react-app/compat/navigation';
 import { AuthForm } from '@/src/features/auth/auth-form';
 import { AuthShell } from '@/src/features/auth/auth-shell';
 import { isLocale } from '@/src/i18n/config';

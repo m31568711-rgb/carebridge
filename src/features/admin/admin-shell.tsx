@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/src/react-app/compat/link";
+import { usePathname } from "@/src/react-app/compat/navigation";
 import { useState, type ComponentType, type ReactNode } from "react";
 import {
   BadgeCheck,

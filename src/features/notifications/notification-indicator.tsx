@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/src/react-app/compat/link';
 import { Bell, CheckCheck } from 'lucide-react';
 import type { Locale } from '@/src/i18n/config';
 import type { PortalKey } from '@/src/config/roles';
