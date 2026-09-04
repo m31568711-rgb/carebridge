@@ -10,6 +10,10 @@ const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === 'seatbelt';
 export default defineConfig(() => {
   return {
     envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
+    // Sites serves a Worker from dist/server and binds static files from
+    // dist/client. Keeping the two outputs separate also prevents the SPA
+    // fallback worker from being published as a browser asset.
+    build: { outDir: 'dist/client' },
     css: { postcss: { plugins: [tailwindcss()] } },
     optimizeDeps: { exclude: ['lucide-react'] },
     resolve: {
