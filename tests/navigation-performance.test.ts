@@ -18,6 +18,12 @@ describe('authenticated navigation performance', () => {
     expect(navigation).toContain("window.history[method]");
   });
 
+  it('provides an SPA fallback worker for localized deep links', () => {
+    const worker = source('../scripts/prepare-spa-worker.mjs');
+    expect(worker).toContain("new URL('/index.html', request.url)");
+    expect(worker).toContain('env.ASSETS.fetch');
+  });
+
   it('reuses the browser Supabase client and caches the active auth context', () => {
     expect(source('../src/lib/supabase/browser.ts')).toContain('if (client !== undefined) return client');
     expect(source('../src/lib/auth/context.ts')).toContain('supabase.auth.getSession()');
