@@ -1,10 +1,8 @@
 import {
-  BadgeCheck,
   Building2,
   CalendarDays,
   ClipboardList,
   ClipboardCheck,
-  FileClock,
   FileText,
   BedDouble,
   Plane,
@@ -13,11 +11,9 @@ import {
   Microscope,
   LayoutDashboard,
   Pill,
-  Settings2,
   ShieldCheck,
   Stethoscope,
   UserRound,
-  UsersRound,
 } from 'lucide-react';
 import type { PortalKey } from '@/src/config/roles';
 import type { Dictionary } from '@/src/i18n/messages/en';
@@ -28,11 +24,6 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
 
   const portalNavigation = {
     admin: [
-      { icon: Hospital, label: navigation.hospitals },
-      { icon: Stethoscope, label: navigation.doctors },
-      { icon: BadgeCheck, label: navigation.verification },
-      { icon: UsersRound, label: navigation.users },
-      { icon: FileClock, label: navigation.audit },
     ],
     patient: [
       { icon: ClipboardList, label: navigation.cases, href: '' },
@@ -45,9 +36,6 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
     ],
     hospital: [
       { icon: ClipboardList, label: navigation.cases, href: '' },
-      { icon: Stethoscope, label: navigation.doctors },
-      { icon: UsersRound, label: navigation.team },
-      { icon: ClipboardList, label: navigation.catalog },
     ],
     doctor: [
       { icon: UserRound, label: navigation.assignedCases, href: '' },
@@ -56,10 +44,6 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: ClipboardCheck, label: navigation.clinical, href: '/clinical' },
     ],
     pharmacy: [
-      { icon: Pill, label: navigation.prescriptions },
-      { icon: UserRound, label: navigation.patients },
-      { icon: ClipboardList, label: navigation.pharmacy },
-      { icon: Settings2, label: dictionary.common.profile },
     ],
     provider: [
       { icon: ClipboardList, label: navigation.cases, href: '' },

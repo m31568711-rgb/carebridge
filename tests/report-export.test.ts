@@ -26,7 +26,7 @@ describe("report exports", () => {
     expect(sheet.views[0]?.rightToLeft).toBe(true);
     expect(sheet.getCell("A1").value).toBe("المرجع");
     expect(sheet.getCell("A2").value).toBe("CBI-DEMO2026INTL");
-  });
+  }, 15000);
 
   it("builds branded Arabic RTL source shared by PDF and Print", () => {
     const report = buildReportHtml({

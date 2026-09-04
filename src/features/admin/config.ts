@@ -40,6 +40,9 @@ export interface AdminModuleDefinition {
   idFields: readonly string[];
   onConflict?: string;
   defaultSort: string;
+  /** Hard deletion is reserved for removable link records. Business/master
+   * records are retained for auditability and deactivated through statusField. */
+  allowHardDelete?: boolean;
 }
 
 const localizedName = (required = true): AdminFieldDefinition[] => [
@@ -97,7 +100,7 @@ export const adminModules: Record<AdminModuleKey, AdminModuleDefinition> = {
   hospital_specialties: {
     key: 'hospital_specialties', table: 'hospital_specialties', permission: 'providers.hospitals', titleKey: 'hospital_specialties',
     fields: [{ name: 'hospital_id', label: 'hospital', type: 'select', required: true, lookup: 'hospitals' }, { name: 'specialty_id', label: 'specialty', type: 'select', required: true, lookup: 'specialties' }],
-    listColumns: ['hospital_id', 'specialty_id', 'created_at'], searchColumns: [], filterField: 'hospital_id', filterLookup: 'hospitals', idFields: ['hospital_id', 'specialty_id'], onConflict: 'hospital_id,specialty_id', defaultSort: 'created_at',
+    listColumns: ['hospital_id', 'specialty_id', 'created_at'], searchColumns: [], filterField: 'hospital_id', filterLookup: 'hospitals', idFields: ['hospital_id', 'specialty_id'], onConflict: 'hospital_id,specialty_id', defaultSort: 'created_at', allowHardDelete: true,
   },
   hospital_treatments: {
     key: 'hospital_treatments', table: 'hospital_treatments', permission: 'providers.hospitals', titleKey: 'hospital_treatments',
@@ -111,11 +114,11 @@ export const adminModules: Record<AdminModuleKey, AdminModuleDefinition> = {
   },
   doctor_specialties: {
     key: 'doctor_specialties', table: 'doctor_specialties', permission: 'providers.doctors', titleKey: 'doctor_specialties', fields: [{ name: 'doctor_id', label: 'displayName', type: 'select', required: true, lookup: 'doctors' }, { name: 'specialty_id', label: 'specialty', type: 'select', required: true, lookup: 'specialties' }, { name: 'is_primary', label: 'primary', type: 'boolean' }],
-    listColumns: ['doctor_id', 'specialty_id', 'is_primary'], searchColumns: [], filterField: 'doctor_id', filterLookup: 'doctors', idFields: ['doctor_id', 'specialty_id'], onConflict: 'doctor_id,specialty_id', defaultSort: 'created_at',
+    listColumns: ['doctor_id', 'specialty_id', 'is_primary'], searchColumns: [], filterField: 'doctor_id', filterLookup: 'doctors', idFields: ['doctor_id', 'specialty_id'], onConflict: 'doctor_id,specialty_id', defaultSort: 'created_at', allowHardDelete: true,
   },
   doctor_languages: {
     key: 'doctor_languages', table: 'doctor_languages', permission: 'providers.doctors', titleKey: 'doctor_languages', fields: [{ name: 'doctor_id', label: 'displayName', type: 'select', required: true, lookup: 'doctors' }, { name: 'language_code', label: 'language', type: 'select', required: true, lookup: 'languages' }, { name: 'proficiency', label: 'proficiency', type: 'select', options: ['BASIC', 'CONVERSATIONAL', 'PROFESSIONAL', 'NATIVE'] }],
-    listColumns: ['doctor_id', 'language_code', 'proficiency'], searchColumns: [], filterField: 'doctor_id', filterLookup: 'doctors', idFields: ['doctor_id', 'language_code'], onConflict: 'doctor_id,language_code', defaultSort: 'created_at',
+    listColumns: ['doctor_id', 'language_code', 'proficiency'], searchColumns: [], filterField: 'doctor_id', filterLookup: 'doctors', idFields: ['doctor_id', 'language_code'], onConflict: 'doctor_id,language_code', defaultSort: 'created_at', allowHardDelete: true,
   },
   doctor_hospitals: {
     key: 'doctor_hospitals', table: 'doctor_hospitals', permission: 'providers.doctors', titleKey: 'doctor_hospitals', fields: [{ name: 'doctor_id', label: 'displayName', type: 'select', required: true, lookup: 'doctors' }, { name: 'hospital_id', label: 'hospital', type: 'select', required: true, lookup: 'hospitals' }, { name: 'branch_id', label: 'branch', type: 'select', lookup: 'hospital_branches' }, { name: 'title', label: 'titleAtHospital', type: 'text' }, { name: 'is_primary', label: 'primary', type: 'boolean' }, { name: 'consultation_available', label: 'consultationAvailable', type: 'boolean' }, { name: 'status', label: 'status', type: 'select', options: recordStatuses }],

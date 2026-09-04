@@ -67,6 +67,9 @@ export function clearAuthContextCache() { cachedContext = null; }
 export async function requireAuth(locale: Locale) {
   const context = await getAuthContext();
   if (!context) redirect(`/${locale}/login`);
+  if (context.profile && context.profile.accountStatus !== 'ACTIVE') {
+    redirect(`/${locale}/auth-error?reason=account-status`);
+  }
   return context;
 }
 

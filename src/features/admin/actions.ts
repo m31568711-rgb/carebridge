@@ -81,7 +81,7 @@ export async function deleteAdminRecord(formData: FormData) {
   if (!adminModuleKeys.includes(moduleValue as AdminModuleKey) || !isLocale(localeValue)) return;
   const moduleKey = moduleValue as AdminModuleKey;
   const definition = adminModules[moduleKey];
-  if (!definition.idFields.length) return;
+  if (!definition.allowHardDelete || !definition.idFields.length) return;
   await requireRoles(localeValue, ['SUPER_ADMIN', 'ADMIN']);
   const supabase = await getSupabaseBrowserClient();
   if (!supabase) return;

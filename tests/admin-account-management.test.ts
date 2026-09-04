@@ -28,8 +28,15 @@ describe('Admin-only account provisioning', () => {
   });
 
   it('never includes a password in application audit metadata', () => {
-    const auditBlock = edgeFunction.slice(edgeFunction.indexOf("from('audit_logs')"));
-    expect(auditBlock).not.toContain('password');
+    const metadataBlocks = [...edgeFunction.matchAll(/metadata:\s*\{[^}]*\}/g)].map(([value]) => value);
+    expect(metadataBlocks.length).toBeGreaterThan(0);
+    expect(metadataBlocks.every((value) => !value.includes('password'))).toBe(true);
     expect(edgeFunction).toContain('auth.admin.deleteUser(createdUserId)');
+  });
+
+  it('suspends accounts through Auth and preserves linked business records', () => {
+    expect(edgeFunction).toContain("body?.action === 'set_status'");
+    expect(edgeFunction).toContain("ban_duration: accountStatus === 'SUSPENDED'");
+    expect(edgeFunction).not.toContain('auth.admin.deleteUser(targetUserId)');
   });
 });

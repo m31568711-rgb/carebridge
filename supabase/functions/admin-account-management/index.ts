@@ -40,6 +40,34 @@ Deno.serve(async (request) => {
   if (!actorRoles?.length) return json({ error: 'Administrator access is required.' }, 403);
 
   const body = await request.json().catch(() => null) as Record<string, unknown> | null;
+  if (body?.action === 'update_profile') {
+    const targetUserId = typeof body.targetUserId === 'string' ? body.targetUserId : '';
+    const targetType = body.accountType as AccountType;
+    const targetFullName = typeof body.fullName === 'string' ? body.fullName.trim().replace(/\s+/g, ' ') : '';
+    const targetPhone = typeof body.phone === 'string' ? body.phone.trim() : '';
+    const targetBirth = typeof body.dateOfBirth === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(body.dateOfBirth) ? body.dateOfBirth : null;
+    const targetGender = genders.includes(body.gender as (typeof genders)[number]) ? body.gender as string : null;
+    const names = splitFullName(targetFullName);
+    if (!/^[0-9a-f-]{36}$/i.test(targetUserId) || !accountTypes.includes(targetType) || !names.lastName || targetPhone.length > 40 || (targetType === 'patients' && (!targetBirth || !targetGender))) return json({ error: 'Review the account fields.' }, 400);
+    const { error } = await service.from('profiles').update({ first_name: names.firstName, last_name: names.lastName, display_name: targetFullName, phone: targetPhone || null, ...(targetType === 'patients' ? { date_of_birth: targetBirth, gender: targetGender } : {}) }).eq('id', targetUserId);
+    if (error) return json({ error: 'Could not update the account.' }, 400);
+    await service.from('audit_logs').insert({ actor_id: actorId, action: 'UPDATE', entity_type: 'application_account', entity_id: targetUserId, metadata: { fields: targetType === 'patients' ? ['name','phone','date_of_birth','gender'] : ['name','phone'] } });
+    return json({ userId: targetUserId });
+  }
+  if (body?.action === 'set_status') {
+    const targetUserId = typeof body.targetUserId === 'string' ? body.targetUserId : '';
+    const accountStatus = body.accountStatus === 'ACTIVE' ? 'ACTIVE' : body.accountStatus === 'SUSPENDED' ? 'SUSPENDED' : null;
+    if (!/^[0-9a-f-]{36}$/i.test(targetUserId) || !accountStatus || targetUserId === actorId) return json({ error: 'Invalid account status request.' }, 400);
+    const { error: authError } = await service.auth.admin.updateUserById(targetUserId, { ban_duration: accountStatus === 'SUSPENDED' ? '876000h' : 'none' });
+    if (authError) return json({ error: 'Could not update the account.' }, 400);
+    const { error: profileError } = await service.from('profiles').update({ account_status: accountStatus }).eq('id', targetUserId);
+    if (profileError) {
+      await service.auth.admin.updateUserById(targetUserId, { ban_duration: accountStatus === 'SUSPENDED' ? 'none' : '876000h' });
+      return json({ error: 'Could not update the account.' }, 400);
+    }
+    await service.from('audit_logs').insert({ actor_id: actorId, action: 'UPDATE', entity_type: 'application_account', entity_id: targetUserId, metadata: { account_status: accountStatus } });
+    return json({ userId: targetUserId, accountStatus });
+  }
   const accountType = body?.accountType as AccountType;
   const fullName = typeof body?.fullName === 'string' ? body.fullName.trim() : '';
   const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
