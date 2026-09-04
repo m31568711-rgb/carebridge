@@ -1,0 +1,9 @@
+import { z } from 'zod';
+
+const uuid=z.uuid();
+const optionalText=(max:number)=>z.string().trim().max(max).optional();
+export const journeyCreateSchema=z.object({patient_id:uuid,journey_type:z.enum(['LOCAL_CARE','INTERNATIONAL_MEDICAL_TRAVEL']),expected_start_date:z.union([z.iso.date(),z.literal('')]).optional(),expected_end_date:z.union([z.iso.date(),z.literal('')]).optional(),coordination_notes:optionalText(4000)}).refine(v=>!v.expected_start_date||!v.expected_end_date||v.expected_end_date>=v.expected_start_date,{path:['expected_end_date'],message:'invalid dates'});
+export const journeyUpdateSchema=z.object({journey_id:uuid,journey_status:z.enum(['DRAFT','PLANNING','READY_FOR_CONFIRMATION','CONFIRMED','IN_PROGRESS','FOLLOW_UP','COMPLETED','CANCELLED']),expected_start_date:z.union([z.iso.date(),z.literal('')]).optional(),expected_end_date:z.union([z.iso.date(),z.literal('')]).optional(),coordination_notes:optionalText(4000)}).refine(v=>!v.expected_start_date||!v.expected_end_date||v.expected_end_date>=v.expected_start_date,{path:['expected_end_date']});
+export const journeyServiceSchema=z.object({journey_id:uuid,service_id:z.union([uuid,z.literal('')]).optional(),service_type:z.enum(['DOCTOR_CONSULTATION','HOSPITAL_PROCEDURE','LABORATORY','RADIOLOGY']),selection_state:z.enum(['ADMIN_SELECTED','PATIENT_TO_CHOOSE','PATIENT_SELECTED','NOT_REQUIRED']),status:z.enum(['PLANNED','REQUESTED','CONFIRMED','IN_PROGRESS','COMPLETED','CANCELLED','ARCHIVED']),title:z.string().trim().min(2).max(240),provider_id:z.union([uuid,z.literal('')]).optional(),planned_date:z.union([z.iso.date(),z.literal('')]).optional(),notes:optionalText(3000)}).refine(v=>!['ADMIN_SELECTED','PATIENT_SELECTED'].includes(v.selection_state)||Boolean(v.provider_id),{path:['provider_id'],message:'provider required'});
+export const journeyDeleteSchema=z.object({journey_id:uuid});
+export const journeyServiceDeleteSchema=z.object({journey_id:uuid,service_id:uuid});

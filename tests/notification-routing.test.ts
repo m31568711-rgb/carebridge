@@ -24,4 +24,8 @@ describe('notification routing', () => {
   it('keeps diagnostic entities inside the notification center for unrelated portals', () => {
     expect(notificationHref(notification('lab_order', 'lab-id'), 'ar', 'patient')).toBe('/ar/notifications');
   });
+
+  it('opens booking notifications in the Admin care journey workspace', () => {
+    expect(notificationHref(notification('booking', 'journey-id'), 'ar', 'admin')).toBe('/ar/admin/journeys/journey-id');
+  });
 });

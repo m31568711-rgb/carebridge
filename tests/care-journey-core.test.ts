@@ -1,0 +1,15 @@
+import { readFileSync } from 'node:fs';
+import { describe,expect,it } from 'vitest';
+import { journeyCreateSchema,journeyServiceSchema,journeyUpdateSchema } from '@/src/features/care-journeys/validation';
+import { getCareJourneyDictionary } from '@/src/features/care-journeys/messages';
+
+const migration=readFileSync('supabase/migrations/202609040001_care_journey_core_phase1.sql','utf8');
+const id='11111111-1111-4111-8111-111111111111';
+describe('Care Journey core Phase 1',()=>{
+  it('reuses bookings as the journey aggregate and links clinical planning lines',()=>{expect(migration).toContain('alter table public.bookings');expect(migration).toContain('booking_id uuid not null references public.bookings(id) on delete cascade');expect(migration).not.toContain('create table public.care_journeys');});
+  it('enforces the clinical confirmation gate in PostgreSQL',()=>{expect(migration).toContain("new.journey_status in ('READY_FOR_CONFIRMATION','CONFIRMED','IN_PROGRESS','FOLLOW_UP','COMPLETED')");expect(migration).toContain('and not public.journey_has_clinical_service(old.id)');expect(migration).toContain('a valid clinical service is required');});
+  it('enforces lifecycle transitions and history-preserving deletion',()=>{expect(migration).toContain("old.journey_status='DRAFT' and new.journey_status in ('PLANNING','CANCELLED')");expect(migration).toContain("old.journey_status not in ('DRAFT','PLANNING')");expect(migration).toContain('journey history must be preserved; cancel it instead');expect(migration).toContain('confirmed service history cannot be deleted');});
+  it('accepts a practical Admin-created draft journey',()=>{expect(journeyCreateSchema.safeParse({patient_id:id,journey_type:'LOCAL_CARE',expected_start_date:'2026-10-01',expected_end_date:'2026-10-10',coordination_notes:'Plan with patient'}).success).toBe(true);expect(journeyCreateSchema.safeParse({patient_id:id,journey_type:'LOCAL_CARE',expected_start_date:'2026-10-10',expected_end_date:'2026-10-01'}).success).toBe(false);});
+  it('requires a provider for selected clinical services but not future patient choice',()=>{const base={journey_id:id,service_id:'',service_type:'DOCTOR_CONSULTATION',status:'REQUESTED',title:'Initial consultation',planned_date:'',notes:''};expect(journeyServiceSchema.safeParse({...base,selection_state:'ADMIN_SELECTED',provider_id:''}).success).toBe(false);expect(journeyServiceSchema.safeParse({...base,selection_state:'PATIENT_TO_CHOOSE',provider_id:''}).success).toBe(true);expect(journeyServiceSchema.safeParse({...base,selection_state:'ADMIN_SELECTED',provider_id:id}).success).toBe(true);});
+  it('allows only the defined journey statuses and provides natural Arabic labels',()=>{expect(journeyUpdateSchema.safeParse({journey_id:id,journey_status:'CONFIRMED',expected_start_date:'',expected_end_date:'',coordination_notes:''}).success).toBe(true);expect(journeyUpdateSchema.safeParse({journey_id:id,journey_status:'PAID'}).success).toBe(false);expect(getCareJourneyDictionary('ar').title).toBe('رحلات العلاج');expect(getCareJourneyDictionary('ar').clinical).toBe('الخدمات الطبية');});
+});

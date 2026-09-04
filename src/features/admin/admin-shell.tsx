@@ -13,6 +13,7 @@ import {
   FileSpreadsheet,
   FlaskConical,
   Globe2,
+  HeartPulse,
   Hospital,
   Languages,
   LayoutDashboard,
@@ -100,9 +101,9 @@ const accountNavigation = {
 } as const;
 
 const journeyNavigation = {
-  en: { title: 'Journey operations', accommodation: 'Accommodation', travel: 'Travel & passport' },
-  fr: { title: 'Opérations du parcours', accommodation: 'Hébergement', travel: 'Voyage et passeport' },
-  ar: { title: 'عمليات رحلة العلاج', accommodation: 'الإقامة', travel: 'السفر وجواز السفر' },
+  en: { title: 'Journey operations', journeys: 'Care Journeys', accommodation: 'Accommodation', travel: 'Travel & passport' },
+  fr: { title: 'Opérations du parcours', journeys: 'Parcours de soins', accommodation: 'Hébergement', travel: 'Voyage et passeport' },
+  ar: { title: 'عمليات رحلة العلاج', journeys: 'رحلات العلاج', accommodation: 'الإقامة', travel: 'السفر وجواز السفر' },
 } as const;
 
 export function AdminShell({
@@ -166,7 +167,7 @@ export function AdminShell({
         <div className="mt-6">
           <p className="px-3 text-[0.66rem] font-bold uppercase tracking-[0.12em] text-[#8a9ba8]">{journeyNavigation[locale].title}</p>
           <div className="mt-2 space-y-0.5">
-            {([['accommodation', journeyNavigation[locale].accommodation, BedDouble], ['travel', journeyNavigation[locale].travel, Plane]] as const).map(([path,label,Icon]) => {
+            {([['journeys', journeyNavigation[locale].journeys, HeartPulse], ['accommodation', journeyNavigation[locale].accommodation, BedDouble], ['travel', journeyNavigation[locale].travel, Plane]] as const).map(([path,label,Icon]) => {
               const href=`/${locale}/admin/${path}`;
               return <Link className={`flex min-h-10 items-center gap-3 rounded-[var(--radius-sm)] px-3 text-sm font-medium transition ${pathname===href?'bg-[#eaf3f9] text-[var(--primary)]':'text-[#53697b] hover:bg-[#f0f5f8] hover:text-[var(--foreground)]'}`} href={href} key={path} onClick={()=>setMobileOpen(false)}><Icon className="size-[1.05rem] shrink-0"/>{label}</Link>;
             })}
@@ -220,8 +221,9 @@ export function AdminShell({
   const activeItem = groups
     .flatMap((group) => group.items)
     .find(([module]) => module === currentSegment);
+  const journeyLabel = pathname.includes('/admin/journeys') ? journeyNavigation[locale].journeys : undefined;
   const breadcrumb =
-    accountLabel ?? (currentSegment === "import"
+    accountLabel ?? journeyLabel ?? (currentSegment === "import"
       ? adminCopy.navigation.bulkImport
       : activeItem
         ? adminCopy.navigation[activeItem[1]]
