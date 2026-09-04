@@ -28,4 +28,10 @@ describe('notification routing', () => {
   it('opens booking notifications in the Admin care journey workspace', () => {
     expect(notificationHref(notification('booking', 'journey-id'), 'ar', 'admin')).toBe('/ar/admin/journeys/journey-id');
   });
+
+  it('opens patient booking and accommodation updates inside the care journey', () => {
+    expect(notificationHref(notification('booking', 'journey-id'), 'en', 'patient')).toBe('/en/patient/journeys/journey-id');
+    const stay={...notification('booking','journey-id'),type:'accommodation.held'};
+    expect(notificationHref(stay,'ar','patient')).toBe('/ar/patient/journeys/journey-id#accommodation');
+  });
 });

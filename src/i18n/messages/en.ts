@@ -216,6 +216,7 @@ export const en = {
     lastUpdated: 'Updated just now',
     navigation: {
       overview: 'Overview',
+      careJourney: 'My care journey',
       cases: 'Medical cases',
       providers: 'Providers',
       appointments: 'Appointments',

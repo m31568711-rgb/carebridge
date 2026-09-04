@@ -4,8 +4,6 @@ import {
   ClipboardList,
   ClipboardCheck,
   FileText,
-  BedDouble,
-  Plane,
   HeartPulse,
   Hospital,
   Microscope,
@@ -26,13 +24,11 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
     admin: [
     ],
     patient: [
+      { icon: HeartPulse, label: navigation.careJourney, href: '/journeys' },
       { icon: ClipboardList, label: navigation.cases, href: '' },
       { icon: Building2, label: navigation.providers, href: '/providers' },
       { icon: FileText, label: navigation.offers, href: '/offers' },
-      { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
       { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
-      { icon: BedDouble, label: navigation.accommodation, href: '/accommodation' },
-      { icon: Plane, label: navigation.travel, href: '/travel' },
     ],
     hospital: [
       { icon: ClipboardList, label: navigation.cases, href: '' },
