@@ -10,6 +10,6 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const supabase = await getSupabaseBrowserClient();
-  const data = supabase ? await loadAdminDashboard(supabase) : { counts:{ hospitals:0,doctors:0,pharmacies:0,radiologyCenters:0,medicalLaboratories:0,specialties:0,countries:0 },distribution:{},verified:0,awaiting:0,error:true };
+  const data = supabase ? await loadAdminDashboard(supabase) : { counts:{ hospitals:0,doctors:0,pharmacies:0,radiologyCenters:0,medicalLaboratories:0,specialties:0,countries:0,journeys:0 },distribution:{},journeyBreakdown:{},verified:0,awaiting:0,error:true };
   return <AdminDashboard copy={getAdminDictionary(locale)} data={data} locale={locale} />;
 }

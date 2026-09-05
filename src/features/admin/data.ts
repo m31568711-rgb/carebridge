@@ -71,7 +71,7 @@ export async function loadAdminRecord(supabase: SupabaseClient, definition: Admi
 }
 
 export async function loadAdminDashboard(supabase: SupabaseClient) {
-  const [hospitals, doctors, pharmacies, radiologyCenters, medicalLaboratories, specialties, countries, hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates] = await Promise.all([
+  const [hospitals, doctors, pharmacies, radiologyCenters, medicalLaboratories, specialties, countries, hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates, journeys] = await Promise.all([
     supabase.from('hospitals').select('*', { count: 'exact', head: true }),
     supabase.from('doctors').select('*', { count: 'exact', head: true }),
     supabase.from('pharmacies').select('*', { count: 'exact', head: true }),
@@ -84,16 +84,20 @@ export async function loadAdminDashboard(supabase: SupabaseClient) {
     supabase.from('pharmacies').select('verification_state'),
     supabase.from('radiology_centers').select('verification_state'),
     supabase.from('medical_laboratories').select('verification_state'),
+    supabase.from('bookings').select('journey_status'),
   ]);
   const stateRows = [hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates].flatMap((result) => (result.data ?? []) as { verification_state: string }[]);
   const distribution = stateRows.reduce<Record<string, number>>((counts, row) => {
     counts[row.verification_state] = (counts[row.verification_state] ?? 0) + 1;
     return counts;
   }, {});
-  const errors = [hospitals, doctors, pharmacies, radiologyCenters, medicalLaboratories, specialties, countries, hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates].some((result) => result.error);
+  const journeyRows=(journeys.data??[]) as {journey_status:string}[];
+  const journeyBreakdown=journeyRows.reduce<Record<string,number>>((counts,row)=>{counts[row.journey_status]=(counts[row.journey_status]??0)+1;return counts;},{});
+  const errors = [hospitals, doctors, pharmacies, radiologyCenters, medicalLaboratories, specialties, countries, hospitalStates, doctorStates, pharmacyStates, radiologyStates, laboratoryStates, journeys].some((result) => result.error);
   return {
-    counts: { hospitals: hospitals.count ?? 0, doctors: doctors.count ?? 0, pharmacies: pharmacies.count ?? 0, radiologyCenters: radiologyCenters.count ?? 0, medicalLaboratories: medicalLaboratories.count ?? 0, specialties: specialties.count ?? 0, countries: countries.count ?? 0 },
+    counts: { hospitals: hospitals.count ?? 0, doctors: doctors.count ?? 0, pharmacies: pharmacies.count ?? 0, radiologyCenters: radiologyCenters.count ?? 0, medicalLaboratories: medicalLaboratories.count ?? 0, specialties: specialties.count ?? 0, countries: countries.count ?? 0, journeys:journeyRows.length },
     distribution,
+    journeyBreakdown,
     verified: distribution.VERIFIED ?? 0,
     awaiting: (distribution.PENDING_REVIEW ?? 0) + (distribution.DRAFT ?? 0),
     error: errors,
