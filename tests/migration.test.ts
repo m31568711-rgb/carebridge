@@ -24,6 +24,7 @@ const part5TriggerFix = readFileSync(fileURLToPath(new URL('../supabase/migratio
 const part5ProofFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608290004_part5_payment_proof_path.sql', import.meta.url)), 'utf8');
 const part6Migration = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608300001_operational_clinical_workflow.sql', import.meta.url)), 'utf8');
 const part6Hardening = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608300002_part6_clinical_hardening.sql', import.meta.url)), 'utf8');
+const clinicalFollowUpScopeFix = readFileSync(fileURLToPath(new URL('../supabase/migrations/202609090002_clinical_follow_up_scope_fix.sql', import.meta.url)), 'utf8');
 const polishAttachments = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310001_clinical_consultation_attachments.sql', import.meta.url)), 'utf8');
 const polishAttachmentPath = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310002_clinical_attachment_storage_path.sql', import.meta.url)), 'utf8');
 const coreDemoPolish = readFileSync(fileURLToPath(new URL('../supabase/migrations/202608310003_core_demo_cycle_polish.sql', import.meta.url)), 'utf8');
@@ -182,6 +183,7 @@ describe('Part 6 operational clinical workflow migration',()=>{
   it('does not grant clinical data to anonymous users',()=>{expect(part6Migration).not.toMatch(/grant (?:select|insert|update|delete)[^;]*(?:clinical_encounters|prescriptions|lab_orders|radiology_orders|lab_results)[^;]*to anon/);});
   it('lets diagnostic triggers verify relationships without broad booking visibility',()=>{expect(part6Hardening).toContain('create function public.clinical_scope_matches');expect(part6Hardening).toContain('security definer');expect(part6Hardening).toContain("doctor cannot manage laboratory processing status");expect(part6Hardening).toContain("doctor cannot manage radiology processing status");});
   it('locks released results, result paths, and follow-up transitions',()=>{expect(part6Hardening).toContain("released laboratory result is immutable");expect(part6Hardening).toContain("released radiology result is immutable");expect(part6Hardening).toContain("object_name!~'^[0-9a-f-]{36}/(lab|radiology)");expect(part6Hardening).toContain("raise exception 'invalid follow-up transition'");});
+  it('lets the scope trigger validate a booking without granting callers direct execution',()=>{expect(clinicalFollowUpScopeFix).toContain('alter function public.protect_doctor_clinical_row() security definer');expect(clinicalFollowUpScopeFix).toContain("set search_path = ''");expect(clinicalFollowUpScopeFix).toContain('revoke all on function public.protect_doctor_clinical_row() from public, anon, authenticated');expect(clinicalFollowUpScopeFix).not.toContain('grant execute');});
 });
 
 describe('demo polish consultation attachments',()=>{

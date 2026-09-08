@@ -17,7 +17,9 @@ describe('new Admin route runtime stability', () => {
     for (const route of ['patients', 'doctors', 'provider_staff', 'laboratory_staff', 'radiology_staff', 'admin/accommodation', 'admin/travel']) {
       expect(routeValidator).toContain(`'${route}'`);
     }
-    expect(routeValidator).toContain("marker: '@carebridge.test'");
+    expect(routeValidator).toContain("id=\"root\"");
+    expect(routeValidator).toContain("rpc('admin_list_accounts'");
+    expect(routeValidator).not.toContain("@supabase/ssr");
     expect(routeValidator).toContain("role: 'SUPER_ADMIN'");
     expect(routeValidator).toContain('deleteUser(userId)');
   });

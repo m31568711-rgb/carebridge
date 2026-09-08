@@ -9,7 +9,7 @@ export const adminModuleKeys = [
 
 export type AdminModuleKey = (typeof adminModuleKeys)[number];
 export type AdminFieldType = 'text' | 'textarea' | 'email' | 'url' | 'number' | 'date' | 'select' | 'boolean' | 'json' | 'storage';
-export type LookupKey = 'countries' | 'cities' | 'specialties' | 'treatments' | 'hospitals' | 'hospital_branches' | 'doctors' | 'pharmacies' | 'languages';
+export type LookupKey = 'countries' | 'cities' | 'specialties' | 'treatments' | 'hospitals' | 'hospital_branches' | 'doctors' | 'pharmacies' | 'languages' | 'providers';
 
 export interface AdminFieldDefinition {
   name: string;

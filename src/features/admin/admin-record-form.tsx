@@ -30,6 +30,7 @@ export function AdminRecordForm({ copy, definition, locale, lookups, record }: P
   const recordId = definition.idFields.length === 1 ? String(record?.[definition.idFields[0]] ?? '') : '';
   const [countryId, setCountryId] = useState(String(record?.country_id ?? ''));
   const [cityId, setCityId] = useState(String(record?.city_id ?? ''));
+  const [providerType, setProviderType] = useState(String(record?.provider_type ?? 'HOSPITAL'));
 
   return (
     <Card className="mb-7" variant="form">
@@ -50,12 +51,15 @@ export function AdminRecordForm({ copy, definition, locale, lookups, record }: P
             if (field.name === 'address_en') return <AddressLocationPicker address={String(initial)} addressLabel={copy.fields.addressEn} addressName="address_en" key={field.name} latitude={record?.latitude as string | number | null} longitude={record?.longitude as string | number | null} placeId={record?.google_place_id as string | null} />;
             if (['address_fr','address_ar'].includes(field.name)) return <input key={field.name} name={field.name} type="hidden" value={String(initial)} />;
             if (['google_place_id','latitude','longitude'].includes(field.name)) return null;
+            if (field.name === 'user_id' || field.name === 'owner_user_id') return null;
+            if (field.name === 'original_filename' || field.name === 'mime_type') return <input key={field.name} name={field.name} type="hidden" value={String(initial)} />;
+            if (field.name === 'provider_id') return <FormField error={error} id={field.name} key={field.name} label={copy.fields.provider} required><Select defaultValue={defaultValue} id={field.name} name={field.name} required><option value="">—</option>{(lookups.providers ?? []).filter((option) => option.providerType === providerType).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</Select></FormField>;
             return (
               <FormField className={fullWidth ? 'sm:col-span-2' : undefined} error={error} id={field.name} key={field.name} label={copy.fields[field.label]} required={field.required}>
                 {field.type === 'textarea' || field.type === 'json' ? (
                   <Textarea aria-invalid={Boolean(error)} defaultValue={String(initial)} dir={field.name.endsWith('_ar') ? 'rtl' : undefined} id={field.name} name={field.name} required={field.required} />
                 ) : field.type === 'select' ? (
-                  <Select aria-invalid={Boolean(error)} defaultValue={field.name==='country_id'||field.name==='city_id'?undefined:defaultValue} disabled={field.name==='city_id'&&!countryId} id={field.name} name={field.name} onChange={field.name==='country_id'?(event)=>{setCountryId(event.target.value);setCityId('');}:field.name==='city_id'?(event)=>setCityId(event.target.value):undefined} required={field.required} value={field.name==='country_id'?countryId:field.name==='city_id'?cityId:undefined}>
+                  <Select aria-invalid={Boolean(error)} defaultValue={field.name==='country_id'||field.name==='city_id'||field.name==='provider_type'?undefined:defaultValue} disabled={field.name==='city_id'&&!countryId} id={field.name} name={field.name} onChange={field.name==='country_id'?(event)=>{setCountryId(event.target.value);setCityId('');}:field.name==='city_id'?(event)=>setCityId(event.target.value):field.name==='provider_type'?(event)=>setProviderType(event.target.value):undefined} required={field.required} value={field.name==='country_id'?countryId:field.name==='city_id'?cityId:field.name==='provider_type'?providerType:undefined}>
                     {!field.required ? <option value="">—</option> : null}
                     {(field.lookup ? lookups[field.lookup] ?? [] : field.options?.map((value) => ({ value, label: formatEnum(value, locale) })) ?? []).filter((option)=>field.lookup!=='cities'||!countryId||('countryId' in option&&option.countryId===countryId)).map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
                   </Select>

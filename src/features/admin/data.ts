@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Locale } from '@/src/i18n/config';
 import { adminModules, type AdminModuleDefinition, type LookupKey } from './config';
 
-export interface LookupOption { value: string; label: string; countryId?: string; }
+export interface LookupOption { value: string; label: string; countryId?: string; providerType?: string; }
 export type LookupMap = Partial<Record<LookupKey, LookupOption[]>>;
 
 function translated(value: unknown, locale: Locale) {
@@ -11,7 +11,7 @@ function translated(value: unknown, locale: Locale) {
   return String(record[locale] ?? record.en ?? record.fr ?? record.ar ?? '');
 }
 
-const lookupSelect: Record<LookupKey, { table: string; select: string; order: string }> = {
+const lookupSelect: Record<Exclude<LookupKey, 'providers'>, { table: string; select: string; order: string }> = {
   countries: { table: 'countries', select: 'id,name_i18n,iso2', order: 'iso2' },
   cities: { table: 'cities', select: 'id,country_id,name_i18n', order: 'created_at' },
   specialties: { table: 'specialties', select: 'id,name_i18n,code', order: 'display_order' },
@@ -31,7 +31,26 @@ function lookupLabel(key: LookupKey, row: Record<string, unknown>, locale: Local
 
 export async function loadLookups(supabase: SupabaseClient, definition: AdminModuleDefinition, locale: Locale): Promise<LookupMap> {
   const keys = [...new Set(definition.fields.flatMap((field) => field.lookup ? [field.lookup] : []))];
+  if (definition.key === 'provider_documents' || definition.key === 'provider_accreditations') keys.push('providers');
   const entries = await Promise.all(keys.map(async (key) => {
+    if (key === 'providers') {
+      const [hospitals, doctors, pharmacies, radiology, laboratories] = await Promise.all([
+        supabase.from('hospitals').select('id,display_name_i18n,legal_name').order('legal_name').limit(250),
+        supabase.from('doctors').select('id,display_name,first_name,last_name').order('display_name').limit(250),
+        supabase.from('pharmacies').select('id,display_name_i18n,legal_name').order('legal_name').limit(250),
+        supabase.from('radiology_centers').select('id,display_name_i18n,legal_name').order('legal_name').limit(250),
+        supabase.from('medical_laboratories').select('id,display_name_i18n,legal_name').order('legal_name').limit(250),
+      ]);
+      const named = (rows: unknown[] | null, providerType: string) => (rows ?? []).map((item) => {
+        const row = item as Record<string, unknown>;
+        return { value: String(row.id), label: translated(row.display_name_i18n, locale) || String(row.display_name ?? row.legal_name ?? [row.first_name, row.last_name].filter(Boolean).join(' ')), providerType };
+      });
+      return [key, [
+        ...named(hospitals.data as unknown[] | null, 'HOSPITAL'), ...named(doctors.data as unknown[] | null, 'DOCTOR'),
+        ...named(pharmacies.data as unknown[] | null, 'PHARMACY'), ...named(radiology.data as unknown[] | null, 'RADIOLOGY_CENTER'),
+        ...named(laboratories.data as unknown[] | null, 'MEDICAL_LABORATORY'),
+      ]] as const;
+    }
     const config = lookupSelect[key];
     const { data } = await supabase.from(config.table).select(config.select).order(config.order).limit(250);
     const options = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({

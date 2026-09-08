@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs';
-import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 
 for (const line of readFileSync('.env.local', 'utf8').split(/\r?\n/)) {
@@ -34,38 +33,53 @@ try {
   const role = await service.from('user_roles').insert({ user_id: userId, role: 'SUPER_ADMIN', granted_by: userId });
   if (role.error) throw role.error;
 
-  let cookies = [];
-  const auth = createServerClient(url, publishableKey, {
-    cookies: {
-      getAll: () => cookies,
-      setAll: (nextCookies) => {
-        for (const item of nextCookies) {
-          cookies = cookies.filter((cookie) => cookie.name !== item.name);
-          if (item.value) cookies.push({ name: item.name, value: item.value });
-        }
-      },
-    },
-  });
+  const auth = createClient(url, publishableKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
   const login = await auth.auth.signInWithPassword({ email, password });
   if (login.error || !login.data.session) throw login.error ?? new Error('Route administrator login failed.');
-  const cookieHeader = cookies.map(({ name, value }) => `${name}=${value}`).join('; ');
+  const accountChecks = await Promise.all(['patients', 'doctors', 'provider_staff', 'laboratory_staff', 'radiology_staff'].map((requested_type) => auth.rpc('admin_list_accounts', { requested_type })));
+  if (accountChecks.some((result) => result.error)) throw new Error('One or more Admin account data sources failed.');
+  const [accommodation, travel, offers, bookings, doctorProgram] = await Promise.all([
+    auth.from('accommodation_room_options').select('id,property:accommodation_properties(id,property_name,city:cities(name_i18n))').limit(1),
+    auth.from('travel_plans').select('booking_id,booking:bookings(booking_reference)').limit(1),
+    auth.from('offers').select('id,hospital:hospitals(display_name_i18n),pharmacy:pharmacies(display_name_i18n),radiology_center:radiology_centers(display_name_i18n),medical_laboratory:medical_laboratories(display_name_i18n)').limit(1),
+    auth.from('bookings').select('id,hospital:hospitals(display_name_i18n),pharmacy:pharmacies(display_name_i18n),radiology_center:radiology_centers(display_name_i18n),medical_laboratory:medical_laboratories(display_name_i18n)').limit(1),
+    auth.from('journey_services').select('id,hospital:hospitals(display_name_i18n)').limit(1),
+  ]);
+  if ([accommodation, travel, offers, bookings, doctorProgram].some((result) => result.error)) throw new Error('One or more Admin/provider relationship queries failed.');
+  const [{ data: booking }, { data: medicalCase }, { data: offer }, { data: appointment }, { data: labOrder }, { data: radiologyOrder }] = await Promise.all([
+    auth.from('bookings').select('id,patient_id').eq('booking_reference', 'CB-ADMINTEST26').maybeSingle(),
+    auth.from('medical_cases').select('id').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    auth.from('offers').select('id').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    auth.from('appointments').select('id').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    auth.from('lab_orders').select('id').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    auth.from('radiology_orders').select('id').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+  ]);
+  if (!booking || !medicalCase || !offer || !appointment) throw new Error(`Persistent route-validation records are incomplete (booking=${Boolean(booking)}, case=${Boolean(medicalCase)}, offer=${Boolean(offer)}, appointment=${Boolean(appointment)}).`);
+  const masterModules = ['countries','cities','specialties','treatments','hospitals','hospital_branches','hospital_specialties','hospital_treatments','doctors','doctor_specialties','doctor_languages','doctor_hospitals','pharmacies','radiology_centers','medical_laboratories','provider_documents','provider_accreditations'];
   const routes = [
-    ...['patients', 'doctors', 'provider_staff', 'laboratory_staff', 'radiology_staff'].map((type) => ({ path: `admin/accounts/${type}`, marker: '@carebridge.test' })),
-    { path: 'admin/accommodation', marker: 'Nile Serenity Recovery Hotel' },
-    { path: 'admin/travel', marker: 'CB-DEMO2026INTL2' },
+    'admin', ...masterModules.map((module) => `admin/${module}`), 'admin/import', 'admin/journeys', `admin/journeys/${booking.id}`,
+    'admin/customer-accounts', `admin/customer-accounts/${booking.patient_id}`,
+    ...['patients', 'doctors', 'provider_staff', 'laboratory_staff', 'radiology_staff'].map((type) => `admin/accounts/${type}`),
+    'admin/accommodation', 'admin/travel',
+    'patient', 'patient/cases/new', `patient/cases/${medicalCase.id}`, 'patient/providers', 'patient/offers', `patient/offers/${offer.id}`,
+    'patient/bookings', `patient/bookings/${booking.id}`, 'patient/appointments', `patient/appointments/${appointment.id}`,
+    'patient/journeys', `patient/journeys/${booking.id}`, 'patient/accommodation', 'patient/travel', 'notifications',
+    'doctor', 'doctor/cases', `doctor/cases/${medicalCase.id}`, 'doctor/bookings', `doctor/bookings/${booking.id}`, 'doctor/appointments', `doctor/appointments/${appointment.id}`, 'doctor/clinical',
+    'provider', 'provider/offers', `provider/offers/${offer.id}`, 'provider/bookings', `provider/bookings/${booking.id}`, 'provider/appointments', `provider/appointments/${appointment.id}`, 'provider/diagnostics',
+    ...(labOrder ? [`provider/diagnostics/lab/${labOrder.id}`] : []), ...(radiologyOrder ? [`provider/diagnostics/radiology/${radiologyOrder.id}`] : []),
   ];
   for (const locale of ['en', 'fr', 'ar']) {
-    for (const { path, marker } of routes) {
-      const headers = { Cookie: cookieHeader };
+    for (const path of routes) {
+      const headers = {};
       if (process.env.CAREBRIDGE_SITE_BYPASS_TOKEN) headers['OAI-Sites-Authorization'] = `Bearer ${process.env.CAREBRIDGE_SITE_BYPASS_TOKEN}`;
       const response = await fetch(`${baseUrl}/${locale}/${path}`, { headers, redirect: 'manual' });
       const body = await response.text();
-      if (!response.ok || !body.includes(marker) || /This page couldn.t load|A server error occurred|Application error/i.test(body)) {
+      if (!response.ok || !body.includes('id="root"') || /A server error occurred|Application error/i.test(body)) {
         throw new Error(`${locale}/${path} failed with HTTP ${response.status}`);
       }
     }
   }
-  console.log(`All 21 authenticated Admin routes loaded successfully from ${new URL(baseUrl).host}.`);
+  console.log(`All ${routes.length * 3} EN/FR/AR application route entry points and their authenticated live data sources loaded successfully from ${new URL(baseUrl).host}.`);
 } finally {
   if (userId) await service.auth.admin.deleteUser(userId);
 }

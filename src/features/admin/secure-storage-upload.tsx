@@ -61,7 +61,7 @@ export function SecureStorageUpload({ accept, bucket, copy, existingValue, field
         <Button disabled={status === 'uploading'} onClick={() => inputRef.current?.click()} size="sm" type="button" variant="outline">
           <UploadCloud aria-hidden="true" className="size-4" />{status === 'uploading' ? copy.uploading : copy.chooseFile}
         </Button>
-        {path ? <span className="inline-flex min-w-0 items-center gap-2 text-xs text-[#53697b]"><FileCheck2 className="size-4 shrink-0 text-[#217a5b]" /><span className="truncate">{message || path}</span></span> : null}
+        {path ? <span className="inline-flex min-w-0 items-center gap-2 text-xs text-[#53697b]"><FileCheck2 className="size-4 shrink-0 text-[#217a5b]" /><span className="truncate">{message || copy.fileAttached}</span></span> : null}
       </div>
       {status === 'error' ? <p className="mt-2 text-xs text-[#a43547]" role="alert">{message}</p> : null}
     </div>
