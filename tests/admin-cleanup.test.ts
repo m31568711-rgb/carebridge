@@ -25,6 +25,11 @@ describe('Admin cleanup regression', () => {
     expect(builder.eq).toHaveBeenCalledWith('treatment_id','treatment');
     expect(row?.branch_id).toBeNull();
   });
+  it('serves SPA deep links without the canonical index.html redirect', () => {
+    const worker = readFileSync('scripts/prepare-spa-worker.mjs','utf8');
+    expect(worker).toContain("new URL('/', request.url)");
+    expect(worker).not.toContain("new URL('/index.html', request.url)");
+  });
   it('repairs diagnostic labels without widening catalog access', () => {
     const sql = readFileSync('supabase/migrations/202609180001_admin_journey_catalog_columns.sql','utf8');
     expect(sql).toContain('l.display_name_i18n');

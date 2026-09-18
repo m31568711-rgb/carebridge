@@ -17,7 +17,7 @@ export default {
   async fetch(request, env) {
     const asset = await env.ASSETS.fetch(request);
     if (asset.status !== 404 || request.method !== 'GET') return withSecurityHeaders(asset);
-    const fallbackUrl = new URL('/index.html', request.url);
+    const fallbackUrl = new URL('/', request.url);
     return withSecurityHeaders(await env.ASSETS.fetch(new Request(fallbackUrl, request)));
   },
 };

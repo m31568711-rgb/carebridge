@@ -20,7 +20,7 @@ describe('authenticated navigation performance', () => {
 
   it('provides an SPA fallback worker for localized deep links', () => {
     const worker = source('../scripts/prepare-spa-worker.mjs');
-    expect(worker).toContain("new URL('/index.html', request.url)");
+    expect(worker).toContain("new URL('/', request.url)");
     expect(worker).toContain('env.ASSETS.fetch');
   });
 
