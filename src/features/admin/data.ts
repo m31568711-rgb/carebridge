@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Locale } from '@/src/i18n/config';
 import { adminModules, type AdminModuleDefinition, type LookupKey } from './config';
 
-export interface LookupOption { value: string; label: string; countryId?: string; providerType?: string; }
+export interface LookupOption { value: string; label: string; countryId?: string; hospitalId?: string; providerType?: string; }
 export type LookupMap = Partial<Record<LookupKey, LookupOption[]>>;
 
 function translated(value: unknown, locale: Locale) {
@@ -17,7 +17,7 @@ const lookupSelect: Record<Exclude<LookupKey, 'providers'>, { table: string; sel
   specialties: { table: 'specialties', select: 'id,name_i18n,code', order: 'display_order' },
   treatments: { table: 'treatments', select: 'id,name_i18n,code', order: 'created_at' },
   hospitals: { table: 'hospitals', select: 'id,display_name_i18n,legal_name', order: 'created_at' },
-  hospital_branches: { table: 'hospital_branches', select: 'id,name_i18n', order: 'created_at' },
+  hospital_branches: { table: 'hospital_branches', select: 'id,hospital_id,name_i18n', order: 'created_at' },
   doctors: { table: 'doctors', select: 'id,display_name,first_name,last_name', order: 'created_at' },
   pharmacies: { table: 'pharmacies', select: 'id,display_name_i18n,legal_name', order: 'created_at' },
   languages: { table: 'languages', select: 'code,name_i18n', order: 'display_order' },
@@ -54,7 +54,7 @@ export async function loadLookups(supabase: SupabaseClient, definition: AdminMod
     const config = lookupSelect[key];
     const { data } = await supabase.from(config.table).select(config.select).order(config.order).limit(250);
     const options = ((data ?? []) as unknown as Record<string, unknown>[]).map((row) => ({
-      value: String(key === 'languages' ? row.code : row.id), label: lookupLabel(key, row, locale), countryId: key === 'cities' ? String(row.country_id) : undefined,
+      value: String(key === 'languages' ? row.code : row.id), label: lookupLabel(key, row, locale), countryId: key === 'cities' ? String(row.country_id) : undefined, hospitalId: key === 'hospital_branches' ? String(row.hospital_id) : undefined,
     }));
     return [key, options] as const;
   }));
@@ -84,8 +84,13 @@ export async function loadAdminRows(supabase: SupabaseClient, definition: AdminM
 }
 
 export async function loadAdminRecord(supabase: SupabaseClient, definition: AdminModuleDefinition, id?: string) {
-  if (!id || definition.idFields.length !== 1) return null;
-  const { data } = await supabase.from(definition.table).select('*').eq(definition.idFields[0], id).maybeSingle();
+  if (!id) return null;
+  const parts = id.split('|');
+  if (parts.length !== definition.idFields.length) return null;
+  let query = supabase.from(definition.table).select('*');
+  definition.idFields.forEach((field, index) => { query = field === 'branch_id' && parts[index] === '' ? query.is(field, null) : query.eq(field, parts[index]); });
+  const { data, error } = await query.maybeSingle();
+  if (error) throw error;
   return (data as Record<string, unknown> | null) ?? null;
 }
 

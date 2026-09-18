@@ -148,4 +148,7 @@ export const adminModules: Record<AdminModuleKey, AdminModuleDefinition> = {
   },
 };
 
-export function isAdminModuleKey(value: string): value is AdminModuleKey { return adminModuleKeys.includes(value as AdminModuleKey); }
+// Retain backend definitions for existing provider records and verification.
+// These legacy management surfaces are outside the current Admin workflow.
+export const retiredAdminModules = ['provider_documents', 'provider_accreditations', 'doctor_languages'] as const;
+export function isAdminModuleKey(value: string): value is AdminModuleKey { return adminModuleKeys.includes(value as AdminModuleKey) && !retiredAdminModules.some(key => key === value); }

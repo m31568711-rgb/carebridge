@@ -34,6 +34,9 @@ export async function saveAdminRecord(_previous: AdminActionState, formData: For
   const validation = validateAdminForm(module, formData);
   if (!validation.success) return { status: 'error', message: 'validation', fieldErrors: validation.errors };
   const payload = { ...validation.payload };
+  // Account linking belongs to the dedicated Auth/account-management flow.
+  delete payload.user_id;
+  delete payload.owner_user_id;
 
   if (module === 'provider_documents') {
     payload.storage_bucket = 'provider-private';
@@ -45,8 +48,12 @@ export async function saveAdminRecord(_previous: AdminActionState, formData: For
   }
 
   let result;
-  if (recordId && definition.idFields.length === 1) {
-    result = await supabase.from(definition.table).update(payload).eq(definition.idFields[0], recordId);
+  if (recordId) {
+    const parts = recordId.split('|');
+    if (parts.length !== definition.idFields.length) return { status: 'error', message: 'invalidRequest' };
+    let update = supabase.from(definition.table).update(payload);
+    definition.idFields.forEach((field, index) => { update = field === 'branch_id' && parts[index] === '' ? update.is(field, null) : update.eq(field, parts[index]); });
+    result = await update;
   } else if (definition.onConflict) {
     result = await supabase.from(definition.table).upsert(payload, { onConflict: definition.onConflict });
   } else {

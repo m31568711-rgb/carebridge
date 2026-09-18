@@ -1,5 +1,5 @@
 import Link from '@/src/react-app/compat/link';
-import { ArrowDownUp, Pencil, Power, Search } from 'lucide-react';
+import { ArrowDownUp, Eye, Pencil, Power, Search } from 'lucide-react';
 import { Badge, type BadgeProps } from '@/src/components/ui/badge';
 import { Button } from '@/src/components/ui/button';
 import { EmptyState } from '@/src/components/ui/empty-state';
@@ -7,6 +7,7 @@ import { Input } from '@/src/components/ui/input';
 import { Select } from '@/src/components/ui/select';
 import type { Locale } from '@/src/i18n/config';
 import { deleteAdminRecord, setAdminRecordActive } from './actions';
+import { ConfirmSubmit } from './confirm-submit';
 import { AdminDeleteButton } from './admin-delete-button';
 import type { AdminModuleDefinition } from './config';
 import type { LookupMap } from './data';
@@ -65,6 +66,13 @@ export function AdminDataTable({ copy, count, definition, direction, filter, loc
     return `${basePath}?${params.toString()}`;
   };
 
+  const renderActions = (row: Record<string, unknown>) => { const id = definition.idFields.map(field => String(row[field] ?? '')).join('|'); return (<div className="flex justify-end gap-1">
+                    {id ? <Link aria-label={locale === "ar" ? "\u0639\u0631\u0636" : locale === "fr" ? "Voir" : "View"} className="grid size-9 place-items-center rounded-lg text-blue-700" href={`/${locale}/admin/${definition.key}?view=${encodeURIComponent(id)}`}><Eye className="size-4" /></Link> : null}
+                    {id ? <Link aria-label={copy.common.edit} className="grid size-9 place-items-center rounded-lg text-[#53697b] transition hover:bg-[#eaf3f9] hover:text-[var(--primary)]" href={`${basePath}?edit=${id}`}><Pencil className="size-4" /></Link> : null}
+                    {id && definition.idFields.length === 1 && definition.statusField ? <form action={setAdminRecordActive}><input name="module" type="hidden" value={definition.key} /><input name="locale" type="hidden" value={locale} /><input name="id" type="hidden" value={id} /><input name="active" type="hidden" value={String(!(row[definition.statusField] === true || row[definition.statusField] === 'ACTIVE'))} /><ConfirmSubmit locale={locale} label={row[definition.statusField] === true || row[definition.statusField] === 'ACTIVE' ? copy.common.inactive : copy.common.activate}><Power className="size-4" /></ConfirmSubmit></form> : null}
+                    {definition.allowHardDelete ? <form action={deleteAdminRecord}>{definition.idFields.map((key) => <input key={key} name={key} type="hidden" value={String(row[key] ?? '')} />)}<input name="module" type="hidden" value={definition.key} /><input name="locale" type="hidden" value={locale} /><AdminDeleteButton locale={locale} confirmLabel={copy.common.deleteConfirm} label={copy.common.delete} /></form> : null}
+                  </div>); };
+
   return (
     <div className="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border)] bg-white shadow-[var(--shadow-card)]">
       <div className="flex flex-col justify-between gap-3 border-b border-[var(--border)] bg-white p-4 sm:flex-row sm:items-center"><p className="text-xs text-[#667c8d]">{count} {copy.common.records}</p><ReportToolbar columns={definition.listColumns.map(column=>({key:column,label:copy.fields[columnLabels[column]??'displayName']}))} filters={[query,filter].filter(Boolean)} locale={locale} reportName={copy.modules[definition.titleKey][0]} rows={rows.map(row=>Object.fromEntries(definition.listColumns.map(column=>[column,formatCell(column,row[column],locale,lookups)])))}/></div>
@@ -84,20 +92,16 @@ export function AdminDataTable({ copy, count, definition, direction, filter, loc
               </thead>
               <tbody className="divide-y divide-[var(--border)] text-[#40576a]">
                 {rows.map((row, rowIndex) => {
-                  const id = definition.idFields.length === 1 ? String(row[definition.idFields[0]] ?? '') : '';
+                  const id = definition.idFields.map(field => String(row[field] ?? '')).join('|');
                   return <tr className="transition hover:bg-[#f8fbfd]" key={id || rowIndex}>{definition.listColumns.map((column) => {
                     const value = row[column]; const statusLike = column === 'status' || column === 'verification_state' || column === 'is_active';
                     return <td className="max-w-64 px-4 py-4" key={column}>{statusLike ? <Badge variant={statusBadge(value)}>{typeof value === 'boolean' ? value ? copy.common.active : copy.common.inactive : formatEnum(String(value), locale)}</Badge> : <span className="line-clamp-2">{formatCell(column, value, locale, lookups)}</span>}</td>;
-                  })}<td className="px-4 py-4"><div className="flex justify-end gap-1">
-                    {id ? <Link aria-label={copy.common.edit} className="grid size-9 place-items-center rounded-lg text-[#53697b] transition hover:bg-[#eaf3f9] hover:text-[var(--primary)]" href={`${basePath}?edit=${id}`}><Pencil className="size-4" /></Link> : null}
-                    {id && definition.statusField ? <form action={setAdminRecordActive}><input name="module" type="hidden" value={definition.key} /><input name="locale" type="hidden" value={locale} /><input name="id" type="hidden" value={id} /><input name="active" type="hidden" value={String(!(row[definition.statusField] === true || row[definition.statusField] === 'ACTIVE'))} /><button aria-label={copy.common.activate} className="grid size-9 place-items-center rounded-lg text-[#53697b] transition hover:bg-[#eaf3f9] hover:text-[var(--primary)]" type="submit"><Power className="size-4" /></button></form> : null}
-                    {definition.allowHardDelete ? <form action={deleteAdminRecord}>{definition.idFields.map((key) => <input key={key} name={key} type="hidden" value={String(row[key] ?? '')} />)}<input name="module" type="hidden" value={definition.key} /><input name="locale" type="hidden" value={locale} /><AdminDeleteButton confirmLabel={copy.common.deleteConfirm} label={copy.common.delete} /></form> : null}
-                  </div></td></tr>;
+                  })}<td className="px-4 py-4">{renderActions(row)}</td></tr>;
                 })}
               </tbody>
             </table>
           </div>
-          <div className="divide-y divide-[var(--border)] md:hidden">{rows.map((row, index) => <article className="p-4" key={String(row.id ?? index)}><div className="flex items-start justify-between gap-3"><h3 className="font-semibold text-[var(--foreground)]">{rowTitle(row, locale)}</h3>{row.verification_state ? <Badge variant={statusBadge(row.verification_state)}>{formatEnum(String(row.verification_state), locale)}</Badge> : null}</div><dl className="mt-3 grid gap-2 text-xs">{definition.listColumns.slice(1,4).map((column) => <div className="flex justify-between gap-4" key={column}><dt className="text-[#708496]">{copy.fields[columnLabels[column] ?? 'displayName']}</dt><dd className="text-end text-[#40576a]">{formatCell(column,row[column],locale,lookups)}</dd></div>)}</dl>{row.id ? <Link className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[var(--primary)]" href={`${basePath}?edit=${String(row.id)}`}><Pencil className="size-4" />{copy.common.edit}</Link> : null}</article>)}</div>
+          <div className="divide-y divide-[var(--border)] md:hidden">{rows.map((row, index) => <article className="p-4" key={String(row.id ?? index)}><div className="flex items-start justify-between gap-3"><h3 className="font-semibold text-[var(--foreground)]">{rowTitle(row, locale)}</h3>{row.verification_state ? <Badge variant={statusBadge(row.verification_state)}>{formatEnum(String(row.verification_state), locale)}</Badge> : null}</div><dl className="mt-3 grid gap-2 text-xs">{definition.listColumns.slice(1,4).map((column) => <div className="flex justify-between gap-4" key={column}><dt className="text-[#708496]">{copy.fields[columnLabels[column] ?? 'displayName']}</dt><dd className="text-end text-[#40576a]">{formatCell(column,row[column],locale,lookups)}</dd></div>)}</dl>{renderActions(row)}</article>)}</div>
         </>
       ) : <div className="p-8"><EmptyState description={copy.common.noResultsDescription} title={copy.common.noResults} /></div>}
 

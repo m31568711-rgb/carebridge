@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from '@/src/components/ui/card';
 import { FormField } from '@/src/components/ui/form-field';
 import { Input } from '@/src/components/ui/input';
 import { Select } from '@/src/components/ui/select';
+import { ConfirmationDialog } from '@/src/components/ui/confirmation-dialog';
 import { Dialog } from '@/src/components/ui/dialog';
 import type { Locale } from '@/src/i18n/config';
 import { getSupabaseBrowserClient } from '@/src/lib/supabase/browser';
@@ -59,6 +60,8 @@ function calculateAge(dateOfBirth: string) {
 export function AdminAccountManagement({ accountType, locale, options, rows }: { accountType: AccountType; locale: Locale; options: ProviderOption[]; rows: ManagedAccountRow[] }) {
   const labels = copy[locale];
   const router = useRouter();
+  const [creating, setCreating] = useState(false);
+  const [statusTarget, setStatusTarget] = useState<ManagedAccountRow | null>(null);
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -99,6 +102,7 @@ export function AdminAccountManagement({ accountType, locale, options, rows }: {
     if (error) setMessage({ type: 'error', text: error.message || labels.failed });
     else {
       form.reset();
+      setCreating(false);
       setDateOfBirth('');
       setMessage({ type: 'success', text: labels.saved });
       router.refresh();
@@ -149,7 +153,8 @@ export function AdminAccountManagement({ accountType, locale, options, rows }: {
         <h1 className="mt-2 text-3xl font-semibold tracking-[-0.035em] text-slate-950">{labels.title[accountType]}</h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">{labels.description}</p>
       </div>
-      <Card className="mt-7" variant="form">
+      <Button className="mt-5" onClick={() => setCreating(true)} type="button">{labels.create}</Button>
+      <Dialog className="max-w-3xl" open={creating} onClose={() => setCreating(false)} closeLabel={labels.close} title={labels.create}><Card variant="form">
         <CardHeader><h2 className="type-h3">{labels.create}</h2></CardHeader>
         <CardContent>
           <form className="grid gap-5 sm:grid-cols-2" onSubmit={submit}>
@@ -170,10 +175,12 @@ export function AdminAccountManagement({ accountType, locale, options, rows }: {
             </div>
           </form>
         </CardContent>
-      </Card>
+      </Card></Dialog>
+      {message && !creating ? <p role="status" className="mt-4 text-sm">{message.text}</p> : null}
+      <ConfirmationDialog open={Boolean(statusTarget)} onClose={() => setStatusTarget(null)} onConfirm={() => { if (statusTarget) void toggleStatus(statusTarget); setStatusTarget(null); }} title={statusTarget?.account_status === 'ACTIVE' ? labels.suspend : labels.activate} description={statusTarget?.full_name ?? ''} confirmLabel={statusTarget?.account_status === 'ACTIVE' ? labels.suspend : labels.activate} cancelLabel={labels.close} closeLabel={labels.close} destructive />
       <Card className="mt-7">
         <CardContent className="overflow-x-auto p-0">
-          {rows.length ? <table className="w-full min-w-[860px] text-sm"><thead><tr className="border-b border-slate-200 bg-slate-50 text-start text-xs font-semibold text-slate-600"><th className="px-5 py-3 text-start">{labels.name}</th><th className="px-5 py-3 text-start">{labels.email}</th><th className="px-5 py-3 text-start">{labels.phone}</th><th className="px-5 py-3 text-start">{labels.accountRole}</th><th className="px-5 py-3 text-start">{labels.relationship}</th><th className="px-5 py-3 text-start">{labels.status}</th><th className="px-5 py-3 text-end">{labels.actions}</th></tr></thead><tbody>{rows.map((row) => <tr className="border-b border-slate-100 last:border-0" key={row.user_id}><td className="px-5 py-4 font-medium text-slate-950">{row.full_name}</td><td className="px-5 py-4 text-slate-600">{row.email}</td><td className="px-5 py-4 text-slate-600">{row.phone || '—'}</td><td className="px-5 py-4 text-slate-600">{row.role_label.replaceAll('_', ' ')}</td><td className="px-5 py-4 text-slate-600">{row.relationship_name || '—'}</td><td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${row.account_status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}>{row.account_status}</span></td><td className="px-5 py-4"><div className="flex justify-end gap-1"><Button aria-label={labels.edit} onClick={() => setEditing(row)} size="sm" type="button" variant="ghost"><Pencil className="size-4" /></Button><Button aria-label={row.account_status === 'ACTIVE' ? labels.suspend : labels.activate} disabled={pending} onClick={() => void toggleStatus(row)} size="sm" type="button" variant="ghost"><Power className="size-4" /></Button></div></td></tr>)}</tbody></table> : <p className="p-8 text-center text-sm text-slate-500">{labels.empty}</p>}
+          {rows.length ? <table className="w-full min-w-[860px] text-sm"><thead><tr className="border-b border-slate-200 bg-slate-50 text-start text-xs font-semibold text-slate-600"><th className="px-5 py-3 text-start">{labels.name}</th><th className="px-5 py-3 text-start">{labels.email}</th><th className="px-5 py-3 text-start">{labels.phone}</th><th className="px-5 py-3 text-start">{labels.accountRole}</th><th className="px-5 py-3 text-start">{labels.relationship}</th><th className="px-5 py-3 text-start">{labels.status}</th><th className="px-5 py-3 text-end">{labels.actions}</th></tr></thead><tbody>{rows.map((row) => <tr className="border-b border-slate-100 last:border-0" key={row.user_id}><td className="px-5 py-4 font-medium text-slate-950">{row.full_name}</td><td className="px-5 py-4 text-slate-600">{row.email}</td><td className="px-5 py-4 text-slate-600">{row.phone || '—'}</td><td className="px-5 py-4 text-slate-600">{row.role_label.replaceAll('_', ' ')}</td><td className="px-5 py-4 text-slate-600">{row.relationship_name || '—'}</td><td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${row.account_status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-800'}`}>{row.account_status}</span></td><td className="px-5 py-4"><div className="flex justify-end gap-1"><Button aria-label={labels.edit} onClick={() => setEditing(row)} size="sm" type="button" variant="ghost"><Pencil className="size-4" /></Button><Button aria-label={row.account_status === 'ACTIVE' ? labels.suspend : labels.activate} disabled={pending} onClick={() => setStatusTarget(row)} size="sm" type="button" variant="ghost"><Power className="size-4" /></Button></div></td></tr>)}</tbody></table> : <p className="p-8 text-center text-sm text-slate-500">{labels.empty}</p>}
         </CardContent>
       </Card>
       <Dialog closeLabel={labels.close} onClose={() => setEditing(null)} open={Boolean(editing)} title={labels.edit}>

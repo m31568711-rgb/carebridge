@@ -19,7 +19,7 @@ export function formatEnum(value: string, locale: Locale) { return enumTranslati
 export function formatCell(column: string, value: unknown, locale: Locale, lookups: LookupMap) {
   if (column.endsWith('_i18n')) return localizedValue(value, locale);
   const lookupKey = lookupForColumn(column);
-  if (lookupKey && value) return lookups[lookupKey]?.find((option) => option.value === String(value))?.label ?? String(value).slice(0, 8);
+  if (lookupKey && value) return lookups[lookupKey]?.find((option) => option.value === String(value))?.label ?? '—';
   if (typeof value === 'boolean') return value ? (locale === 'ar' ? 'نعم' : locale === 'fr' ? 'Oui' : 'Yes') : (locale === 'ar' ? 'لا' : locale === 'fr' ? 'Non' : 'No');
   if (typeof value === 'number') return new Intl.NumberFormat(locale).format(value);
   if (value === null || value === undefined || value === '') return '—';

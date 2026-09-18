@@ -13,7 +13,7 @@ import { PageHeader } from '@/src/components/ui/page-header';
 export const dynamic = 'force-dynamic';
 
 type Params = { locale: string; module: string };
-type Query = { q?: string; filter?: string; page?: string; sort?: string; dir?: string; create?: string; edit?: string };
+type Query = { q?: string; filter?: string; page?: string; sort?: string; dir?: string; create?: string; edit?: string; view?: string };
 
 export default async function AdminModulePage({ params, searchParams }: { params: Promise<Params>; searchParams: Promise<Query> }) {
   const [{ locale, module }, queryParams] = await Promise.all([params, searchParams]);
@@ -28,10 +28,10 @@ export default async function AdminModulePage({ params, searchParams }: { params
   const [list, lookups, record] = await Promise.all([
     loadAdminRows(supabase, definition, input),
     loadLookups(supabase, definition, locale),
-    loadAdminRecord(supabase, definition, queryParams.edit),
+    loadAdminRecord(supabase, definition, queryParams.edit ?? queryParams.view),
   ]);
-  const showForm = queryParams.create === '1' || Boolean(queryParams.edit);
+  const showForm = queryParams.create === '1' || Boolean(queryParams.edit || queryParams.view);
   return <div className="mx-auto max-w-[92rem]"><PageHeader actions={<Link className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--primary)] px-4 text-sm font-semibold text-white shadow-[0_12px_28px_-16px_rgba(22,75,122,.8)] hover:bg-[var(--primary-hover)]" href={`/${locale}/admin/${module}?create=1`}><Plus className="size-4" />{copy.common.add}</Link>} description={copy.modules[module][1]} eyebrow={copy.title} title={copy.modules[module][0]} />
-    <div className="mt-7">{showForm ? <AdminRecordForm copy={copy} definition={definition} locale={locale} lookups={lookups} record={record} /> : null}<AdminDataTable copy={copy} count={list.count} definition={definition} direction={direction} filter={input.filter} locale={locale} lookups={lookups} page={page} pageSize={list.pageSize} query={input.query} rows={list.rows} sort={list.sort} /></div>
+    <div className="mt-7">{showForm ? <AdminRecordForm readOnly={Boolean(queryParams.view)} copy={copy} definition={definition} locale={locale} lookups={lookups} record={record} /> : null}<AdminDataTable copy={copy} count={list.count} definition={definition} direction={direction} filter={input.filter} locale={locale} lookups={lookups} page={page} pageSize={list.pageSize} query={input.query} rows={list.rows} sort={list.sort} /></div>
   </div>;
 }

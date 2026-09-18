@@ -145,7 +145,7 @@ export const ar = {
     lastUpdated: 'تم التحديث الآن',
     navigation: {
       careJourney: 'رحلة علاجي',
-      overview: 'نظرة عامة', cases: 'الحالات الطبية', providers: 'مقدمو الرعاية', appointments: 'المواعيد', documents: 'الوثائق', patients: 'المرضى', team: 'الفريق', doctors: 'الأطباء', hospitals: 'المستشفيات', pharmacy: 'خدمات الصيدلية', prescriptions: 'الوصفات', catalog: 'دليل الرعاية', verification: 'التحقق', users: 'المستخدمون والأدوار', audit: 'سجل التدقيق', offers: 'العروض', bookings: 'الحجوزات', assignedCases: 'الحالات المعينة', notifications: 'الإشعارات', clinical: 'المراجعات السريرية', diagnostics: 'العمليات التشخيصية', accommodation: 'الإقامة', travel: 'السفر وجواز السفر',
+      overview: 'نظرة عامة', cases: 'الحالات الطبية', providers: 'مقدمو الرعاية', appointments: 'المواعيد', documents: 'الوثائق', patients: 'المرضى', team: 'الفريق', doctors: 'الأطباء', hospitals: 'المستشفيات', pharmacy: 'خدمات الصيدلية', prescriptions: 'الوصفات', catalog: 'دليل الرعاية', verification: 'التحقق', users: 'المستخدمون والأدوار', audit: 'سجل التدقيق', offers: 'العروض', bookings: 'الحجوزات', assignedCases: 'الحالات المعينة', notifications: 'الإشعارات', clinical: 'المراجعات السريرية', diagnostics: 'العمليات التشخيصية', services: 'خدماتي', account: 'حسابي', accommodation: 'الإقامة', travel: 'السفر وجواز السفر',
     },
     stats: {
       profileTitle: 'اكتمال الملف', profileValue: 'جاهز', profileHint: 'بيانات الحساب وتفضيلات التواصل',

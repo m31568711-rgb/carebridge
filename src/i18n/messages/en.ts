@@ -237,6 +237,8 @@ export const en = {
       notifications: 'Notifications',
       clinical: 'Clinical reviews',
       diagnostics: 'Diagnostic operations',
+      services: 'My services',
+      account: 'My account',
       accommodation: 'Accommodation',
       travel: 'Travel & passport',
     },

@@ -1,7 +1,7 @@
 import type {SupabaseClient} from '@supabase/supabase-js';
 
 export type ServiceCategory='DOCTOR'|'HOSPITAL'|'PROCEDURE'|'LABORATORY'|'RADIOLOGY'|'ACCOMMODATION'|'TRAVEL'|'TRANSPORT'|'OTHER';
-export interface CustomerInvoiceItem{id:string;description:string;service_category:ServiceCategory;quantity:number;unit_amount:number;base_unit_amount:number;carebridge_fee_percent:number;carebridge_fee_amount:number;line_amount:number;display_order:number}
+export interface CustomerInvoiceItem{id:string;description:string;service_category:ServiceCategory;quantity:number;unit_amount:number;base_unit_amount:number;carebridge_fee_percent:number;carebridge_fee_amount:number;line_amount:number;display_order:number;journey_service_id?:string|null;service?:{doctor?:{display_name:string}|null;hospital?:{display_name_i18n:Record<string,string>}|null;laboratory?:{display_name_i18n:Record<string,string>}|null;radiology?:{display_name_i18n:Record<string,string>}|null}|null}
 export interface CustomerPayment{id:string;amount:number;paid_at:string;method:string;reference_number:string|null}
 export interface CustomerInvoice{id:string;invoice_number:string;booking_id:string;currency:string;total_amount:number;amount_paid:number;status:string;due_date:string|null;created_at:string;items:CustomerInvoiceItem[];payments:CustomerPayment[]}
 export interface CustomerAccountRow{patientId:string;patientName:string;bookingReferences:string[];currency:string;totalBilled:number;totalPaid:number;remaining:number;status:string;lastPaymentDate:string|null;invoices:CustomerInvoice[]}
@@ -13,7 +13,7 @@ const money=(v:number|string|null|undefined)=>Number(v??0);
 
 export async function loadCustomerAccounts(s:SupabaseClient):Promise<CustomerAccountRow[]>{
  const {data:rawPatientAccounts,error:patientError}=await s.rpc('admin_list_accounts',{requested_type:'patients'});if(patientError)throw patientError;const patientAccounts=(rawPatientAccounts??[]) as unknown as AdminPatientAccount[];
- const {data,error}=await s.from('invoices').select('id,invoice_number,booking_id,patient_id,currency,total_amount,amount_paid,status,due_date,created_at,items:invoice_items(id,description,service_category,quantity,unit_amount,base_unit_amount,carebridge_fee_percent,carebridge_fee_amount,line_amount,display_order),payments:payment_records(id,amount,paid_at,method,reference_number),booking:bookings(booking_reference)').order('created_at',{ascending:false}).limit(1000);
+ const {data,error}=await s.from('invoices').select('id,invoice_number,booking_id,patient_id,currency,total_amount,amount_paid,status,due_date,created_at,items:invoice_items(id,description,service_category,quantity,unit_amount,base_unit_amount,carebridge_fee_percent,carebridge_fee_amount,line_amount,display_order,journey_service_id,service:journey_services(doctor:doctors(display_name),hospital:hospitals(display_name_i18n),laboratory:medical_laboratories(display_name_i18n),radiology:radiology_centers(display_name_i18n))),payments:payment_records(id,amount,paid_at,method,reference_number),booking:bookings(booking_reference)').order('created_at',{ascending:false}).limit(1000);
  if(error)throw error;
  const invoices=(data??[]) as unknown as Array<CustomerInvoice&{patient_id:string;booking:{booking_reference:string}|null}>;
  const profilesById=new Map<string,{display_name:string|null;first_name:string|null;last_name:string|null}>(patientAccounts.map((p:AdminPatientAccount)=>[p.user_id,{display_name:p.full_name,first_name:null,last_name:null}]));

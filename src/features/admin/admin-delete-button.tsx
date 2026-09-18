@@ -1,16 +1,13 @@
 'use client';
 
 import { Trash2 } from 'lucide-react';
+import { ConfirmSubmit } from './confirm-submit';
+import type { Locale } from '@/src/i18n/config';
 
-export function AdminDeleteButton({ confirmLabel, label }: { confirmLabel: string; label: string }) {
+export function AdminDeleteButton({ confirmLabel, label, locale = 'en' }: { confirmLabel: string; label: string; locale?: Locale }) {
   return (
-    <button
-      aria-label={label}
-      className="grid size-9 place-items-center rounded-lg text-[#a43547] transition hover:bg-[#fbecef]"
-      onClick={(event) => { if (!window.confirm(confirmLabel)) event.preventDefault(); }}
-      type="submit"
-    >
+    <ConfirmSubmit label={label} description={confirmLabel} locale={locale}>
       <Trash2 aria-hidden="true" className="size-4" />
-    </button>
+    </ConfirmSubmit>
   );
 }

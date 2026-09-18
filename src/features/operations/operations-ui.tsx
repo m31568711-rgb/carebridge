@@ -1,4 +1,5 @@
 "use client";
+import { AdminFormDialog } from "@/src/features/admin/form-dialog";
 import { useActionState } from "react";
 import Link from "@/src/react-app/compat/link";
 import {
@@ -221,7 +222,7 @@ export function OperationsPanel({
   data: BookingOperations;
   locale: Locale;
   copy: OperationsDictionary;
-  mode: "patient" | "manager" | "doctor";
+  mode: "patient" | "manager" | "doctor" | "provider";
 }) {
   const manager = mode === "manager";
   const [journeyState, journeyAction, jp] = useActionState(
@@ -269,7 +270,7 @@ export function OperationsPanel({
       {manager ? (
         <Card variant="form">
           <CardContent>
-            <form
+            <AdminFormDialog enabled={manager} title={copy.mode} closeLabel={locale === "ar" ? "\u0625\u063a\u0644\u0627\u0642" : locale === "fr" ? "Fermer" : "Close"}><form
               action={journeyAction}
               className="grid gap-4 sm:grid-cols-[1fr_1fr_auto]"
             >
@@ -294,7 +295,7 @@ export function OperationsPanel({
                 {copy.save}
               </Button>
               <Feedback c={copy} s={journeyState} />
-            </form>
+            </form></AdminFormDialog>
           </CardContent>
         </Card>
       ) : null}
@@ -319,7 +320,7 @@ export function OperationsPanel({
             records={data.appointments}
           />
           {mode !== "patient" ? (
-            <form
+            <AdminFormDialog enabled={manager} title={copy.appointments} closeLabel={locale === "ar" ? "\u0625\u063a\u0644\u0627\u0642" : locale === "fr" ? "Fermer" : "Close"}><form
               action={appointmentAction}
               className="mt-6 grid gap-4 rounded-2xl bg-slate-50 p-4"
             >
@@ -364,11 +365,11 @@ export function OperationsPanel({
                 <Textarea name="provider_notes" />
               </Field>
               <Button loading={ap}>{copy.save}</Button>
-            </form>
+            </form></AdminFormDialog>
           ) : null}
         </CardContent>
       </Card>
-      {mode !== "doctor" ? (
+      {mode === "patient" || mode === "manager" ? (
         <Finance
           booking={booking}
           copy={copy}
@@ -386,7 +387,7 @@ export function OperationsPanel({
           pfp={pfp}
         />
       ) : null}
-      {international && mode !== "doctor" ? (
+      {international && (mode === "patient" || mode === "manager") ? (
         <Travel
           booking={booking}
           copy={copy}
@@ -621,7 +622,7 @@ function Finance({
                 {manager &&
                 ["ISSUED", "PARTIALLY_PAID", "OVERDUE"].includes(i.status) ? (
                   <>
-                    <form
+                    <AdminFormDialog enabled={manager} title={copy.recordPayment} closeLabel={locale === "ar" ? "\u0625\u063a\u0644\u0627\u0642" : locale === "fr" ? "Fermer" : "Close"}><form
                       action={paymentAction}
                       className="mt-5 grid gap-3 rounded-xl bg-slate-50 p-4 sm:grid-cols-2"
                     >
@@ -677,9 +678,9 @@ function Finance({
                         <Input name="reference_number" />
                       </Field>
                       <Button loading={pp}>{copy.recordPayment}</Button>
-                    </form>
+                    </form></AdminFormDialog>
                     {i.payments?.map((p) => (
-                      <form
+                      <AdminFormDialog enabled={manager} title={copy.proof} closeLabel={locale === "ar" ? "\u0625\u063a\u0644\u0627\u0642" : locale === "fr" ? "Fermer" : "Close"} key={p.id}><form
                         action={proofAction}
                         className="mt-3 flex flex-wrap items-end gap-3"
                         key={p.id}
@@ -698,7 +699,7 @@ function Finance({
                           {copy.upload}
                         </Button>
                         <Feedback c={copy} s={proofState} />
-                      </form>
+                      </form></AdminFormDialog>
                     ))}
                   </>
                 ) : null}
@@ -707,7 +708,7 @@ function Finance({
           ))}
         </div>
         {manager ? (
-          <form
+          <AdminFormDialog enabled={manager} title={copy.newInvoice} closeLabel={locale === "ar" ? "\u0625\u063a\u0644\u0627\u0642" : locale === "fr" ? "Fermer" : "Close"}><form
             action={invoiceAction}
             className="mt-6 grid gap-4 rounded-2xl bg-slate-50 p-4"
           >
@@ -755,7 +756,7 @@ function Finance({
               <Textarea name="notes" />
             </Field>
             <Button loading={ip}>{copy.save}</Button>
-          </form>
+          </form></AdminFormDialog>
         ) : null}
       </CardContent>
     </Card>
@@ -813,7 +814,7 @@ function Travel({
             <Info l={copy.companion}>{t?.companion_name}</Info>
           </dl>
         ) : (
-          <form action={travelAction} className="grid gap-4">
+          <AdminFormDialog enabled={manager} title={copy.travel} closeLabel={locale === "ar" ? "\u0625\u063a\u0644\u0627\u0642" : locale === "fr" ? "Fermer" : "Close"}><form action={travelAction} className="grid gap-4">
             <input name="locale" type="hidden" value={locale} />
             <input name="booking_id" type="hidden" value={booking.id} />
             <Feedback c={copy} s={travelState} />
@@ -909,7 +910,7 @@ function Travel({
               value={t?.companion_notes ?? ""}
             />
             <Button loading={tp}>{copy.save}</Button>
-          </form>
+          </form></AdminFormDialog>
         )}
         <div className="mt-6">
           <h4 className="flex items-center gap-2 font-semibold">
@@ -929,7 +930,7 @@ function Travel({
             </div>
           ))}
           {manager ? (
-            <form
+            <AdminFormDialog enabled={manager} title={copy.transport} closeLabel={locale === "ar" ? "\u0625\u063a\u0644\u0627\u0642" : locale === "fr" ? "Fermer" : "Close"}><form
               action={transportAction}
               className="mt-4 grid gap-3 sm:grid-cols-2"
             >
@@ -964,7 +965,7 @@ function Travel({
               </Field>
               <input name="notes" type="hidden" />
               <Button loading={trp}>{copy.save}</Button>
-            </form>
+            </form></AdminFormDialog>
           ) : null}
         </div>
       </CardContent>

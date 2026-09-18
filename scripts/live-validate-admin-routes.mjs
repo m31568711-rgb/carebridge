@@ -55,7 +55,7 @@ try {
     auth.from('radiology_orders').select('id').order('created_at', { ascending: false }).limit(1).maybeSingle(),
   ]);
   if (!booking || !medicalCase || !offer || !appointment) throw new Error(`Persistent route-validation records are incomplete (booking=${Boolean(booking)}, case=${Boolean(medicalCase)}, offer=${Boolean(offer)}, appointment=${Boolean(appointment)}).`);
-  const masterModules = ['countries','cities','specialties','treatments','hospitals','hospital_branches','hospital_specialties','hospital_treatments','doctors','doctor_specialties','doctor_languages','doctor_hospitals','pharmacies','radiology_centers','medical_laboratories','provider_documents','provider_accreditations'];
+  const masterModules = ['countries','cities','specialties','treatments','hospitals','hospital_branches','hospital_specialties','hospital_treatments','doctors','doctor_specialties','doctor_hospitals','pharmacies','radiology_centers','medical_laboratories'];
   const routes = [
     'admin', ...masterModules.map((module) => `admin/${module}`), 'admin/import', 'admin/journeys', `admin/journeys/${booking.id}`,
     'admin/customer-accounts', `admin/customer-accounts/${booking.patient_id}`,

@@ -3,6 +3,7 @@ import {
   CalendarDays,
   ClipboardList,
   ClipboardCheck,
+  CircleDollarSign,
   FileText,
   HeartPulse,
   Hospital,
@@ -37,6 +38,8 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: UserRound, label: navigation.assignedCases, href: '' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
       { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
+      { icon: ClipboardList, label: navigation.services, href: '/services' },
+      { icon: CircleDollarSign, label: navigation.account, href: '/account' },
       { icon: ClipboardCheck, label: navigation.clinical, href: '/clinical' },
     ],
     pharmacy: [
@@ -46,6 +49,8 @@ export function getPortalConfig(portal: PortalKey, dictionary: Dictionary) {
       { icon: FileText, label: navigation.offers, href: '/offers' },
       { icon: CalendarDays, label: navigation.bookings, href: '/bookings' },
       { icon: CalendarDays, label: navigation.appointments, href: '/appointments' },
+      { icon: ClipboardCheck, label: navigation.services, href: '/services' },
+      { icon: CircleDollarSign, label: navigation.account, href: '/account' },
       { icon: Microscope, label: navigation.diagnostics, href: '/diagnostics' },
     ],
   } as const;
